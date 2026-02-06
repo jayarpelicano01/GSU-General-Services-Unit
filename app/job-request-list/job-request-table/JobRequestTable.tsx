@@ -68,7 +68,7 @@ const JobRequestTable = () => {
 
   const handleNavigateToJobOrderForm = (request: JobRequest) => {
     localStorage.setItem('selectedRequest', JSON.stringify(request));
-    router.push('/job-order-form');
+    router.push('/job-order');
   }
 
   const filteredRequests = mockRequests.filter(req => {
