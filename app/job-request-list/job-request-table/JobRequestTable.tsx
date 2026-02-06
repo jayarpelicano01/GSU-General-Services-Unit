@@ -33,10 +33,10 @@ const JobRequestTable = () => {
     },
     {
       id: 2,
-      requestingUnit: "College of Engineering",
+      requestingUnit: "White Beach Resort",
       location: "UEP Main Campus",
-      fieldWork: "Plumbing",
-      specificWork: "Leaking pipes in the faculty restroom",
+      fieldWork: "Electrical",
+      specificWork: "Installation of Power Supply at Swimming Pool Area & temporary source of electricity at Staff House",
       duration: 5,
       unit: "Hours",
       statusOfMaterials: "Not Available",
