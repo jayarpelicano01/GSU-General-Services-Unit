@@ -20,12 +20,12 @@ const JobRequestForm = () => {
     
   const loggedUser = {
     name: "John Doe",
-    department: "General Services Unit",
+    unit: "General Services Unit",
   };
 
 
   const [formData, setFormData] = useState({
-    requestingUnit: loggedUser.department,
+    requestingUnit: loggedUser.unit,
     fieldWork: "" as FieldWork | "",
     specificWorkToBeDone: "",
     resultOfAssessment: "",
@@ -219,7 +219,7 @@ return (
             onClick={() => {
               if(window.confirm("Are you sure you want to clear the form?")) {
                 setFormData({
-                  requestingUnit: loggedUser.department,
+                  requestingUnit: loggedUser.unit,
                   fieldWork: '',
                   specificWorkToBeDone: '',
                   resultOfAssessment: '',
