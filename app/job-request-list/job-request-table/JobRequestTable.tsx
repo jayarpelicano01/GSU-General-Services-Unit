@@ -1,7 +1,8 @@
 "use client"; // Required for useState
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { API } from '@/app/utils/api/api';
 
 interface JobRequest {
   id: number;
@@ -19,6 +20,7 @@ const JobRequestTable = () => {
   const [activeTab, setActiveTab] = useState('All Requests');
   const tabs = ['All Requests', 'Completed', 'Pending', 'Ongoing', 'Terminated'];
   const router = useRouter();
+  const [requests, setRequests] = useState<JobRequest[]>([]);
   const mockRequests = [
     {
       id: 1,
@@ -65,6 +67,24 @@ const JobRequestTable = () => {
       status: "Terminated"
     }
   ];
+
+  useEffect(() => {
+
+    const fetchRequests = async () => {
+      try {
+        const response = await API.get('/job-requests');
+        setRequests(response.data.data);
+      } catch (error) {
+        console.error('Error fetching job requests:', error);
+      }
+    };
+
+    fetchRequests();
+    
+  }, []); // Refetch if the number of requests changes
+      
+  console.log(requests);
+  
 
   const handleNavigateToJobOrderForm = (request: JobRequest) => {
     localStorage.setItem('selectedRequest', JSON.stringify(request));

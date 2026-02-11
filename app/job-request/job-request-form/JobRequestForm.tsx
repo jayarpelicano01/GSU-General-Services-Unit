@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import {API} from "@/app/utils/api/api";
+import { useEffect, useState } from "react";
 
 export enum FieldWork {
   Masonry = "Masonry",
@@ -15,10 +16,16 @@ export enum FieldWork {
   Utility = "Utility",
 }
 
+interface Unit {
+  id: number;
+  unit_name: string;
+  unit_acronym: string;
+}
+
 const JobRequestForm = () => {
-
-
+  const [units, setUnits] = useState<Unit[]>([]);
   const [formData, setFormData] = useState({
+    unitId: '' as string | number,
     requestingUnit: '',
     fieldWork: "" as FieldWork | "",
     specificWorkToBeDone: "",
@@ -27,6 +34,20 @@ const JobRequestForm = () => {
     estimatedUnit: "hours",
     statusOfMaterials: "",
   });
+
+
+  useEffect(() => {
+    const fetchUnits = async () => {
+      try {
+        const response = await API.get('/units');
+        setUnits(response.data.data);
+      } catch (error) {
+        console.error("Failed to fetch units:", error);
+      }
+    };
+    fetchUnits();
+  }, []);
+  
 
 
   const fieldWorkOptions = [
@@ -65,19 +86,33 @@ return (
 
       <form className="p-8 space-y-8">
         {/* Requesting Unit */}
-        <div>
-          <label htmlFor="requestingUnit" className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+        <div className="relative">
+          <label htmlFor="unitId" className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
             Requesting Unit <span className="text-red-400">*</span>
           </label>
-          <input
-            type="text"
-            id="requestingUnit"
-            name="requestingUnit"
-            value={formData.requestingUnit}
+          
+          <select
+            id="unitId"
+            name="unitId"
+            value={formData.unitId}
             onChange={handleInputChange}
-            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer"
             required
-          />
+          >
+            <option value="" disabled>Select a Unit...</option>
+            {units.map((unit: Unit) => (
+              <option key={unit.id} value={unit.id}>
+                {unit.unit_name} {unit.unit_acronym ? `(${unit.unit_acronym})` : ''}
+              </option>
+            ))}
+          </select>
+
+          {/* Custom Arrow Icon since 'appearance-none' hides the default one */}
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pt-6 pointer-events-none text-slate-400">
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
         </div>
 
         {/* Field Work */}
@@ -212,6 +247,7 @@ return (
             onClick={() => {
               if(window.confirm("Are you sure you want to clear the form?")) {
                 setFormData({
+                  unitId: '' as string | number,
                   requestingUnit: '',
                   fieldWork: '',
                   specificWorkToBeDone: '',
