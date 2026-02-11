@@ -16,6 +16,16 @@ export enum FieldWork {
   Utility = "Utility",
 }
 
+interface JobRequestFormData {
+  unitId: number | '';
+  fieldWork: FieldWork | '';
+  specificWorkToBeDone: string;
+  resultOfAssessment: string;
+  estimatedValue: number;
+  estimatedUnit: "Hours" | "Days" | "";
+  statusOfMaterials: "Available" | "Not Available" | "";
+}
+
 interface Unit {
   id: number;
   unit_name: string;
@@ -24,15 +34,15 @@ interface Unit {
 
 const JobRequestForm = () => {
   const [units, setUnits] = useState<Unit[]>([]);
-  const [formData, setFormData] = useState({
-    unitId: '' as string | number,
-    requestingUnit: '',
-    fieldWork: "" as FieldWork | "",
-    specificWorkToBeDone: "",
-    resultOfAssessment: "",
-    estimatedDays: "",
-    estimatedUnit: "hours",
-    statusOfMaterials: "",
+  const [formData, setFormData] = useState<JobRequestFormData>(
+    {
+      unitId: '',
+      fieldWork: '',
+      specificWorkToBeDone: "",
+      resultOfAssessment: "",
+      estimatedValue: 0,
+      estimatedUnit: "Hours",
+      statusOfMaterials: "",
   });
 
 
@@ -47,6 +57,57 @@ const JobRequestForm = () => {
     };
     fetchUnits();
   }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const payload = {
+      request_date: new Date().toISOString().split('T')[0],
+      unit_id: formData.unitId,
+      field_work: formData.fieldWork,
+      specific_work: formData.specificWorkToBeDone,
+      result_of_assessment: formData.resultOfAssessment,
+      estimated_duration_value: formData.estimatedValue,
+      estimated_duration_unit: formData.estimatedUnit,
+      status_of_materials: formData.statusOfMaterials,
+    };
+
+    try {
+      const response = await API.post('/job-requests', payload);
+      alert("Job request submitted successfully!");
+
+      setFormData({
+        unitId: '',
+        fieldWork: '',
+        specificWorkToBeDone: "",
+        resultOfAssessment: "",
+        estimatedValue: 0,
+        estimatedUnit: "Hours",
+        statusOfMaterials: "",
+      });
+
+      if (response.status === 201 || response.status === 200) {
+        alert("Job Request submitted successfully!");
+        setFormData({
+          unitId: 0,
+          fieldWork: '',
+          specificWorkToBeDone: "",
+          resultOfAssessment: "",
+          estimatedValue: 0,
+          estimatedUnit: "Hours",
+          statusOfMaterials: "",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to submit job request:", error);
+      alert("Failed to submit job request. Please try again.");
+    }
+  };
+
+
+  useEffect(() => {
+    console.log("Form Data Updated:", formData);
+  }, [formData]);
   
 
 
@@ -84,7 +145,7 @@ return (
         <p className="text-sm text-slate-400 mt-1">General Services Unit (GSU) Office</p>
       </div>
 
-      <form className="p-8 space-y-8">
+      <form className="p-8 space-y-8" onSubmit={handleSubmit}>
         {/* Requesting Unit */}
         <div className="relative">
           <label htmlFor="unitId" className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
@@ -191,8 +252,8 @@ return (
             <div className="flex gap-4">
               <input
                 type="number"
-                name="estimatedDays"
-                value={formData.estimatedDays}
+                name="estimatedValue"
+                value={formData.estimatedValue}
                 onChange={handleInputChange}
                 className="flex-1 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-700 focus:border-indigo-500 outline-none"
                 placeholder="0"
@@ -203,8 +264,8 @@ return (
                 onChange={handleInputChange}
                 className="w-40 border border-slate-200 bg-white rounded-lg px-3 py-2.5 text-slate-700 focus:border-indigo-500 outline-none cursor-pointer text-sm"
               >
-                <option value="hours">Hours</option>
-                <option value="days">Days</option>
+                <option value="Hours">Hours</option>
+                <option value="Days">Days</option>
               </select>
             </div>
           </div>
@@ -216,9 +277,9 @@ return (
             <div className="flex gap-3">
               <button
                 type="button"
-                onClick={() => setFormData(p => ({...p, statusOfMaterials: "available"}))}
+                onClick={() => setFormData(p => ({...p, statusOfMaterials: "Available"}))}
                 className={`flex-1 py-3 rounded-lg text-xs font-bold tracking-widest uppercase transition-all border ${
-                  formData.statusOfMaterials === "available"
+                  formData.statusOfMaterials === "Available"
                   ? "bg-emerald-50 border-emerald-200 text-emerald-600 shadow-sm"
                   : "bg-white border-slate-200 text-slate-400 hover:bg-slate-50"
                 }`}
@@ -227,9 +288,9 @@ return (
               </button>
               <button
                 type="button"
-                onClick={() => setFormData(p => ({...p, statusOfMaterials: "not-available"}))}
+                onClick={() => setFormData(p => ({...p, statusOfMaterials: "Not Available"}))}
                 className={`flex-1 py-3 rounded-lg text-xs font-bold tracking-widest uppercase transition-all border ${
-                  formData.statusOfMaterials === "not-available"
+                  formData.statusOfMaterials === "Not Available"
                   ? "bg-rose-50 border-rose-200 text-rose-600 shadow-sm"
                   : "bg-white border-slate-200 text-slate-400 hover:bg-slate-50"
                 }`}
@@ -247,13 +308,12 @@ return (
             onClick={() => {
               if(window.confirm("Are you sure you want to clear the form?")) {
                 setFormData({
-                  unitId: '' as string | number,
-                  requestingUnit: '',
-                  fieldWork: '',
+                  unitId: 0,
+                  fieldWork: FieldWork.Masonry,
                   specificWorkToBeDone: '',
                   resultOfAssessment: '',
-                  estimatedDays: '',
-                  estimatedUnit: 'hours',
+                  estimatedValue: 0,
+                  estimatedUnit: 'Hours',
                   statusOfMaterials: '',
                 });
               }

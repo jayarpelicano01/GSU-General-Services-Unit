@@ -1,58 +1,139 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { API } from "@/app/utils/api/api";
 
 // MOCK DATA
-const AVAILABLE_PERSONNEL = [
-  "Alex De Guzman",
-  "Benjie Cortez",
-  "Charlie Magne",
-  "Danilo Santos",
-  "Eddie Garcia",
-  "Francis Tolentino",
-  "George Estregan",
-  "Harry Roque",
-  "Isko Moreno",
-  "Jose Mari Chan"
-];
+// const AVAILABLE_PERSONNEL = [
+//   "Alex De Guzman",
+//   "Benjie Cortez",
+//   "Charlie Magne",
+//   "Danilo Santos",
+//   "Eddie Garcia",
+//   "Francis Tolentino",
+//   "George Estregan",
+//   "Harry Roque",
+//   "Isko Moreno",
+//   "Jose Mari Chan"
+// ];
 
 interface JobRequestData {
-  requestingUnit: string;
-  fieldWork: string;
-  specificWork: string; 
+  id: number;
+  unit: {
+    unit_name: string;
+    unit_acronym: string;
+  };
+  location: "UEP MAIN CAMPUS";
+  field_work: string;
+  specific_work: string;
+  estimated_duration_value: number;
+  estimated_duration_unit: string;
+  status_of_materials: string;
+  status: string;
+}
+
+interface JobOrderData {
+  jobOrderNo: "31";
+  specificWorkOrder: string; 
+  remarks: string;
+  personnel1: string;
+  personnel2: string;
+  personnel3: string;
+}
+
+interface Personnel {
+    id: number;
+    first_name: string;
+    middle_name: string | null;
+    last_name: string;
+    suffix: string | null;
 }
 
 const JobOrderForm = () => {
   const router = useRouter();
-  const [requestData, setRequestData] = useState<JobRequestData | null>(null);
-
-  
-  const [orderData, setOrderData] = useState({
-    jobOrderNo: "35",
-    dateIssued: new Date().toISOString().split('T')[0],
-    personnel1: "", 
-    personnel2: "", 
-    personnel3: "", 
-    specificWorkOrder: "",
-    remarks: "",
-  });
+  const [personnelList, setPersonnelList] = useState<Personnel[]>([]);
 
   useEffect(() => {
+
+    const fetchPersonnel = async () => {
+      try {
+        const response = await API.get('/personnels');
+        setPersonnelList(response.data.data);
+      } catch (error) {
+        console.error('Error fetching personnel:', error);
+      }
+    };
+
+    fetchPersonnel();
+    
+  }, []);
+
+  const [requestData] = useState<JobRequestData | null>(() => {
     const storedRequest = localStorage.getItem("selectedRequest");
     if (storedRequest) {
       try {
-        setRequestData(JSON.parse(storedRequest));
+        return JSON.parse(storedRequest);
       } catch (error) {
         console.error("Failed to parse selected request", error);
       }
     }
-  }, []);
+    return null;
+  });
+
+  const [JobOrderFormData, setJobOrderFormData] = useState<JobOrderData>({
+    jobOrderNo: "31",
+    specificWorkOrder: "",
+    personnel1: "",
+    personnel2: "",
+    personnel3: "",
+    remarks: "",
+  });
+  
+  const selectedPersonnel = [
+    JobOrderFormData.personnel1,
+    JobOrderFormData.personnel2,
+    JobOrderFormData.personnel3,
+  ].filter(Boolean); 
+
+  useEffect(() => {
+    console.log(JobOrderFormData);
+ }, [JobOrderFormData]);
+
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const payload = {
+        request_id: requestData?.id,
+        specific_work: JobOrderFormData.specificWorkOrder,
+        remarks: JobOrderFormData.remarks,
+        jo_number: JobOrderFormData.jobOrderNo,
+    }
+
+    console.log(payload);
+    
+
+    try {
+        const response = await API.post('/job-orders', {...payload});
+
+        const jobOrderId = response.data.data.id;
+
+        // await Promise.all(selectedPersonnel.map(personnelId => 
+        //     API.post(`/job-orders/${jobOrderId}/assign-personnel`, { personnel_id: personnelId })
+        // ));
+        // console.log('Job Order created successfully:', response.data);
+
+
+    } catch (error) {
+      console.error('Error creating job order:', error);
+    }
+  };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setOrderData((prev) => ({ ...prev, [name]: value }));
+    setJobOrderFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   if (!requestData) return <div className="p-8 text-center text-slate-400">Loading...</div>;
@@ -69,11 +150,11 @@ const JobOrderForm = () => {
           </div>
           <div className="text-right">
              <span className="block text-xs font-bold uppercase tracking-wider text-slate-400">Order No.</span>
-             <span className="text-lg font-mono font-bold text-indigo-600">{orderData.jobOrderNo}</span>
+             <span className="text-lg font-mono font-bold text-indigo-600">{JobOrderFormData.jobOrderNo}</span>
           </div>
         </div>
 
-        <form className="p-8 space-y-8">
+        <form className="p-8 space-y-8" onSubmit={handleSubmit}>
           
           {/* SECTION 1: REQUEST REFERENCE */}
           <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 space-y-4">
@@ -85,18 +166,18 @@ const JobOrderForm = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Requesting Unit</label>
-                    <div className="text-sm font-medium text-slate-700">{requestData.requestingUnit || "N/A"}</div>
+                    <div className="text-sm font-medium text-slate-700">{requestData.unit.unit_name} ({requestData.unit.unit_acronym})</div>
                 </div>
                 <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Field of Work</label>
                     <div className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold inline-block border border-indigo-100">
-                        {requestData.fieldWork || "General"}
+                        {requestData.field_work || "General"}
                     </div>
                 </div>
                 <div className="md:col-span-2">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Original Description</label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Requested Work Description</label>
                     <div className="text-sm text-slate-600 italic bg-white p-3 rounded border border-slate-200">
-                        "{requestData.specificWork}"
+                        {requestData.specific_work}
                     </div>
                 </div>
             </div>
@@ -118,14 +199,14 @@ const JobOrderForm = () => {
                         <div className="relative flex-1">
                             <select
                                 name="personnel1"
-                                value={orderData.personnel1}
+                                value={JobOrderFormData.personnel1}
                                 onChange={handleInputChange}
                                 className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer"
                                 required
                             >
                                 <option value="">Select Personnel 1...</option>
-                                {AVAILABLE_PERSONNEL.map(person => (
-                                    <option key={person} value={person}>{person}</option>
+                                {personnelList.map(person => (
+                                    <option key={person.id} value={person.id}>{person.first_name} {person.middle_name || ''} {person.last_name} {person.suffix || ''}</option>
                                 ))}
                             </select>
                             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">▼</div>
@@ -137,13 +218,13 @@ const JobOrderForm = () => {
                         <div className="relative flex-1">
                             <select
                                 name="personnel2"
-                                value={orderData.personnel2}
+                                value={JobOrderFormData.personnel2}
                                 onChange={handleInputChange}
                                 className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer"
                             >
                                 <option value="">Select Personnel 2...</option>
-                                {AVAILABLE_PERSONNEL.map(person => (
-                                    <option key={person} value={person}>{person}</option>
+                                {personnelList.map(person => (
+                                    <option key={person.id} value={person.id}>{person.first_name} {person.middle_name || ''} {person.last_name} {person.suffix || ''}</option>
                                 ))}
                             </select>
                             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">▼</div>
@@ -155,13 +236,13 @@ const JobOrderForm = () => {
                         <div className="relative flex-1">
                             <select
                                 name="personnel3"
-                                value={orderData.personnel3}
+                                value={JobOrderFormData.personnel3}
                                 onChange={handleInputChange}
                                 className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer"
                             >
                                 <option value="">Select Personnel 3...</option>
-                                {AVAILABLE_PERSONNEL.map(person => (
-                                    <option key={person} value={person}>{person}</option>
+                                {personnelList.map(person => (
+                                    <option key={person.id} value={person.id}>{person.first_name} {person.middle_name || ''} {person.last_name} {person.suffix || ''}</option>
                                 ))}
                             </select>
                             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">▼</div>
@@ -180,7 +261,7 @@ const JobOrderForm = () => {
                     <textarea
                         id="specificWorkOrder"
                         name="specificWorkOrder"
-                        value={orderData.specificWorkOrder}
+                        value={JobOrderFormData.specificWorkOrder}
                         onChange={handleInputChange}
                         rows={4}
                         className="w-full border border-slate-200 rounded-lg px-4 py-3 text-slate-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
@@ -196,7 +277,7 @@ const JobOrderForm = () => {
                     <textarea
                         id="remarks"
                         name="remarks"
-                        value={orderData.remarks}
+                        value={JobOrderFormData.remarks}
                         onChange={handleInputChange}
                         rows={3}
                         className="w-full border border-slate-200 rounded-lg px-4 py-3 text-slate-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"

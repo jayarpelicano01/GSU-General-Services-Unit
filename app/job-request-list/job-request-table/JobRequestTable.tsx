@@ -6,13 +6,16 @@ import { API } from '@/app/utils/api/api';
 
 interface JobRequest {
   id: number;
-  requestingUnit: string;
-  location: string;
-  fieldWork: string;
-  specificWork: string;
-  duration: number;
-  unit: string;
-  statusOfMaterials: string;
+  unit: {
+    unit_name: string;
+    unit_acronym: string;
+  };
+  location: "UEP MAIN CAMPUS";
+  field_work: string;
+  specific_work: string;
+  estimated_duration_value: number;
+  estimated_duration_unit: string;
+  status_of_materials: string;
   status: string;
 }
 
@@ -91,7 +94,7 @@ const JobRequestTable = () => {
     router.push('/job-order');
   }
 
-  const filteredRequests = mockRequests.filter(req => {
+  const filteredRequests = requests.filter(req => {
     if (activeTab === 'All Requests') return true;
     return req.status === activeTab;
   });
@@ -140,28 +143,28 @@ const JobRequestTable = () => {
                   <td className="px-8 py-6 text-slate-400 text-sm font-medium">{req.id}</td>
 
                   <td className="px-4 py-6">
-                    <div className="text-slate-700 font-bold text-sm">{req.requestingUnit}</div>
+                    <div className="text-slate-700 font-bold text-sm">{req.unit.unit_name} ({req.unit.unit_acronym})</div>
                     <div className="text-slate-400 text-[11px] italic">{req.location}</div>
                   </td>
 
                   <td className="px-4 py-6">
-                    <span className="text-slate-600 text-sm font-medium">{req.fieldWork}</span>
+                    <span className="text-slate-600 text-sm font-medium">{req.field_work}</span>
                   </td>
                   
                   <td className="px-4 py-6 max-w-xs">
-                    <div className="font-bold text-slate-700 truncate">{req.specificWork}</div>
-                    <div className="text-indigo-500 text-xs mt-0.5">Est: {req.duration} {req.unit}</div>
+                    <div className="font-bold text-slate-700 truncate">{req.specific_work }</div>
+                    <div className="text-indigo-500 text-xs mt-0.5">Est: {req.estimated_duration_value} {req.estimated_duration_unit}</div>
                   </td>
                   
 
                   {/* Materials Status Badge */}
                   <td className="px-4 py-6">
                     <span className={`text-[10px] font-bold uppercase tracking-tighter px-2 py-1 rounded border ${
-                      req.statusOfMaterials === 'Available' 
+                      req.status_of_materials === 'Available' 
                       ? 'text-emerald-600 border-emerald-100 bg-emerald-50' 
                       : 'text-amber-600 border-amber-100 bg-amber-50'
                     }`}>
-                      {req.statusOfMaterials}
+                      {req.status_of_materials}
                     </span>
                   </td>
 
