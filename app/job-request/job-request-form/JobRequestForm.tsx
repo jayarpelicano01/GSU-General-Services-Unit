@@ -17,15 +17,9 @@ export enum FieldWork {
 
 const JobRequestForm = () => {
 
-    
-  const loggedUser = {
-    name: "John Doe",
-    department: "General Services Unit",
-  };
-
 
   const [formData, setFormData] = useState({
-    requestingUnit: loggedUser.department,
+    requestingUnit: '',
     fieldWork: "" as FieldWork | "",
     specificWorkToBeDone: "",
     resultOfAssessment: "",
@@ -82,7 +76,6 @@ return (
             value={formData.requestingUnit}
             onChange={handleInputChange}
             className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
-            readOnly
             required
           />
         </div>
@@ -219,7 +212,7 @@ return (
             onClick={() => {
               if(window.confirm("Are you sure you want to clear the form?")) {
                 setFormData({
-                  requestingUnit: loggedUser.department,
+                  requestingUnit: '',
                   fieldWork: '',
                   specificWorkToBeDone: '',
                   resultOfAssessment: '',

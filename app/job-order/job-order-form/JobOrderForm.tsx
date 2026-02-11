@@ -26,8 +26,9 @@ const JobOrderForm = () => {
   const router = useRouter();
   const [requestData, setRequestData] = useState<JobRequestData | null>(null);
 
+  
   const [orderData, setOrderData] = useState({
-    jobOrderNo: "JO-2026-001",
+    jobOrderNo: "35",
     dateIssued: new Date().toISOString().split('T')[0],
     personnel1: "", 
     personnel2: "", 
@@ -87,7 +88,7 @@ const JobOrderForm = () => {
                     <div className="text-sm font-medium text-slate-700">{requestData.requestingUnit || "N/A"}</div>
                 </div>
                 <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Work Type</label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Field of Work</label>
                     <div className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold inline-block border border-indigo-100">
                         {requestData.fieldWork || "General"}
                     </div>
