@@ -61,11 +61,11 @@ const JobOrderForm = () => {
     <div className="min-h-screen bg-[#f8f9ff] py-12 px-4">
       <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         
-        {/* Header */}
+        {/* Header - UPDATED: Removed subtitle */}
         <div className="px-8 py-6 border-b border-slate-100 bg-white flex justify-between items-start">
           <div>
             <h1 className="text-xl font-bold text-slate-800">Job Order Form</h1>
-            <p className="text-sm text-slate-400 mt-1">Maintenance & Fulfillment Section</p>
+            {/* Subtitle removed here */}
           </div>
           <div className="text-right">
              <span className="block text-xs font-bold uppercase tracking-wider text-slate-400">Order No.</span>
@@ -105,16 +105,15 @@ const JobOrderForm = () => {
           {/* SECTION 2: JOB EXECUTION DETAILS */}
           <div className="space-y-6">
             
-            {/* 2. UPDATED UI: Stacked Vertical Personnel List */}
+            {/* Personnel Stack */}
             <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">
                     Assigned Personnel
                 </label>
                 
-                {/* Changed Grid to Space-y (Stack) */}
                 <div className="space-y-4">
                     
-                    {/* Row 1 */}
+                    {/* Personnel 1 */}
                     <div className="flex gap-4 items-center">
                         <div className="relative flex-1">
                             <select
@@ -131,10 +130,9 @@ const JobOrderForm = () => {
                             </select>
                             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">▼</div>
                         </div>
-                        {/* Placeholder for future status column */}
                     </div>
 
-                    {/* Row 2 */}
+                    {/* Personnel 2 */}
                     <div className="flex gap-4 items-center">
                         <div className="relative flex-1">
                             <select
@@ -152,7 +150,7 @@ const JobOrderForm = () => {
                         </div>
                     </div>
 
-                    {/* Row 3 */}
+                    {/* Personnel 3 */}
                     <div className="flex gap-4 items-center">
                         <div className="relative flex-1">
                             <select
