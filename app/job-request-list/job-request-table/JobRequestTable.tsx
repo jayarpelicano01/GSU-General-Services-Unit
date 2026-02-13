@@ -9,8 +9,18 @@ interface JobRequest {
   unit: {
     unit_name: string;
     unit_acronym: string;
+    head_id: number;
+    head: {
+      first_name: string;
+      middle_name: string;
+      last_name: string;
+      suffix: string;
+    };
+    location_id: number;
+    location: {
+      location_name: string;
+    }
   };
-  location: "UEP MAIN CAMPUS";
   field_work: string;
   specific_work: string;
   estimated_duration_value: number;
@@ -144,7 +154,7 @@ const JobRequestTable = () => {
 
                   <td className="px-4 py-6">
                     <div className="text-slate-700 font-bold text-sm">{req.unit.unit_name} ({req.unit.unit_acronym})</div>
-                    <div className="text-slate-400 text-[11px] italic">{req.location}</div>
+                    <div className="text-slate-400 text-[11px] italic">{req.unit.location.location_name}</div>
                   </td>
 
                   <td className="px-4 py-6">

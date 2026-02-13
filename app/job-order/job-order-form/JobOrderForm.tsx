@@ -5,7 +5,7 @@ import { API } from "@/app/utils/api/api";
 
 // MOCK DATA
 // const AVAILABLE_PERSONNEL = [
-//   "Alex De Guzman",
+//   "Alex De Guzman",1
 //   "Benjie Cortez",
 //   "Charlie Magne",
 //   "Danilo Santos",
@@ -22,8 +22,19 @@ interface JobRequestData {
   unit: {
     unit_name: string;
     unit_acronym: string;
+    head_id: number;
+    head: {
+      first_name: string;
+      middle_name: string;
+      last_name: string;
+      suffix: string;
+    };
+    location_id: number;
+    location: {
+      location_name: string;
+    };
   };
-  location: "UEP MAIN CAMPUS";
+  location: string;
   field_work: string;
   specific_work: string;
   estimated_duration_value: number;
@@ -33,7 +44,7 @@ interface JobRequestData {
 }
 
 interface JobOrderData {
-  jobOrderNo: "31";
+  jobOrderNo: "33";
   specificWorkOrder: string; 
   remarks: string;
   personnel1: string;
@@ -80,9 +91,21 @@ const JobOrderForm = () => {
     return null;
   });
 
+  const getAvailablePersonnel = (currentFieldName: string) => {
+    // 1. Identify which IDs are currently selected in OTHER fields
+    const selectedIds = [
+        currentFieldName !== 'personnel1' ? JobOrderFormData.personnel1 : null,
+        currentFieldName !== 'personnel2' ? JobOrderFormData.personnel2 : null,
+        currentFieldName !== 'personnel3' ? JobOrderFormData.personnel3 : null,
+    ].filter(Boolean); // Removes nulls and empty strings
+
+    // 2. Filter the master list to exclude those IDs
+    return personnelList.filter(person => !selectedIds.includes(person.id.toString()));
+};
+
   const [JobOrderFormData, setJobOrderFormData] = useState<JobOrderData>({
-    jobOrderNo: "31",
-    specificWorkOrder: "",
+    jobOrderNo: "33",
+    specificWorkOrder: requestData?.specific_work || "",
     personnel1: "",
     personnel2: "",
     personnel3: "",
@@ -112,18 +135,30 @@ const JobOrderForm = () => {
 
     console.log(payload);
     
-
     try {
         const response = await API.post('/job-orders', {...payload});
 
-        const jobOrderId = response.data.data.id;
+        if (response.data.status === 'success') {
+          const jobOrderId = response.data.data.id;
 
-        // await Promise.all(selectedPersonnel.map(personnelId => 
-        //     API.post(`/job-orders/${jobOrderId}/assign-personnel`, { personnel_id: personnelId })
-        // ));
-        // console.log('Job Order created successfully:', response.data);
-
-
+          try {
+            API.patch(`/job-requests/${requestData?.id}/status`, { status: "Approved"});
+          } catch (error) {
+            console.error(error);
+          }
+          
+          try {
+            await Promise.all(selectedPersonnel.map(personnelId => 
+                API.post(`/assignments/${personnelId}/assign/${jobOrderId}`, { personnel_id: personnelId })
+            ));
+          } catch (error) {
+            console.error(error);
+          }
+        }
+        
+        console.log('Job Order created successfully:', response.data);
+        alert('Job Order processed successfully!');
+        router.push('/job-request-list');
     } catch (error) {
       console.error('Error creating job order:', error);
     }
@@ -174,6 +209,10 @@ const JobOrderForm = () => {
                         {requestData.field_work || "General"}
                     </div>
                 </div>
+                <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Location</label>
+                    <div className="text-sm font-medium text-slate-700">{requestData.unit.location.location_name}</div>
+                </div>
                 <div className="md:col-span-2">
                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Requested Work Description</label>
                     <div className="text-sm text-slate-600 italic bg-white p-3 rounded border border-slate-200">
@@ -205,7 +244,7 @@ const JobOrderForm = () => {
                                 required
                             >
                                 <option value="">Select Personnel 1...</option>
-                                {personnelList.map(person => (
+                                {getAvailablePersonnel('personnel1').map(person => (
                                     <option key={person.id} value={person.id}>{person.first_name} {person.middle_name || ''} {person.last_name} {person.suffix || ''}</option>
                                 ))}
                             </select>
@@ -223,7 +262,7 @@ const JobOrderForm = () => {
                                 className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer"
                             >
                                 <option value="">Select Personnel 2...</option>
-                                {personnelList.map(person => (
+                                {getAvailablePersonnel('personnel2').map(person => (
                                     <option key={person.id} value={person.id}>{person.first_name} {person.middle_name || ''} {person.last_name} {person.suffix || ''}</option>
                                 ))}
                             </select>
@@ -241,7 +280,7 @@ const JobOrderForm = () => {
                                 className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer"
                             >
                                 <option value="">Select Personnel 3...</option>
-                                {personnelList.map(person => (
+                                {getAvailablePersonnel('personnel3').map(person => (
                                     <option key={person.id} value={person.id}>{person.first_name} {person.middle_name || ''} {person.last_name} {person.suffix || ''}</option>
                                 ))}
                             </select>
