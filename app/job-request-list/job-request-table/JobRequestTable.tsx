@@ -34,52 +34,52 @@ const JobRequestTable = () => {
   const tabs = ['All Requests', 'Completed', 'Pending', 'Ongoing', 'Terminated'];
   const router = useRouter();
   const [requests, setRequests] = useState<JobRequest[]>([]);
-  const mockRequests = [
-    {
-      id: 1,
-      requestingUnit: "College of Science",
-      location: "UEP Main Campus",
-      fieldWork: "Electrical",
-      specificWork: "Repair of air-conditioning unit in Laboratory 101",
-      duration: 2,
-      unit: "Days",
-      statusOfMaterials: "available",
-      status: "Completed"
-    },
-    {
-      id: 2,
-      requestingUnit: "White Beach Resort",
-      location: "UEP Main Campus",
-      fieldWork: "Electrical",
-      specificWork: "Installation of Power Supply at Swimming Pool Area & temporary source of electricity at Staff House",
-      duration: 5,
-      unit: "Hours",
-      statusOfMaterials: "Not Available",
-      status: "Pending"
-    },
-    {
-      id: 3,
-      requestingUnit: "Business Ad",
-      location: "UEP Main Campus",
-      fieldWork: "Carpentry",
-      specificWork: "Repair of broken faculty desks",
-      duration: 3,
-      unit: "Days",
-      statusOfMaterials: "Available",
-      status: "Ongoing"
-    },
-    {
-      id: 4,
-      requestingUnit: "Registrar Office",
-      location: "UEP Main Campus",
-      fieldWork: "Masonry",
-      specificWork: "Fixing floor tiles at the entrance",
-      duration: 1,
-      unit: "Days",
-      statusOfMaterials: "Not Available",
-      status: "Terminated"
-    }
-  ];
+  // const mockRequests = [
+  //   {
+  //     id: 1,
+  //     requestingUnit: "College of Science",
+  //     location: "UEP Main Campus",
+  //     fieldWork: "Electrical",
+  //     specificWork: "Repair of air-conditioning unit in Laboratory 101",
+  //     duration: 2,
+  //     unit: "Days",
+  //     statusOfMaterials: "available",
+  //     status: "Completed"
+  //   },
+  //   {
+  //     id: 2,
+  //     requestingUnit: "White Beach Resort",
+  //     location: "UEP Main Campus",
+  //     fieldWork: "Electrical",
+  //     specificWork: "Installation of Power Supply at Swimming Pool Area & temporary source of electricity at Staff House",
+  //     duration: 5,
+  //     unit: "Hours",
+  //     statusOfMaterials: "Not Available",
+  //     status: "Pending"
+  //   },
+  //   {
+  //     id: 3,
+  //     requestingUnit: "Business Ad",
+  //     location: "UEP Main Campus",
+  //     fieldWork: "Carpentry",
+  //     specificWork: "Repair of broken faculty desks",
+  //     duration: 3,
+  //     unit: "Days",
+  //     statusOfMaterials: "Available",
+  //     status: "Ongoing"
+  //   },
+  //   {
+  //     id: 4,
+  //     requestingUnit: "Registrar Office",
+  //     location: "UEP Main Campus",
+  //     fieldWork: "Masonry",
+  //     specificWork: "Fixing floor tiles at the entrance",
+  //     duration: 1,
+  //     unit: "Days",
+  //     statusOfMaterials: "Not Available",
+  //     status: "Terminated"
+  //   }
+  // ];
 
   useEffect(() => {
 

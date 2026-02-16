@@ -66,7 +66,7 @@ const JobRequestForm = () => {
       unit_id: formData.unitId,
       field_work: formData.fieldWork,
       specific_work: formData.specificWorkToBeDone,
-      result_of_assessment: formData.resultOfAssessment,
+      assessment_results: formData.resultOfAssessment,
       estimated_duration_value: formData.estimatedValue,
       estimated_duration_unit: formData.estimatedUnit,
       status_of_materials: formData.statusOfMaterials,
