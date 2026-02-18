@@ -1,5 +1,4 @@
   "use client";
-  import React from 'react';
   import Image from 'next/image';
 
   interface PrintProps {
@@ -25,22 +24,19 @@
   }
 
   const PrintJobRequest = ({ JobRequest: data }: PrintProps) => {
-    // data = JSON.parse(data)
+  
+    const dateString = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
     const headOfUnit = data.unit.head;
     const headFullName = `${headOfUnit.first_name} ${headOfUnit.middle_name || ''} ${headOfUnit.last_name} ${headOfUnit.suffix || ''}`
-    console.log(data);
-    
     
     const shouldShowDecorativeLine = (text: string) => {
       if (!text || text.trim().length === 0) return true;
       if (text.includes('\n')) return false;
-      // Heuristic: ~90 chars fits on one line with the form layout
       return text.length < 90;
     };
     
     return (
-      <div className="print-area bg-white text-black font-sans p-[10mm] w-[210mm] min-h-[297mm] mx-auto overflow-hidden">
-        {/* 1. UNIVERSITY HEADER */}
+      <div className="print-area bg-white text-black font-sans pl-[10mm] pt-[10mm] pr-[10mm] w-[210mm] mx-auto overflow-hidden">
         <div className="flex justify-center items-center relative mb-2">
           <Image 
             src="/UEP-Logo.png" 
@@ -71,7 +67,7 @@
           <div className="flex gap-2">
             <span className="">Date:</span>
             <span className="border-b border-black w-32 text-center">
-              {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+              {/* {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} */}{dateString}
             </span>
           </div>
         </div>
@@ -80,7 +76,9 @@
         <div className="text-[11px]">
           <div className="flex gap-2">
             <span className="font-semibold text-[11px]! shrink-0">Requesting Unit:</span>
-            <span style={{width: '18rem'}} className="border-b border-black px-2 italic">{data?.unit?.unit_name} ({data?.unit?.unit_acronym})</span>
+            <span style={{width: '18rem'}} className="border-b border-black px-2 italic">
+              {data?.unit?.unit_name} ({data?.unit?.unit_acronym})
+              </span>
           </div>
 
           <div>
@@ -110,7 +108,9 @@
           {/* 5. SIGNATURE SECTION */}
           <div style={{marginLeft: '25px'}} className="flex mt-2">
             <div className="text-center mt-2">
-            <p className="text-[11px] font-bold border-b border-black pb-1 uppercase">{headFullName}</p>
+            <p className="text-[11px] font-bold border-b border-black pb-1 uppercase">
+              {headFullName}
+              </p>
             <p className="text-xs font-semibold">Head of requesting Unit</p>
           </div>
           </div>
@@ -119,7 +119,7 @@
             <div className="flex items-end mt-2 gap-2 w-full">
               <span className=" whitespace-nowrap shrink-0">Result of Assessment and Evaluation:</span>
               <span className="border-b border-black w-full italic px-2">
-                {data?.assessment_results}
+                {data?.assessment_results}  
               </span>
             </div>
             {/* Decorative lines to match the form image */}
@@ -130,7 +130,9 @@
             <div className="mt-2">
               <div className='flex gap-2'>
                 <span className='text-xs'>Estimated no. of days/hours: </span>
-                <span className='text-xs border-b border-black '>{data?.estimated_duration_value} {data?.estimated_duration_unit}</span>
+                <span className='text-xs border-b border-black '>
+                  {data?.estimated_duration_value} {data?.estimated_duration_unit}
+                  </span>
               </div>
             </div>
 
@@ -185,43 +187,17 @@
           </div>
         </div>
 
-        {/* PRINT-ONLY CSS STYLES */}
-        <style jsx global>{`
+        <style jsx>{`
+        .bg-blue-header { background-color: #0056b3 !important; }
           @media print {
-            body * { visibility: hidden; }
-            .print-area, .print-area * { visibility: visible; }
-            
-            .print-area { 
-              position: absolute; 
-              left: 0; 
-              top: 0; 
-              width: 210mm; /* Fixed A4 width */
-              height: 297mm; /* Fixed A4 height */
-              margin: 0;
-              padding: 12.7mm;
-            }
-
-            /* Force the Blue Bar & White Text */
-            .bg-blue-header {
-              background-color: #0056b3 !important;
-              color: #ffffff !important; /* Forces text to stay white */
-              -webkit-print-color-adjust: exact !important;
-              print-color-adjust: exact !important;
-              forced-color-adjust: none !important; /* Prevents browser from overriding colors */
-            }
-
-            .bg-blue-header span, 
-            .bg-blue-header p, 
-            .bg-blue-header div {
-              color: white !important;
-            }
-
-            @page { 
-              size: A4; 
-              margin: 0; 
-            }
+            .print-area { border: none; margin: 0;  }
+            .bg-blue-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           }
-        `}</style>
+        ` 
+        }</style>
+
+        {/* PRINT-ONLY CSS STYLES */}
+       
       </div>
     );
   };

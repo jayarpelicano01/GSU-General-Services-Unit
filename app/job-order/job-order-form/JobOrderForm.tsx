@@ -133,12 +133,28 @@ const JobOrderForm = () => {
         jo_number: JobOrderFormData.jobOrderNo,
     }
 
+    const orderData = {
+        request: requestData,
+        specific_work: JobOrderFormData.specificWorkOrder,
+        remarks: JobOrderFormData.remarks,
+        jo_number: JobOrderFormData.jobOrderNo,
+        // Map the IDs stored in state to the full objects from your source list
+        personnels: [
+            personnelList.find(p => p.id === Number(JobOrderFormData.personnel1)),
+            personnelList.find(p => p.id === Number(JobOrderFormData.personnel2)),
+            personnelList.find(p => p.id === Number(JobOrderFormData.personnel3))
+        ].filter(Boolean) // .filter(Boolean) removes any undefined results if a person wasn't selected
+    };
+
+
+
     console.log(payload);
 
     alert("Printing Job Request");
     localStorage.setItem("job-request", JSON.stringify(requestData))
+    localStorage.setItem("job-order", JSON.stringify(orderData))
 
-    window.open(`/job-order/print-job-order`)
+    router.push(`/job-order/print-job-order`)
     
     // try {
     //     const response = await API.post('/job-orders', {...payload});

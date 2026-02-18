@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import PrintJobRequest from "@/app/components/PrintJobRequest";
+import PrintRequestAndOrder from "./print/PrintRequestAndOrder";
 
 interface JobRequest {
         id: number;
@@ -10,6 +10,9 @@ interface JobRequest {
             middle_name: string;
             last_name: string;
             suffix: string;
+        },
+        location: {
+          location_name: string;
         }
         unit_name: string;
         unit_acronym: string;
@@ -20,30 +23,40 @@ interface JobRequest {
         status_of_materials: string;
         estimated_duration_value: number;
         estimated_duration_unit: string;
-        
     }
 
+  interface Personnel {
+    first_name: string;
+    middle_name: string;
+    last_name: string;
+    suffix: string;
+}
+
+interface JobOrder {
+    request: JobRequest;
+    specific_work: string;
+    remarks: string;
+    jo_number: number;
+    personnels: [Personnel];
+}
+
 export default function PrintPage() {
-  // 1. Initialize state directly from localStorage
-  const [data] = useState<JobRequest>(() => {
+  
+  const [RequestData] = useState<JobRequest>(() => {
     if (typeof window !== "undefined") {
-      const storedData = localStorage.getItem("job-request");
-      return storedData ? JSON.parse(storedData) : null;
+      const storedRequestData = localStorage.getItem("job-request");
+      return storedRequestData ? JSON.parse(storedRequestData) : null;
     }
     return null;
   });
 
-  // 2. Effect now only handles the side effect (printing)
-  useEffect(() => {
-    if (data) {
-      const timer = setTimeout(() => {
-        window.print();
-      }, 1000);
-      return () => clearTimeout(timer);
+  const [OrderData] = useState<JobOrder>(() => {
+    if (typeof window !== "undefined") {
+      const storedOrderData = localStorage.getItem("job-order");
+      return storedOrderData ? JSON.parse(storedOrderData) : null;
     }
-  }, [data]);
+    return null;
+  });
 
-  if (!data) return <div className="p-10 text-center">Loading Print Document...</div>;
-
-  return <PrintJobRequest JobRequest={data} />;
+  return <PrintRequestAndOrder JobRequest={RequestData} JobOrder={OrderData} />;
 }
