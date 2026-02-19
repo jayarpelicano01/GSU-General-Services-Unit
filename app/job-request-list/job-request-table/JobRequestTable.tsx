@@ -31,7 +31,7 @@ interface JobRequest {
 
 const JobRequestTable = () => {
   const [activeTab, setActiveTab] = useState('All Requests');
-  const tabs = ['All Requests', 'Completed', 'Pending', 'Ongoing', 'Terminated'];
+  const tabs = ['All Requests', 'Approved', 'Pending', 'Disapproved', 'Cancelled'];
   const router = useRouter();
   const [requests, setRequests] = useState<JobRequest[]>([]);
   // const mockRequests = [
@@ -135,81 +135,102 @@ const JobRequestTable = () => {
 
         {/* Table Body */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="text-slate-400 text-[11px] font-bold uppercase tracking-widest border-b border-slate-50">
-                <th className="px-8 py-5">ID</th>
-                <th className="px-4 py-5">Requesting Unit</th>
-                <th className="px-4 py-5">Field of Work</th>
-                <th className="px-4 py-5">Work Description</th>
-                <th className="px-4 py-5">Materials</th>
-                <th className="px-4 py-5">Status</th>
-                <th className="px-8 py-5 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {filteredRequests.map((req) => (
-                <tr key={req.id} className="hover:bg-slate-50/50 transition-colors group">
-                  <td className="px-8 py-6 text-slate-400 text-sm font-medium">{req.id}</td>
+    <table className="w-full text-left border-collapse">
+      <thead>
+        <tr className="text-slate-400 text-[11px] font-bold uppercase tracking-widest border-b border-slate-100">
+          <th className="px-8 py-5">ID</th>
+          <th className="px-4 py-5">Requesting Unit</th>
+          <th className="px-4 py-5">Field of Work</th>
+          <th className="px-4 py-5">Work Description</th>
+          <th className="px-4 py-5 text-center">Materials</th>
+          <th className="px-4 py-5 text-center">Status</th>
+          <th className="px-8 py-5 text-right">Action</th>
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-slate-100">
+        {filteredRequests.map((req) => (
+          <tr key={req.id} className="hover:bg-slate-50/50 transition-colors group">
+            {/* ID - Slightly muted */}
+            <td className="px-8 py-6 text-slate-400 text-sm font-medium tabular-nums">
+              #{req.id}
+            </td>
 
-                  <td className="px-4 py-6">
-                    <div className="text-slate-700 font-bold text-sm">{req.unit.unit_name} ({req.unit.unit_acronym})</div>
-                    <div className="text-slate-400 text-[11px] italic">{req.unit.location.location_name}</div>
-                  </td>
+            {/* Requesting Unit - Vertical spacing adjusted */}
+            <td className="px-4 py-6">
+              <div className="text-slate-700 font-bold text-sm leading-tight">
+                {req.unit?.unit_name || 'N/A'}
+              </div>
+              <div className="text-slate-400 text-[11px] mt-0.5 font-medium">
+                {req.unit?.unit_acronym} • {req.unit?.location?.location_name}
+              </div>
+            </td>
 
-                  <td className="px-4 py-6">
-                    <span className="text-slate-600 text-sm font-medium">{req.field_work}</span>
-                  </td>
-                  
-                  <td className="px-4 py-6 max-w-xs">
-                    <div className="font-bold text-slate-700 truncate">{req.specific_work }</div>
-                    <div className="text-indigo-500 text-xs mt-0.5">Est: {req.estimated_duration_value} {req.estimated_duration_unit}</div>
-                  </td>
-                  
+            {/* Field of Work */}
+            <td className="px-4 py-6">
+              <span className="text-slate-600 text-sm font-semibold px-2 py-1 rounded">
+                {req.field_work}
+              </span>
+            </td>
+            
+            {/* Work Description - Improved truncation */}
+            <td className="px-4 py-6 max-w-50">
+              <div className="font-bold text-slate-700 truncate" title={req.specific_work}>
+                {req.specific_work}
+              </div>
+              <div className="text-indigo-500 text-[10px] font-bold uppercase mt-1">
+                Est: {req.estimated_duration_value} {req.estimated_duration_unit}
+              </div>
+            </td>
 
-                  {/* Materials Status Badge */}
-                  <td className="px-4 py-6">
-                    <span className={`text-[10px] font-bold uppercase tracking-tighter px-2 py-1 rounded border ${
-                      req.status_of_materials === 'Available' 
-                      ? 'text-emerald-600 border-emerald-100 bg-emerald-50' 
-                      : 'text-amber-600 border-amber-100 bg-amber-50'
-                    }`}>
-                      {req.status_of_materials}
-                    </span>
-                  </td>
+            {/* Materials Status - Handling Nulls + Centering */}
+            <td className="px-4 py-6 text-center">
+              {req.status_of_materials ? (
+                <span className={`text-[10px] font-bold uppercase tracking-tight px-2.5 py-1 rounded border ${
+                  req.status_of_materials.toLowerCase() === 'available' 
+                  ? 'text-emerald-600 border-emerald-100 bg-emerald-50' 
+                  : 'text-amber-600 border-amber-100 bg-amber-50'
+                }`}>
+                  {req.status_of_materials}
+                </span>
+              ) : (
+                <span className="text-[10px] font-bold uppercase tracking-tight px-2.5 py-1 rounded border text-slate-400 border-slate-100 bg-slate-50">
+                  Not Specified
+                </span>
+              )}
+            </td>
 
-                  {/* Overall Status Badge (From Screenshot Styles) */}
-                  <td className="px-4 py-6">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-tight ${
-                      req.status === 'Completed' ? 'bg-emerald-100 text-emerald-600' :
-                      req.status === 'Pending' ? 'bg-amber-100 text-amber-600' :
-                      req.status === 'Ongoing' ? 'bg-blue-100 text-blue-600' :
-                      'bg-rose-100 text-rose-600'
-                    }`}>
-                      {req.status.toUpperCase()}
-                    </span>
-                  </td>
+            {/* Overall Status Badge - Centered */}
+            <td className="px-4 py-6 text-center">
+              <span className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold tracking-tight inline-block min-w-[80px] ${
+                req.status === 'Approved' ? 'bg-emerald-100 text-emerald-600' :
+                req.status === 'Pending' ? 'bg-amber-100 text-amber-600' :
+                req.status === 'Disapproved' ? 'bg-blue-100 text-blue-600' :
+                'bg-rose-100 text-rose-600'
+              }`}>
+                {req.status?.toUpperCase() || 'UNKNOWN'}
+              </span>
+            </td>
 
-                  {/* Action Menu Dot */}
-                  <td className="px-8 py-6 text-right">
-                    {req.status === 'Pending' ? (
-                      <button 
-                        className="bg-white border border-indigo-600 text-indigo-600 px-4 py-2 rounded-lg text-[11px] font-bold uppercase tracking-tight hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
-                        onClick={() => handleNavigateToJobOrderForm(req)}
-                      >
-                        Create Job Order
-                      </button>
-                    ) : (
-                      <button className="text-slate-300 hover:text-slate-500 transition-colors px-4 py-2 text-[11px] font-bold uppercase">
-                        View Details
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            {/* Action - Better button sizing */}
+            <td className="px-8 py-6 text-right">
+              {req.status === 'Pending' ? (
+                <button 
+                  className="bg-white border border-indigo-600 text-indigo-600 px-4 py-2 rounded-lg text-[11px] font-bold uppercase hover:text-white tracking-tight hover:bg-indigo-600 transition-all shadow-sm"
+                  onClick={() => handleNavigateToJobOrderForm(req)}
+                >
+                  Create Job Order
+                </button>
+              ) : (
+                <button className="text-slate-400 hover:text-indigo-600 transition-colors font-bold text-[11px] uppercase tracking-wider">
+                  View Details
+                </button>
+              )}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
       </div>
     </div>
   );

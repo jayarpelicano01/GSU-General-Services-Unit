@@ -23,7 +23,7 @@ interface JobRequestFormData {
   resultOfAssessment: string;
   estimatedValue: number;
   estimatedUnit: "Hours" | "Days" | "";
-  statusOfMaterials: "Available" | "Not Available" | "";
+  statusOfMaterials: "Available" | "Not Available" | null;
 }
 
 interface Unit {
@@ -42,7 +42,7 @@ const JobRequestForm = () => {
       resultOfAssessment: "",
       estimatedValue: 0,
       estimatedUnit: "Hours",
-      statusOfMaterials: "",
+      statusOfMaterials: null,
   });
 
 
@@ -74,7 +74,7 @@ const JobRequestForm = () => {
 
     try {
       const response = await API.post('/job-requests', payload);
-      alert("Job request submitted successfully!");
+      // alert("Job request submitted successfully!");
 
       setFormData({
         unitId: '',
@@ -83,7 +83,7 @@ const JobRequestForm = () => {
         resultOfAssessment: "",
         estimatedValue: 0,
         estimatedUnit: "Hours",
-        statusOfMaterials: "",
+        statusOfMaterials: null,
       });
 
       if (response.status === 201 || response.status === 200) {
@@ -95,7 +95,7 @@ const JobRequestForm = () => {
           resultOfAssessment: "",
           estimatedValue: 0,
           estimatedUnit: "Hours",
-          statusOfMaterials: "",
+          statusOfMaterials: null,
         });
       }
     } catch (error) {
@@ -105,9 +105,9 @@ const JobRequestForm = () => {
   };
 
 
-  useEffect(() => {
-    console.log("Form Data Updated:", formData);
-  }, [formData]);
+  // useEffect(() => {
+  //   console.log("Form Data Updated:", formData);
+  // }, [formData]);
   
 
 
@@ -314,7 +314,7 @@ return (
                   resultOfAssessment: '',
                   estimatedValue: 0,
                   estimatedUnit: 'Hours',
-                  statusOfMaterials: '',
+                  statusOfMaterials: null,
                 });
               }
             }}

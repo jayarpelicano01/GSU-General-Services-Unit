@@ -83,8 +83,8 @@
 
           <div>
             <span className="font-semibold">Field Work:</span>
-            <div className="grid grid-cols-4 gap-y-1 mt-1 ml-4">
-              {["Masonry", "Welding", "Painting", "Carpentry", "Computer Services", "Electrical", "Plumbing", "Art & Signs", "Refrigeration", "Landscaping", "Utility"].map((field) => (
+            <div className="grid grid-cols-[1fr_1fr_1.2fr_1fr] gap-y-1 mt-1 ml-4">
+              {["Masonry", "Carpentry", "Plumbing", "Landscaping", "Welding", "Computer Services", "Art & Signs", "Utility", "Painting", "Electrical", "Refrigeration & Air-Conditioning"].map((field) => (
                 <div key={field} className="flex items-center gap-2">
                   <div style={{height: '12px', width: '20px'}} className="border border-black flex items-center justify-center font-bold">
                     {data?.field_work === field ? "✓" : ""}
@@ -95,15 +95,24 @@
             </div>
           </div>
 
-          <div className="mt-2">
-            <div className="flex items-end gap-1 w-full">
-              <span className="whitespace-nowrap shrink-0">Specific work to be done:</span>
-              <span className="border-b border-black w-full italic px-2">
+          {data.specific_work?.length > 120 ? (
+            <div className="mt-2 text-[11px] leading-5">
+              <span className="shrink-0 pr-1">Specific work to be done:</span>
+              <span className="italic underline decoration-black underline-offset-6">
                 {data?.specific_work}
               </span>
             </div>
-            <p className="border-b border-black w-full h-4"></p>
-          </div>
+          ) : (
+            <div className="mt-2">
+              <div className="flex items-end mt-2 gap-2 w-full">
+                <span className="whitespace-nowrap shrink-0">Specific work to be done:</span>
+                <span className="border-b border-black w-full italic px-2">
+                  {data?.specific_work}
+                </span>
+              </div>
+              <p className="border-b border-black w-full h-4"></p>
+            </div>
+          )}
 
           {/* 5. SIGNATURE SECTION */}
           <div style={{marginLeft: '25px'}} className="flex mt-2">
@@ -114,17 +123,26 @@
             <p className="text-xs font-semibold">Head of requesting Unit</p>
           </div>
           </div>
-              
-          <div className="mt-2">
-            <div className="flex items-end mt-2 gap-2 w-full">
-              <span className=" whitespace-nowrap shrink-0">Result of Assessment and Evaluation:</span>
-              <span className="border-b border-black w-full italic px-2">
-                {data?.assessment_results}  
+            
+          {data.assessment_results?.length > 120 ? (
+            <div className="mt-2 text-[11px] leading-5">
+              <span className="shrink-0 pr-1">Result of Assessment and Evaluation:</span>
+              <span className="italic underline decoration-black underline-offset-6">
+                {data?.assessment_results}
               </span>
             </div>
-            {/* Decorative lines to match the form image */}
-            <p className="border-b border-black w-full h-4"></p>
-          </div>
+          ) : (
+            <div className="mt-2">
+              <div className="flex items-end mt-2 gap-2 w-full">
+                <span className="whitespace-nowrap shrink-0">Result of Assessment and Evaluation:</span>
+                <span className="border-b border-black w-full italic px-2">
+                  {data?.assessment_results}
+                </span>
+              </div>
+              <p className="border-b border-black w-full h-4"></p>
+            </div>
+          )}
+         
 
           <div className="flex-col">
             <div className="mt-2">
@@ -182,7 +200,7 @@
           <div style={{borderWidth: '0 0 0 1px '}} className="p-2 border-blue-400 text-[11px]">
             EFFECTIVITY DATE: <br />
             <div className="flex justify-center text-center">
-              <span className="block">SEPTEMBER 12, 2022</span>
+              <span className="border-b border-black w-40">SEPTEMBER 12, 2022</span>
             </div>
           </div>
         </div>

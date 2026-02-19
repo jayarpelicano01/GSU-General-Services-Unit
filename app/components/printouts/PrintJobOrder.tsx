@@ -107,20 +107,33 @@
           <div>
             <span style={{marginLeft: "3rem"}} className="font-semibold">Name:</span>
             <div style={{marginLeft: "6rem"}} className="grid grid-cols-3 gap-y-1 mt-1">
-              {data.personnels.map((person) => (
-                <div key={person.first_name} className="flex items-center">
+              {data.personnels.map((person, index) => (
+                <div key={person.first_name} className="flex gap-1.5 items-center">
+                  <span className="text-[11px]">{index + 1}.</span>
                   <span className="text-[11px]">{person.first_name} {person.middle_name || ''} {person.last_name} {person.suffix || ''} </span>
                 </div>
               ))}
             </div>
           </div>
 
-         <div className="mt-2 text-[11px] leading-5">
-            <span className="shrink-0 pr-1">Specific work to be done:</span>
-            <span className="italic underline decoration-black underline-offset-6">
-              {data?.specific_work}
-            </span>
-          </div>
+          {data.specific_work?.length > 120 ? (
+            <div className="mt-2 text-[11px] leading-5">
+              <span className="shrink-0 pr-1">Specific work to be done:</span>
+              <span className="italic underline decoration-black underline-offset-6">
+                {data?.specific_work}
+              </span>
+            </div>
+          ) : (
+            <div className="mt-2">
+              <div className="flex items-end mt-2 gap-2 w-full">
+                <span className="whitespace-nowrap shrink-0">Specific work to be done:</span>
+                <span className="border-b border-black w-full italic px-2">
+                  {data?.specific_work}
+                </span>
+              </div>
+              <p className="border-b border-black w-full h-4"></p>
+            </div>
+          )}
 
           <div className="flex mt-2 gap-6 ">
             <div className="flex items-end w-full gap-1">
@@ -170,12 +183,24 @@
 
             </div>
               
-          <div className="mt-2 text-[11px] leading-5">
-            <span className="shrink-0 pr-1">Remarks:</span>
-            <span className="italic underline decoration-black underline-offset-6">
-              {data?.remarks}
-            </span>
-          </div>
+          {data.remarks?.length > 150 ? (
+            <div className="mt-1 text-[11px] leading-5">
+              <span className="shrink-0 pr-1">Remarks:</span>
+              <span className="italic underline decoration-black underline-offset-6">
+                {data?.remarks}
+              </span>
+            </div>
+          ) : (
+            <div className="">
+              <div className="flex items-end mt-1 gap-2 w-full">
+                <span className="whitespace-nowrap shrink-0">Remarks:</span>
+                <span className="border-b border-black w-full italic px-2">
+                  {data?.remarks}
+                </span>
+              </div>
+              <p className="border-b border-black w-full h-4"></p>
+            </div>
+          )}
 
           </div>
         
@@ -199,7 +224,7 @@
           <div style={{borderWidth: '0 0 0 1px '}} className="p-2 border-blue-400 text-[11px]">
             EFFECTIVITY DATE: <br />
             <div className="flex justify-center text-center">
-              <span className="block">SEPTEMBER 12, 2022</span>
+              <span className="border-b border-black w-40">SEPTEMBER 12, 2022</span>
             </div>
           </div>
         </div>

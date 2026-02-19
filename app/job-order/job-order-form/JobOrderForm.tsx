@@ -47,9 +47,7 @@ interface JobOrderData {
   jobOrderNo: "33";
   specificWorkOrder: string; 
   remarks: string;
-  personnel1: string;
-  personnel2: string;
-  personnel3: string;
+  personnels: string[];
 }
 
 interface Personnel {
@@ -58,6 +56,7 @@ interface Personnel {
     middle_name: string | null;
     last_name: string;
     suffix: string | null;
+    field: string;
 }
 
 const JobOrderForm = () => {
@@ -70,11 +69,11 @@ const JobOrderForm = () => {
       try {
         const response = await API.get('/personnels');
         setPersonnelList(response.data.data);
+        console.log(response.data.data);
       } catch (error) {
         console.error('Error fetching personnel:', error);
       }
     };
-
     fetchPersonnel();
     
   }, []);
@@ -91,32 +90,43 @@ const JobOrderForm = () => {
     return null;
   });
 
-  const getAvailablePersonnel = (currentFieldName: string) => {
-    // 1. Identify which IDs are currently selected in OTHER fields
-    const selectedIds = [
-        currentFieldName !== 'personnel1' ? JobOrderFormData.personnel1 : null,
-        currentFieldName !== 'personnel2' ? JobOrderFormData.personnel2 : null,
-        currentFieldName !== 'personnel3' ? JobOrderFormData.personnel3 : null,
-    ].filter(Boolean); // Removes nulls and empty strings
+//   const getAvailablePersonnel = (currentFieldName: string) => {
+//     // 1. Identify which IDs are currently selected in OTHER fields
+//     const selectedIds = [
+//         currentFieldName !== 'personnel1' ? JobOrderFormData.personnel1 : null,
+//         currentFieldName !== 'personnel2' ? JobOrderFormData.personnel2 : null,
+//         currentFieldName !== 'personnel3' ? JobOrderFormData.personnel3 : null,
+//     ].filter(Boolean); // Removes nulls and empty strings
 
-    // 2. Filter the master list to exclude those IDs
-    return personnelList.filter(person => !selectedIds.includes(person.id.toString()));
-};
+//     // 2. Filter the master list to exclude those IDs
+//     return personnelList.filter(person => !selectedIds.includes(person.id.toString()));
+// };
 
   const [JobOrderFormData, setJobOrderFormData] = useState<JobOrderData>({
     jobOrderNo: "33",
     specificWorkOrder: requestData?.specific_work || "",
-    personnel1: "",
-    personnel2: "",
-    personnel3: "",
+    personnels: [],
     remarks: "",
   });
+
+  const filteredPersonnel = personnelList.filter(
+    person => person.field === requestData?.field_work
+  );
+
+  // People selected via the assist dropdown (not in filteredPersonnel)
+  const assistPersonnel = personnelList.filter(p => 
+    JobOrderFormData.personnels.includes(String(p.id)) && 
+    !filteredPersonnel.some(fp => fp.id === p.id)
+  );
+
+  // Combined list: field-matched + assist selections
+  const displayPersonnel = [...filteredPersonnel, ...assistPersonnel];
   
-  const selectedPersonnel = [
-    JobOrderFormData.personnel1,
-    JobOrderFormData.personnel2,
-    JobOrderFormData.personnel3,
-  ].filter(Boolean); 
+  // const selectedPersonnel = [
+  //   JobOrderFormData.personnel1,
+  //   JobOrderFormData.personnel2,
+  //   JobOrderFormData.personnel3,
+  // ].filter(Boolean); 
 
   useEffect(() => {
     console.log(JobOrderFormData);
@@ -139,11 +149,9 @@ const JobOrderForm = () => {
         remarks: JobOrderFormData.remarks,
         jo_number: JobOrderFormData.jobOrderNo,
         // Map the IDs stored in state to the full objects from your source list
-        personnels: [
-            personnelList.find(p => p.id === Number(JobOrderFormData.personnel1)),
-            personnelList.find(p => p.id === Number(JobOrderFormData.personnel2)),
-            personnelList.find(p => p.id === Number(JobOrderFormData.personnel3))
-        ].filter(Boolean) // .filter(Boolean) removes any undefined results if a person wasn't selected
+        personnels: JobOrderFormData.personnels
+        .map(id => personnelList.find(p => p.id === Number(id)))
+        .filter(Boolean)
     };
 
 
@@ -246,72 +254,114 @@ const JobOrderForm = () => {
           {/* SECTION 2: JOB EXECUTION DETAILS */}
           <div className="space-y-6">
             
-            {/* Personnel Stack */}
-            <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">
-                    Assigned Personnel
-                </label>
-                
-                <div className="space-y-4">
-                    
-                    {/* Personnel 1 */}
-                    <div className="flex gap-4 items-center">
-                        <div className="relative flex-1">
-                            <select
-                                name="personnel1"
-                                value={JobOrderFormData.personnel1}
-                                onChange={handleInputChange}
-                                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer"
-                                required
-                            >
-                                <option value="">Select Personnel 1...</option>
-                                {getAvailablePersonnel('personnel1').map(person => (
-                                    <option key={person.id} value={person.id}>{person.first_name} {person.middle_name || ''} {person.last_name} {person.suffix || ''}</option>
-                                ))}
-                            </select>
-                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">▼</div>
-                        </div>
-                    </div>
+            {/* Personnel */}
+<div className="space-y-4">
+  <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+    Personnel <span className="text-red-400">*</span>
+  </label>
 
-                    {/* Personnel 2 */}
-                    <div className="flex gap-4 items-center">
-                        <div className="relative flex-1">
-                            <select
-                                name="personnel2"
-                                value={JobOrderFormData.personnel2}
-                                onChange={handleInputChange}
-                                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer"
-                            >
-                                <option value="">Select Personnel 2...</option>
-                                {getAvailablePersonnel('personnel2').map(person => (
-                                    <option key={person.id} value={person.id}>{person.first_name} {person.middle_name || ''} {person.last_name} {person.suffix || ''}</option>
-                                ))}
-                            </select>
-                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">▼</div>
-                        </div>
-                    </div>
+  {/* Filtered by field_work */}
+  <div className="border border-slate-200 rounded-xl overflow-hidden">
+  {displayPersonnel.length === 0 ? (
+    <div className="px-4 py-6 text-center text-sm text-slate-400">
+      No personnel available for <span className="font-semibold">{requestData?.field_work}</span>
+    </div>
+  ) : (
+    displayPersonnel.map((person, index) => {
+      const isSelected = JobOrderFormData.personnels.includes(String(person.id));
+      const isAssist = assistPersonnel.some(p => p.id === person.id);
+      const fullName = `${person.first_name} ${person.middle_name || ''} ${person.last_name} ${person.suffix || ''}`.trim();
 
-                    {/* Personnel 3 */}
-                    <div className="flex gap-4 items-center">
-                        <div className="relative flex-1">
-                            <select
-                                name="personnel3"
-                                value={JobOrderFormData.personnel3}
-                                onChange={handleInputChange}
-                                className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer"
-                            >
-                                <option value="">Select Personnel 3...</option>
-                                {getAvailablePersonnel('personnel3').map(person => (
-                                    <option key={person.id} value={person.id}>{person.first_name} {person.middle_name || ''} {person.last_name} {person.suffix || ''}</option>
-                                ))}
-                            </select>
-                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">▼</div>
-                        </div>
-                    </div>
-
-                </div>
+      return (
+        <div
+          key={person.id}
+          onClick={() => {
+            setJobOrderFormData(prev => ({
+              ...prev,
+              personnels: isSelected
+                ? prev.personnels.filter(id => id !== String(person.id))
+                : [...prev.personnels, String(person.id)]
+            }));
+          }}
+          className={`flex items-center justify-between px-4 py-3 cursor-pointer transition-all
+            ${index !== 0 ? 'border-t border-slate-100' : ''}
+            ${isSelected
+              ? 'bg-indigo-50 text-indigo-700'
+              : 'bg-white text-slate-600 hover:bg-slate-50'
+            }`}
+        >
+          <div className="flex items-center gap-3">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
+              ${isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
+              {person.first_name[0]}{person.last_name[0]}
             </div>
+            <div>
+              <span className="text-sm font-medium">{fullName}</span>
+              {/* Badge to indicate this person is from assist */}
+              {isAssist && (
+                <span className="ml-2 text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full">
+                  Assist
+                </span>
+              )}
+            </div>
+          </div>
+          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all
+            ${isSelected ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300'}`}>
+            {isSelected && (
+              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </div>
+        </div>
+      );
+    })
+  )}
+</div>
 
+  {/* Selected summary */}
+  {JobOrderFormData.personnels.length > 0 && (
+    <p className="text-xs text-indigo-500 font-medium">
+      {JobOrderFormData.personnels.length} personnel selected
+    </p>
+  )}
+
+  {/* Add person to assist */}
+  <div className="border-t border-slate-100 pt-4">
+    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+      Add Person to Assist
+    </label>
+    <div className="relative">
+      <select
+        onChange={(e) => {
+          const id = e.target.value;
+          if (!id || JobOrderFormData.personnels.includes(id)) return;
+          setJobOrderFormData(prev => ({
+            ...prev,
+            personnels: [...prev.personnels, id]
+          }));
+          e.target.value = ""; // reset after selection
+        }}
+        className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer"
+      >
+        <option value="">Select a person to assist...</option>
+        {personnelList
+          .filter(p => 
+            !JobOrderFormData.personnels.includes(String(p.id)) &&
+            !filteredPersonnel.some(fp => fp.id === p.id)
+        )
+          .map(person => (
+            <option key={person.id} value={person.id}>
+              {person.first_name} {person.middle_name || ''} {person.last_name} {person.suffix || ''}
+            </option>
+          ))
+        }
+      </select>
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">▼</div>
+    </div>
+  </div>
+
+</div>
             {/* Text Areas */}
             <div className="space-y-6">
                 <div>
