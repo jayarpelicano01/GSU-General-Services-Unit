@@ -52,7 +52,6 @@
     
     return (
       <div style={{padding: "10mm 10mm 10mm 10mm"}} className=" bg-white text-black font-sans -pt-[10mm] w-[210mm] mx-auto overflow-hidden">
-        {/* 1. UNIVERSITY HEADER */}
         <div className="flex justify-center items-center relative mb-2">
           <Image 
             src="/UEP-Logo.png" 

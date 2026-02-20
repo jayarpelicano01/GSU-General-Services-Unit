@@ -2,7 +2,7 @@
 import PrintJobRequest from "@/app/components/printouts/PrintJobRequest";
 import PrintJobOrder from "@/app/components/printouts/PrintJobOrder";
 import { useSyncExternalStore } from "react";
-import Sidebar from "@/app/components/printouts/Sidebar";
+import Sidebar from "@/app/components/Sidebar";
 
 
 const subscribe = () => () => {}; 

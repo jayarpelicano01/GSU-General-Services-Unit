@@ -34,6 +34,7 @@ interface JobRequestData {
       location_name: string;
     };
   };
+  assessment_results: string;
   location: string;
   field_work: string;
   specific_work: string;
@@ -158,39 +159,38 @@ const JobOrderForm = () => {
 
     console.log(payload);
 
-    alert("Printing Job Request");
+    // alert("Printing Job Request");
     localStorage.setItem("job-request", JSON.stringify(requestData))
     localStorage.setItem("job-order", JSON.stringify(orderData))
 
-    router.push(`/job-order/print-job-order`)
     
-    // try {
-    //     const response = await API.post('/job-orders', {...payload});
+    try {
+        const response = await API.post('/job-orders', {...payload});
 
-    //     if (response.data.status === 'success') {
-    //       const jobOrderId = response.data.data.id;
+        if (response.data.status === 'success') {
+          const jobOrderId = response.data.data.id;
 
-    //       try {
-    //         API.patch(`/job-requests/${requestData?.id}/status`, { status: "Approved"});
-    //       } catch (error) {
-    //         console.error(error);
-    //       }
+          try {
+            API.patch(`/job-requests/${requestData?.id}/status`, { status: "Approved"});
+          } catch (error) {
+            console.error(error);
+          }
           
-    //       try {
-    //         await Promise.all(selectedPersonnel.map(personnelId => 
-    //             API.post(`/assignments/${personnelId}/assign/${jobOrderId}`, { personnel_id: personnelId })
-    //         ));
-    //       } catch (error) {
-    //         console.error(error);
-    //       }
-    //     }
+          try {
+            await Promise.all(JobOrderFormData.personnels.map(personnelId => 
+                API.post(`/assignments/${personnelId}/assign/${jobOrderId}`, { personnel_id: personnelId })
+            ));
+          } catch (error) {
+            console.error(error);
+          }
+        }
         
-    //     console.log('Job Order created successfully:', response.data);
-    //     alert('Job Order processed successfully!');
-    //     router.push('/job-request-list');
-    // } catch (error) {
-    //   console.error('Error creating job order:', error);
-    // }
+        console.log('Job Order created successfully:', response.data);
+        alert('Job Order processed successfully!');
+        router.push(`/job-order/print-job-order`)
+    } catch (error) {
+      console.error('Error creating job order:', error);
+    }
   };
 
   const handleInputChange = (
@@ -246,6 +246,12 @@ const JobOrderForm = () => {
                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Requested Work Description</label>
                     <div className="text-sm text-slate-600 italic bg-white p-3 rounded border border-slate-200">
                         {requestData.specific_work}
+                    </div>
+                </div>
+                <div className="md:col-span-2">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Assessment Results</label>
+                    <div className="text-sm text-slate-600 italic bg-white p-3 rounded border border-slate-200">
+                        {requestData.assessment_results || "None Specified"}
                     </div>
                 </div>
             </div>
