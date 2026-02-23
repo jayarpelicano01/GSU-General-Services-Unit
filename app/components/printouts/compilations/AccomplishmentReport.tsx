@@ -42,9 +42,9 @@ const AccomplishmentReport = ({selectedField}: Props) => {
     
     const [jobOrders, setJobOrders] = useState<JobOrder[]>([]);
 
-    const selectedFieldLabel = selectedField === "All" 
-    ? '' 
-    : selectedField;
+    // const selectedFieldLabel = selectedField === "All" 
+    // ? '' 
+    // : selectedField;
 
     useEffect(() => {
 
@@ -70,7 +70,7 @@ const AccomplishmentReport = ({selectedField}: Props) => {
     return (
         <div 
             style={{padding: "10mm 10mm 10mm 10mm"}} 
-            className="bg-white text-black font-sans w-[297mm] min-h-[210mm] mx-auto overflow-hidden"
+            className=" text-black font-sans w-[297mm] min-h-[210mm] mx-auto overflow-hidden"
             >
             <div className="flex justify-center items-center relative mb-2">
                 <Image 

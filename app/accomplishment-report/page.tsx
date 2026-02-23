@@ -20,7 +20,7 @@ const AccomplishmentReportPage = () => {
     const [selectedField, setSelectedField] = useState("All");
 
     return (
-    <div className="flex">
+    <div className="flex h-screen bg-slate-50">
       
       {/* Sidebar - hidden on print */}
       <div className="no-print fixed left-0 top-0 h-screen w-64 bg-slate-100 p-4 border-r border-slate-200 overflow-y-auto">
