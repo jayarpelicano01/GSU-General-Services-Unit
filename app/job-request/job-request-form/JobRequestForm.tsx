@@ -3,15 +3,14 @@ import {API} from "@/app/utils/api/api";
 import { useEffect, useState } from "react";
 
 export enum FieldWork {
-  Masonry = "Masonry",
   Welding = "Welding",
   Painting = "Painting",
-  Carpentry = "Carpentry",
-  ComputerServices = "Computer Services",
+  Carpentry = "Carpentry/Masonry",
+  GrassCutter = "Grass Cutter",
   Electrical = "Electrical",
   Plumbing = "Plumbing",
   ArtAndSign = "Art & Sign",
-  RefrigeratorAndAirConditioning = "Refrigerator & Air-Conditioning",
+  RefrigerationAndAirConditioning = "Refrigeration & Air-Conditioning",
   Landscaping = "Landscaping",
   Utility = "Utility",
 }
@@ -112,10 +111,10 @@ const JobRequestForm = () => {
 
 
   const fieldWorkOptions = [
-    { column: 1, items: [FieldWork.Masonry, FieldWork.Welding, FieldWork.Painting] },
-    { column: 2, items: [FieldWork.Carpentry, FieldWork.ComputerServices, FieldWork.Electrical] },
-    { column: 3, items: [FieldWork.Plumbing, FieldWork.ArtAndSign, FieldWork.RefrigeratorAndAirConditioning] },
-    { column: 4, items: [FieldWork.Landscaping, FieldWork.Utility] },
+    { column: 1, items: [FieldWork.Carpentry, FieldWork.ArtAndSign, FieldWork.Electrical] },
+    { column: 2, items: [FieldWork.Painting, FieldWork.Landscaping, FieldWork.Plumbing] },
+    { column: 3, items: [FieldWork.Welding, FieldWork.RefrigerationAndAirConditioning, FieldWork.GrassCutter] },
+    { column: 4, items: [FieldWork.Utility] },
   ];
 
   const handleFieldWorkChange = (item: FieldWork) => {
@@ -309,7 +308,7 @@ return (
               if(window.confirm("Are you sure you want to clear the form?")) {
                 setFormData({
                   unitId: 0,
-                  fieldWork: FieldWork.Masonry,
+                  fieldWork: FieldWork.Carpentry,
                   specificWorkToBeDone: '',
                   resultOfAssessment: '',
                   estimatedValue: 0,

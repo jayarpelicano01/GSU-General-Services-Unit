@@ -45,7 +45,7 @@ interface JobRequestData {
 }
 
 interface JobOrderData {
-  jobOrderNo: "33";
+  jobOrderNo: number | null;
   specificWorkOrder: string; 
   remarks: string;
   personnels: string[];
@@ -79,17 +79,45 @@ const JobOrderForm = () => {
     
   }, []);
 
-  const [requestData] = useState<JobRequestData | null>(() => {
-    const storedRequest = localStorage.getItem("selectedRequest");
-    if (storedRequest) {
-      try {
-        return JSON.parse(storedRequest);
-      } catch (error) {
-        console.error("Failed to parse selected request", error);
-      }
-    }
-    return null;
+  
+  const [requestData, setRequestData] = useState<JobRequestData | null>(null);
+  const [JobOrderFormData, setJobOrderFormData] = useState<JobOrderData>({  
+    jobOrderNo: null,
+    specificWorkOrder: requestData?.specific_work || "",
+    personnels: [],
+    remarks: "",
   });
+  
+  useEffect(() => {
+    const fetchRequest = async () => {
+      const storedRequestId = localStorage.getItem("selectedRequestId");
+      console.log(storedRequestId);
+
+      if (storedRequestId) {
+        try {
+          const response = await API.get(`/job-requests/${storedRequestId}`);
+          const data = response.data.data;
+
+          if (data.status === 'Approved') {
+            router.push("/job-request-list")
+          }
+
+          setRequestData(data);
+          setJobOrderFormData(prev => ({
+          ...prev,
+          specificWorkOrder: data.specific_work || "",
+        }));
+        } catch (error) {
+          console.error("Failed to fetch request", error);
+        }
+      }
+    };
+
+    fetchRequest();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+          
 
 //   const getAvailablePersonnel = (currentFieldName: string) => {
 //     // 1. Identify which IDs are currently selected in OTHER fields
@@ -103,12 +131,7 @@ const JobOrderForm = () => {
 //     return personnelList.filter(person => !selectedIds.includes(person.id.toString()));
 // };
 
-  const [JobOrderFormData, setJobOrderFormData] = useState<JobOrderData>({
-    jobOrderNo: "33",
-    specificWorkOrder: requestData?.specific_work || "",
-    personnels: [],
-    remarks: "",
-  });
+  
 
   const filteredPersonnel = personnelList.filter(
     person => person.field === requestData?.field_work
@@ -123,16 +146,10 @@ const JobOrderForm = () => {
   // Combined list: field-matched + assist selections
   const displayPersonnel = [...filteredPersonnel, ...assistPersonnel];
   
-  // const selectedPersonnel = [
-  //   JobOrderFormData.personnel1,
-  //   JobOrderFormData.personnel2,
-  //   JobOrderFormData.personnel3,
-  // ].filter(Boolean); 
 
   useEffect(() => {
     console.log(JobOrderFormData);
  }, [JobOrderFormData]);
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,29 +161,23 @@ const JobOrderForm = () => {
         jo_number: JobOrderFormData.jobOrderNo,
     }
 
-    const orderData = {
-        request: requestData,
-        specific_work: JobOrderFormData.specificWorkOrder,
-        remarks: JobOrderFormData.remarks,
-        jo_number: JobOrderFormData.jobOrderNo,
-        // Map the IDs stored in state to the full objects from your source list
-        personnels: JobOrderFormData.personnels
-        .map(id => personnelList.find(p => p.id === Number(id)))
-        .filter(Boolean)
-    };
-
-
-
-    console.log(payload);
-
-    // alert("Printing Job Request");
-    localStorage.setItem("job-request", JSON.stringify(requestData))
-    localStorage.setItem("job-order", JSON.stringify(orderData))
-
     
+    // const orderData = {
+    //     request: requestData,
+    //     specific_work: JobOrderFormData.specificWorkOrder,
+    //     remarks: JobOrderFormData.remarks,
+    //     jo_number: JobOrderFormData.jobOrderNo,
+    //     personnels: JobOrderFormData.personnels
+    //     .map(id => personnelList.find(p => p.id === Number(id)))
+    //     .filter(Boolean)
+    // };
+
+
+
+    console.log(payload);    
     try {
         const response = await API.post('/job-orders', {...payload});
-
+        
         if (response.data.status === 'success') {
           const jobOrderId = response.data.data.id;
 
@@ -184,8 +195,24 @@ const JobOrderForm = () => {
             console.error(error);
           }
         }
+
+        const updatedRequestData = { 
+          ...requestData, 
+          jo_number: JobOrderFormData.jobOrderNo 
+        };
         
-        console.log('Job Order created successfully:', response.data);
+        localStorage.setItem("job-request", JSON.stringify(updatedRequestData))
+        // localStorage.setItem("job-order", JSON.stringify(orderData))
+        
+        console.log('Job Order creation:', response.data.status , response.data);
+
+        const updatedOrderDate = {
+          ...response.data.data,
+          personnels: JobOrderFormData.personnels
+        .map(id => personnelList.find(p => p.id === Number(id)))
+        }
+
+        localStorage.setItem("job-order", JSON.stringify(updatedOrderDate))
         alert('Job Order processed successfully!');
         router.push(`/job-order/print-job-order`)
     } catch (error) {
@@ -210,11 +237,6 @@ const JobOrderForm = () => {
         <div className="px-8 py-6 border-b border-slate-100 bg-white flex justify-between items-start">
           <div>
             <h1 className="text-xl font-bold text-slate-800">Job Order Form</h1>
-            {/* Subtitle removed here */}
-          </div>
-          <div className="text-right">
-             <span className="block text-xs font-bold uppercase tracking-wider text-slate-400">Order No.</span>
-             <span className="text-lg font-mono font-bold text-indigo-600">{JobOrderFormData.jobOrderNo}</span>
           </div>
         </div>
 
@@ -259,115 +281,129 @@ const JobOrderForm = () => {
 
           {/* SECTION 2: JOB EXECUTION DETAILS */}
           <div className="space-y-6">
-            
-            {/* Personnel */}
-<div className="space-y-4">
-  <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-    Personnel <span className="text-red-400">*</span>
-  </label>
-
-  {/* Filtered by field_work */}
-  <div className="border border-slate-200 rounded-xl overflow-hidden">
-  {displayPersonnel.length === 0 ? (
-    <div className="px-4 py-6 text-center text-sm text-slate-400">
-      No personnel available for <span className="font-semibold">{requestData?.field_work}</span>
-    </div>
-  ) : (
-    displayPersonnel.map((person, index) => {
-      const isSelected = JobOrderFormData.personnels.includes(String(person.id));
-      const isAssist = assistPersonnel.some(p => p.id === person.id);
-      const fullName = `${person.first_name} ${person.middle_name || ''} ${person.last_name} ${person.suffix || ''}`.trim();
-
-      return (
-        <div
-          key={person.id}
-          onClick={() => {
-            setJobOrderFormData(prev => ({
-              ...prev,
-              personnels: isSelected
-                ? prev.personnels.filter(id => id !== String(person.id))
-                : [...prev.personnels, String(person.id)]
-            }));
-          }}
-          className={`flex items-center justify-between px-4 py-3 cursor-pointer transition-all
-            ${index !== 0 ? 'border-t border-slate-100' : ''}
-            ${isSelected
-              ? 'bg-indigo-50 text-indigo-700'
-              : 'bg-white text-slate-600 hover:bg-slate-50'
-            }`}
-        >
-          <div className="flex items-center gap-3">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
-              ${isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
-              {person.first_name[0]}{person.last_name[0]}
-            </div>
+            {/* Order Number */}
             <div>
-              <span className="text-sm font-medium">{fullName}</span>
-              {/* Badge to indicate this person is from assist */}
-              {isAssist && (
-                <span className="ml-2 text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full">
-                  Assist
-                </span>
+              <label htmlFor="jobOrderNo" className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                Order No.
+              </label>
+              <input 
+                type="number" 
+                id="jobOrderNo"
+                name="jobOrderNo"
+                onChange={handleInputChange}
+                className="text-lg p-2 font-mono font-bold text-indigo-400 rounded-xl border-slate-200 border-2 focus:border-indigo-600 focus:bg-white outline-none transition-all w-full"
+                placeholder="0000"
+                required
+              />
+            </div>
+            {/* Personnel */}
+            <div className="space-y-4">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                Personnel <span className="text-red-400">*</span>
+              </label>
+
+              {/* Filtered by field_work */}
+              <div className="border border-slate-200 rounded-xl overflow-hidden">
+              {displayPersonnel.length === 0 ? (
+                <div className="px-4 py-6 text-center text-sm text-slate-400">
+                  No personnel available for <span className="font-semibold">{requestData?.field_work}</span>
+                </div>
+              ) : (
+                displayPersonnel.map((person, index) => {
+                  const isSelected = JobOrderFormData.personnels.includes(String(person.id));
+                  const isAssist = assistPersonnel.some(p => p.id === person.id);
+                  const fullName = `${person.first_name} ${person.middle_name || ''} ${person.last_name} ${person.suffix || ''}`.trim();
+
+                  return (
+                    <div
+                      key={person.id}
+                      onClick={() => {
+                        setJobOrderFormData(prev => ({
+                          ...prev,
+                          personnels: isSelected
+                            ? prev.personnels.filter(id => id !== String(person.id))
+                            : [...prev.personnels, String(person.id)]
+                        }));
+                      }}
+                      className={`flex items-center justify-between px-4 py-3 cursor-pointer transition-all
+                        ${index !== 0 ? 'border-t border-slate-100' : ''}
+                        ${isSelected
+                          ? 'bg-indigo-50 text-indigo-700'
+                          : 'bg-white text-slate-600 hover:bg-slate-50'
+                        }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
+                          ${isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                          {person.first_name[0]}{person.last_name[0]}
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium">{fullName}</span>
+                          {/* Badge to indicate this person is from assist */}
+                          {isAssist && (
+                            <span className="ml-2 text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full">
+                              Assist
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all
+                        ${isSelected ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300'}`}>
+                        {isSelected && (
+                          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
               )}
             </div>
-          </div>
-          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all
-            ${isSelected ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300'}`}>
-            {isSelected && (
-              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-            )}
-          </div>
-        </div>
-      );
-    })
-  )}
-</div>
 
-  {/* Selected summary */}
-  {JobOrderFormData.personnels.length > 0 && (
-    <p className="text-xs text-indigo-500 font-medium">
-      {JobOrderFormData.personnels.length} personnel selected
-    </p>
-  )}
+              {/* Selected summary */}
+              {JobOrderFormData.personnels.length > 0 && (
+                <p className="text-xs text-indigo-500 font-medium">
+                  {JobOrderFormData.personnels.length} personnel selected
+                </p>
+              )}
 
-  {/* Add person to assist */}
-  <div className="border-t border-slate-100 pt-4">
-    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-      Add Person to Assist
-    </label>
-    <div className="relative">
-      <select
-        onChange={(e) => {
-          const id = e.target.value;
-          if (!id || JobOrderFormData.personnels.includes(id)) return;
-          setJobOrderFormData(prev => ({
-            ...prev,
-            personnels: [...prev.personnels, id]
-          }));
-          e.target.value = ""; // reset after selection
-        }}
-        className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer"
-      >
-        <option value="">Select a person to assist...</option>
-        {personnelList
-          .filter(p => 
-            !JobOrderFormData.personnels.includes(String(p.id)) &&
-            !filteredPersonnel.some(fp => fp.id === p.id)
-        )
-          .map(person => (
-            <option key={person.id} value={person.id}>
-              {person.first_name} {person.middle_name || ''} {person.last_name} {person.suffix || ''}
-            </option>
-          ))
-        }
-      </select>
-      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">▼</div>
-    </div>
-  </div>
+              {/* Add person to assist */}
+              <div className="border-t border-slate-100 pt-4">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                  Add Person to Assist
+                </label>
+                <div className="relative">
+                  <select
+                    onChange={(e) => {
+                      const id = e.target.value;
+                      if (!id || JobOrderFormData.personnels.includes(id)) return;
+                      setJobOrderFormData(prev => ({
+                        ...prev,
+                        personnels: [...prev.personnels, id]
+                      }));
+                      e.target.value = ""; // reset after selection
+                    }}
+                    className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer"
+                  >
+                    <option value="">Select a person to assist...</option>
+                    {personnelList
+                      .filter(p => 
+                        !JobOrderFormData.personnels.includes(String(p.id)) &&
+                        !filteredPersonnel.some(fp => fp.id === p.id)
+                    )
+                      .map(person => (
+                        <option key={person.id} value={person.id}>
+                          {person.first_name} {person.middle_name || ''} {person.last_name} {person.suffix || ''}
+                        </option>
+                      ))
+                    }
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">▼</div>
+                </div>
+              </div>
 
-</div>
+            </div>
             {/* Text Areas */}
             <div className="space-y-6">
                 <div>

@@ -4,6 +4,8 @@
   interface PrintProps {
     JobRequest: {
       id: number;
+      jo_number: number;
+      request_date: Date;
       unit: {
         head: {
           first_name: string;
@@ -24,16 +26,12 @@
   }
 
   const PrintJobRequest = ({ JobRequest: data }: PrintProps) => {
-  
-    const dateString = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    console.log(data);
+    
+    // const dateString = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
     const headOfUnit = data.unit.head;
     const headFullName = `${headOfUnit.first_name} ${headOfUnit.middle_name || ''} ${headOfUnit.last_name} ${headOfUnit.suffix || ''}`
-    
-    const shouldShowDecorativeLine = (text: string) => {
-      if (!text || text.trim().length === 0) return true;
-      if (text.includes('\n')) return false;
-      return text.length < 90;
-    };
+
     
     return (
       <div className="print-area bg-white text-black font-sans pl-[10mm] pt-[10mm] pr-[10mm] w-[210mm] mx-auto overflow-hidden">
@@ -51,6 +49,20 @@
             <p className="text-xs italic">University Town, Northern Samar</p>
             <p className="text-[10px]">Website: <span style={{ color: '#0056b3'}}>http://uep.edu.ph</span> Email: <span style={{ color: '#0056b3'}}>uepnsofficial@gmail.com</span></p>
           </div>
+          <Image 
+          src="/bagongpilipinas.png" 
+          alt="UEP Logo" 
+          width={70}
+          height={70}
+          className="absolute right-10" 
+          />
+          <Image 
+          src="/socotec.jpg" 
+          alt="UEP Logo" 
+          width={62}
+          height={70}
+          className=" absolute right-30" 
+          />
         </div>
 
         {/* 2. FORM TITLE BAR */}
@@ -61,13 +73,17 @@
         {/* 3. DATE AND NO. */}
         <div className="text-[11px] flex flex-col items-end text-sm space-y-1 mb-1">
           <div className="flex gap-2">
-            <span className="">JR No.:</span>
-            <span className="border-b border-black w-32 text-center font-mono"></span>
+            <span className="">JO No.:</span>
+            <span className="border-b border-black w-32 text-center font-mono">{data.jo_number}</span>
           </div>
           <div className="flex gap-2">
             <span className="">Date:</span>
             <span className="border-b border-black w-32 text-center">
-              {/* {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} */}{dateString}
+              {new Date(data.request_date).toLocaleDateString('en-US', { 
+                month: 'long', 
+                day: 'numeric', 
+                year: 'numeric' 
+              })}
             </span>
           </div>
         </div>
@@ -83,17 +99,25 @@
 
           <div>
             <span className="font-semibold">Field Work:</span>
-            <div className="grid grid-cols-[1fr_1fr_1.2fr_1fr] gap-y-1 mt-1 ml-4">
-              {["Masonry", "Carpentry", "Plumbing", "Landscaping", "Welding", "Computer Services", "Art & Signs", "Utility", "Painting", "Electrical", "Refrigeration & Air-Conditioning"].map((field) => (
-                <div key={field} className="flex items-center gap-2">
-                  <div style={{height: '12px', width: '20px'}} className="border border-black flex items-center justify-center font-bold">
-                    {data?.field_work === field ? "✓" : ""}
-                  </div>
-                  <span className="text-[11px]">{field}</span>
+            <div className="mt-1 ml-4 space-y-1">
+              {[
+                ["Carpentry/Masonry", "Painting", "Welding", "Utility"], // Row 1 (4 items)
+                ["Arts & Sign", "Landscaping", "Refrigeration & Air-Conditioning"], // Row 2 (3 items)
+                ["Electrical", "Plumbing", "Grass Cutter"]
+              ].map((row, rowIndex) => (
+                <div key={rowIndex} className="grid grid-cols-4 gap-2">
+                  {row.map((field) => (
+                    <div key={field} className="flex items-center gap-2">
+                      <div style={{height: '12px', width: '20px'}} className="border border-black flex items-center justify-center font-bold shrink-0">
+                        {data?.field_work === field ? "✓" : ""}
+                      </div>
+                      <span className="text-[11px] whitespace-nowrap">{field}</span>
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
-          </div>
+        </div>
 
           {data.specific_work?.length > 120 ? (
             <div className="mt-2 text-[11px] leading-5">

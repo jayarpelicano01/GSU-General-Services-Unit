@@ -11,15 +11,16 @@ const getServerSnapshot = () => false;
 
 interface JobRequest {
         id: number;
+        request_date: Date;
         unit: {
-        head: {
-            first_name: string;
-            middle_name: string;
-            last_name: string;
-            suffix: string;
-        },
-        location: {
-            location_name: string;
+            head: {
+                first_name: string;
+                middle_name: string;
+                last_name: string;
+                suffix: string;
+            },
+            location: {
+                location_name: string;
         }
         unit_name: string;
         unit_acronym: string;
@@ -30,6 +31,7 @@ interface JobRequest {
         status_of_materials: string;
         estimated_duration_value: number;
         estimated_duration_unit: string;
+        jo_number: number;
     }
 
 interface Personnel {
@@ -40,9 +42,10 @@ interface Personnel {
 }
 
 interface JobOrder {
-    request: JobRequest;
+    job_request: JobRequest;
     specific_work: string;
     remarks: string;
+    date_started: Date;
     jo_number: number;
     personnels: [Personnel];
 }

@@ -1,21 +1,22 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PrintRequestAndOrder from "./print/PrintRequestAndOrder";
 
 interface JobRequest {
         id: number;
+        request_date: Date;
         unit: {
-        head: {
-            first_name: string;
-            middle_name: string;
-            last_name: string;
-            suffix: string;
-        },
-        location: {
-          location_name: string;
-        }
-        unit_name: string;
-        unit_acronym: string;
+          head: {
+              first_name: string;
+              middle_name: string;
+              last_name: string;
+              suffix: string;
+          },
+          location: {
+            location_name: string;
+          }
+          unit_name: string;
+          unit_acronym: string;
         };
         field_work: string;
         specific_work: string;
@@ -23,6 +24,7 @@ interface JobRequest {
         status_of_materials: string;
         estimated_duration_value: number;
         estimated_duration_unit: string;
+        jo_number: number;
     }
 
   interface Personnel {
@@ -33,10 +35,11 @@ interface JobRequest {
 }
 
 interface JobOrder {
-    request: JobRequest;
+    job_request: JobRequest;
     specific_work: string;
     remarks: string;
     jo_number: number;
+    date_started: Date;
     personnels: [Personnel];
 }
 

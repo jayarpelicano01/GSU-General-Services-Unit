@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { API } from '@/app/utils/api/api';
+import { useRouter } from 'next/navigation';
 
 interface JobRequest {
         id: number;
@@ -65,6 +66,8 @@ const JobOrderTable = () => {
         setIsDetailsOpen(true);
     };
 
+    const router = useRouter();
+
   useEffect(() => {
 
     // const fetchRequests = async () => {
@@ -94,20 +97,35 @@ const JobOrderTable = () => {
   console.log(orders);
   
 
-//   const handleNavigateToJobOrderForm = (request: JobRequest) => {
-//     localStorage.setItem('selectedRequest', JSON.stringify(request));
-//     router.push('/job-order');
-//   }
+    const [showModal, setShowModal] = useState(false);
+    const [selectedMonth, setSelectedMonth] = useState("");
 
-  const filteredOrders = orders.filter(order => {
-    if (activeTab === 'All Orders') return true;
-    return order.status === activeTab;
-  });
+    const handleGenerateReport = () => {
+        setShowModal(true);
+    };
+
+    const handleConfirm = () => {
+        if (!selectedMonth) return;
+        router.push(`/accomplishment-report?month=${selectedMonth}`);
+        setShowModal(false);
+    };
+
+    const filteredOrders = orders.filter(order => {
+        if (activeTab === 'All Orders') return true;
+        return order.status === activeTab;
+    });
 
 
   return (
+    
     <div className="min-h-screen bg-[#f8f9ff] p-8">
       {/* Table Container */}
+        <button
+            onClick={handleGenerateReport}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all"
+            >
+            Generate Report
+        </button>
       <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         
         <div className="flex items-center border-b border-slate-100 px-8 py-2 gap-8">
@@ -132,7 +150,7 @@ const JobOrderTable = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="text-slate-400 text-[11px] font-bold uppercase tracking-widest border-b border-slate-100">
-                <th className="px-8 py-5">ID</th>
+                <th className="px-8 py-5">JO No.</th>
                 <th className="px-4 py-5">Requesting Unit</th>
                 <th className="px-4 py-5">Field of Work</th>
                 <th className="px-4 py-5">Work Description</th>
@@ -146,7 +164,7 @@ const JobOrderTable = () => {
                   
                   {/* ID */}
                   <td className="px-8 py-6 text-slate-400 text-sm font-medium tabular-nums">
-                    #{order.id}
+                    #{order.jo_number}
                   </td>
                   
                   {/* Requesting Unit */}
@@ -334,7 +352,7 @@ const JobOrderTable = () => {
                       <h3 className="text-[11px] font-bold text-indigo-500 uppercase tracking-[0.2em] mb-4">Work Description</h3>
                       <div className="space-y-4">
                           <div className="border-l-4 border-indigo-500 pl-4">
-                              <p className="text-slate-700 text-sm leading-relaxed italic">"{viewingOrder.specific_work}"</p>
+                              <p className="text-slate-700 text-sm leading-relaxed italic">&quot;{viewingOrder.specific_work}&quot;</p>
                           </div>
                           <div className="flex gap-8 text-[12px]">
                               <div>
@@ -371,6 +389,8 @@ const JobOrderTable = () => {
                   </section>
               </div>
 
+              
+
               {/* Footer Action */}
               {/* <div className="p-8 sticky bottom-0 bg-white border-t border-slate-100 flex gap-3">
                   <button 
@@ -383,6 +403,38 @@ const JobOrderTable = () => {
           </div>
       </div>
   )}
+  {showModal && (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div className="bg-white rounded-xl shadow-xl p-6 w-80 space-y-4">
+        <h2 className="text-slate-800 font-bold text-lg">Generate Report</h2>
+        <p className="text-slate-400 text-sm">Select a month to generate the accomplishment report.</p>
+        
+        <input
+            type="month"
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-slate-700 focus:border-indigo-500 outline-none"
+        />
+
+        <div className="flex gap-3 justify-end">
+            <button
+            onClick={() => setShowModal(false)}
+            className="px-4 py-2 text-sm text-slate-400 hover:text-slate-600 font-semibold transition-colors"
+            >
+            Cancel
+            </button>
+            <button
+            onClick={handleConfirm}
+            disabled={!selectedMonth}
+            className="px-4 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white font-bold rounded-lg transition-all"
+            >
+            Generate
+            </button>
+        </div>
+        </div>
+    </div>
+    )}
+  
     </div>
   );
 };

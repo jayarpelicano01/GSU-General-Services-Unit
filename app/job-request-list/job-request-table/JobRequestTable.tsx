@@ -52,8 +52,8 @@ const JobRequestTable = () => {
   console.log(requests);
   
 
-  const handleNavigateToJobOrderForm = (request: JobRequest) => {
-    localStorage.setItem('selectedRequest', JSON.stringify(request));
+  const handleNavigateToJobOrderForm = (requestId: number) => {
+    localStorage.setItem('selectedRequestId', requestId.toString());
     router.push('/job-order');
   }
 
@@ -170,7 +170,7 @@ const JobRequestTable = () => {
                     {req.status === 'Pending' ? (
                       <button 
                         className="bg-white border border-indigo-600 text-indigo-600 px-4 py-2 rounded-lg text-[11px] font-bold uppercase hover:text-white tracking-tight hover:bg-indigo-600 transition-all shadow-sm active:scale-95"
-                        onClick={() => handleNavigateToJobOrderForm(req)}
+                        onClick={() => handleNavigateToJobOrderForm(req.id)}
                       >
                         Create Job Order
                       </button>

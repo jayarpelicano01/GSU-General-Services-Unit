@@ -34,8 +34,9 @@
 
     interface PrintProps {
         JobOrder: {
-            request: JobRequest;
+            job_request: JobRequest;
             specific_work: string;
+            date_started: Date;
             remarks: string;
             jo_number: number;
             personnels: [Personnel];
@@ -44,11 +45,11 @@
 
   const PrintJobOrder = ({ JobOrder: data }: PrintProps) => {
     // data = JSON.parse(data)
-    const headOfUnit = data.request.unit.head;
+    const headOfUnit = data.job_request.unit.head;
     const headFullName = `${headOfUnit.first_name} ${headOfUnit.middle_name || ''} ${headOfUnit.last_name} ${headOfUnit.suffix || ''}`
     console.log(data);
 
-    const dateString =  new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    // const dateString =  new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     
     return (
       <div style={{padding: "10mm 10mm 10mm 10mm"}} className=" bg-white text-black font-sans -pt-[10mm] w-[210mm] mx-auto overflow-hidden">
@@ -66,6 +67,20 @@
             <p className="text-xs italic">University Town, Northern Samar</p>
             <p className="text-[10px]">Website: <span style={{ color: '#0056b3'}}>http://uep.edu.ph</span> Email: <span style={{ color: '#0056b3'}}>uepnsofficial@gmail.com</span></p>
           </div>
+          <Image 
+          src="/bagongpilipinas.png" 
+          alt="UEP Logo" 
+          width={70}
+          height={70}
+          className="absolute right-10" 
+          />
+          <Image 
+          src="/socotec.jpg" 
+          alt="UEP Logo" 
+          width={62}
+          height={70}
+          className=" absolute right-30" 
+          />
         </div>
 
         {/* 2. FORM TITLE BAR */}
@@ -78,24 +93,28 @@
           <div className="div1">
             <div className="flex  gap-2">
                 <span className="">Location: </span>
-                <span className="w-32 font-bold">{data.request.unit.location.location_name}</span>
+                <span className="w-32 font-bold">{data.job_request.unit.location.location_name}</span>
             </div>
             <div className="flex gap-1">
                 <span className="">Requesting Unit:</span>
                 <span className="border-b border-black w-64 text-center">
-                    {data.request.unit.unit_name} ({data.request.unit.unit_acronym})
+                    {data.job_request.unit.unit_name} ({data.job_request.unit.unit_acronym})
                 </span>
             </div>
           </div>
           <div className="div2">
             <div className="flex gap-2">
-                <span className="">JR No.:</span>
-                <span className="border-b border-black w-32 text-center font-mono"></span>
+                <span className="">JO No.:</span>
+                <span className="border-b border-black w-32 text-center font-mono">{data.jo_number}</span>
             </div>
             <div className="flex gap-2">
                 <span className="">Date:</span>
                 <span className="border-b border-black w-32 text-center">
-                {/* {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}  */} {dateString}
+                {new Date(data.date_started).toLocaleDateString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric'
+                })}
                 </span>
             </div>
           </div>
@@ -137,7 +156,12 @@
           <div className="flex mt-2 gap-6 ">
             <div className="flex items-end w-full gap-1">
               <span className="whitespace-nowrap shrink-0">Date Started:</span>
-              <span className="border-b border-black w-full italic px-2">
+              <span className="border-b border-black w-full italic px-2"> 
+                {new Date(data.date_started).toLocaleDateString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric'
+                })}
               </span>
             </div>
             <div className="flex items-end w-full gap-1">
