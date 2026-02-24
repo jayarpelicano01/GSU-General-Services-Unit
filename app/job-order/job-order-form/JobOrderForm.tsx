@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { API } from "@/app/utils/api/api";
+import Alert from "@/app/components/alert/Alert";
+import ConfirmDialog from "@/app/components/confirm/Confirm";
 
 // MOCK DATA
 // const AVAILABLE_PERSONNEL = [
@@ -63,6 +65,8 @@ interface Personnel {
 const JobOrderForm = () => {
   const router = useRouter();
   const [personnelList, setPersonnelList] = useState<Personnel[]>([]);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
 
@@ -118,19 +122,6 @@ const JobOrderForm = () => {
   }, []);
 
           
-
-//   const getAvailablePersonnel = (currentFieldName: string) => {
-//     // 1. Identify which IDs are currently selected in OTHER fields
-//     const selectedIds = [
-//         currentFieldName !== 'personnel1' ? JobOrderFormData.personnel1 : null,
-//         currentFieldName !== 'personnel2' ? JobOrderFormData.personnel2 : null,
-//         currentFieldName !== 'personnel3' ? JobOrderFormData.personnel3 : null,
-//     ].filter(Boolean); // Removes nulls and empty strings
-
-//     // 2. Filter the master list to exclude those IDs
-//     return personnelList.filter(person => !selectedIds.includes(person.id.toString()));
-// };
-
   
 
   const filteredPersonnel = personnelList.filter(
@@ -151,30 +142,15 @@ const JobOrderForm = () => {
     console.log(JobOrderFormData);
  }, [JobOrderFormData]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const submitData = async (status: string) => {  
     const payload = {
         request_id: requestData?.id,
         specific_work: JobOrderFormData.specificWorkOrder,
         remarks: JobOrderFormData.remarks,
         jo_number: JobOrderFormData.jobOrderNo,
+        status: status
     }
 
-    
-    // const orderData = {
-    //     request: requestData,
-    //     specific_work: JobOrderFormData.specificWorkOrder,
-    //     remarks: JobOrderFormData.remarks,
-    //     jo_number: JobOrderFormData.jobOrderNo,
-    //     personnels: JobOrderFormData.personnels
-    //     .map(id => personnelList.find(p => p.id === Number(id)))
-    //     .filter(Boolean)
-    // };
-
-
-
-    console.log(payload);    
     try {
         const response = await API.post('/job-orders', {...payload});
         
@@ -200,11 +176,6 @@ const JobOrderForm = () => {
           ...requestData, 
           jo_number: JobOrderFormData.jobOrderNo 
         };
-        
-        localStorage.setItem("job-request", JSON.stringify(updatedRequestData))
-        // localStorage.setItem("job-order", JSON.stringify(orderData))
-        
-        console.log('Job Order creation:', response.data.status , response.data);
 
         const updatedOrderDate = {
           ...response.data.data,
@@ -212,12 +183,27 @@ const JobOrderForm = () => {
         .map(id => personnelList.find(p => p.id === Number(id)))
         }
 
+        localStorage.setItem("job-request", JSON.stringify(updatedRequestData))
         localStorage.setItem("job-order", JSON.stringify(updatedOrderDate))
-        alert('Job Order processed successfully!');
-        router.push(`/job-order/print-job-order`)
+        setShowSuccess(true);
+
+        if (status === "Assigned") {
+          setTimeout(() => {
+            router.push(`/job-order/print-job-order`);
+          }, 1500);
+        } else {
+          setTimeout(() => {
+            router.push(`/job-order-list`);
+          }, 1500);
+        }
     } catch (error) {
       console.error('Error creating job order:', error);
     }
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault(); // Stop page reload
+    setShowConfirm(true); // Show the confirmation dialog instead of submitting
   };
 
   const handleInputChange = (
@@ -252,7 +238,7 @@ const JobOrderForm = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Requesting Unit</label>
-                    <div className="text-sm font-medium text-slate-700">{requestData.unit.unit_name} ({requestData.unit.unit_acronym})</div>
+                    <div className="text-sm font-medium text-slate-700">{requestData.unit.unit_name || ''} ({requestData.unit.unit_acronym})</div>
                 </div>
                 <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Field of Work</label>
@@ -466,6 +452,34 @@ const JobOrderForm = () => {
           </div>
         </form>
       </div>
+
+      <div className="fixed top-6 right-6 z-9999 w-full max-w-sm pointer-events-none">
+        <div className="pointer-events-auto">
+          {showSuccess && (
+            <Alert 
+              type="success" 
+              message="Job Order processed successfully. Redirecting..." 
+              onClose={() => setShowSuccess(false)}
+            />
+          )}
+        </div>
+      </div>
+
+      <ConfirmDialog
+        isOpen={showConfirm}
+        title="Process Job Order?"
+        message="Finalize and Print the Order or save to draft first?"
+        confirmLabel="Yes, Process"
+        cancelLabel="Save as Draft"
+        onConfirm={() => {
+          setShowConfirm(false);
+          submitData("Assigned");
+        }}
+        onCancel={() => {
+          setShowConfirm(false);
+          submitData("Pending")
+        }}
+      />
     </div>
   );
 };

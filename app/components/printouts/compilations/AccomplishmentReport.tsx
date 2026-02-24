@@ -42,10 +42,6 @@ const AccomplishmentReport = ({selectedField}: Props) => {
     
     const [jobOrders, setJobOrders] = useState<JobOrder[]>([]);
 
-    // const selectedFieldLabel = selectedField === "All" 
-    // ? '' 
-    // : selectedField;
-
     useEffect(() => {
 
         const fetchJobOrders = async () => {
@@ -70,7 +66,7 @@ const AccomplishmentReport = ({selectedField}: Props) => {
     return (
         <div 
             style={{padding: "10mm 10mm 10mm 10mm"}} 
-            className=" text-black font-sans w-[297mm] min-h-[210mm] mx-auto overflow-hidden"
+            className=" print-header text-black font-sans w-[297mm] min-h-[210mm] mx-auto overflow-hidden"
             >
             <div className="flex justify-center items-center relative mb-2">
                 <Image 
@@ -82,10 +78,10 @@ const AccomplishmentReport = ({selectedField}: Props) => {
                 className="w-20 h-20 absolute left-20" 
                 />
                 <div className="text-center">
-                <p className="text-xs">Republic of the Philippines</p>
-                <p className="font-bold text-xs leading-tight">UNIVERSITY OF EASTERN PHILIPPINES</p>
-                <p className="text-xs italic">University Town, Northern Samar</p>
-                <p className="text-[10px]">Website: <span style={{ color: '#0056b3'}}>http://uep.edu.ph</span> Email: <span style={{ color: '#0056b3'}}>uepnsofficial@gmail.com</span></p>
+                <p className="text-md">Republic of the Philippines</p>
+                <p className="font-bold text-md leading-tight">UNIVERSITY OF EASTERN PHILIPPINES</p>
+                <p className="text-md italic">University Town, Northern Samar</p>
+                <p className="text-[11px]">Website: <span style={{ color: '#0056b3'}}>http://uep.edu.ph</span> Email: <span style={{ color: '#0056b3'}}>uepnsofficial@gmail.com</span></p>
                 </div>
                 <Image 
                 src="/bagongpilipinas.png" 
@@ -103,11 +99,11 @@ const AccomplishmentReport = ({selectedField}: Props) => {
                 />
             </div>
 
-            <div className="text-black text-center font-bold text-md m-2">
+            <div className="text-black text-center font-bold text-lg m-2">
                 GENERAL SERVICES UNIT
             </div>
 
-            <div className="text-red-500 text-center font-bold text-lg mb-2">
+            <div className="text-red-500 text-center font-bold text-xl mb-2">
                 MONTHLY ACCOMPLISHMENT REPORT{' '}
                 {month && (
                     <span>
@@ -123,7 +119,7 @@ const AccomplishmentReport = ({selectedField}: Props) => {
                 )} 
             </div>
 
-            <table className="w-full text-black border text-[12px] mt-4">
+            <table className="w-full text-black text-[12px] mt-4">
             {/* Blue Header */}
             <thead className='border border-black'>
                 <tr className=" bg-blue-200 border border-black text-center uppercase">
@@ -144,7 +140,11 @@ const AccomplishmentReport = ({selectedField}: Props) => {
                 <tr key={order.id} className='border border-black'>
                     <td className="border border-black px-2 py-2 text-center">{order.jo_number}</td>
                     <td className="border border-black px-2 py-2 text-center">{order.specific_work}</td>
-                    <td className="border border-black px-2 py-2 text-center">{order.job_request.unit.unit_name} ({order.job_request.unit.unit_acronym})</td>
+                    <td className="border border-black px-2 py-2 text-center">{order.job_request.unit.unit_name} 
+                        {order.job_request.unit.unit_acronym && (
+                            <span> ({order.job_request.unit.unit_acronym})</span>
+                        )}
+                    </td>
                     <td className="border border-black px-2 py-2 text-center">
                         {new Date(order.date_started).toLocaleString("en-US",
                             {month: "long",
@@ -165,55 +165,64 @@ const AccomplishmentReport = ({selectedField}: Props) => {
                     <td className="border border-black text-center px-2 py-2">Accomplished</td>
                 </tr>
                 ))}
-            </tbody>
+            </tbody>    
+            {/* Footer inside tfoot so it naturally appears after the last row, never overlapping */}
+                <tfoot className='hidden '>
+                    <tr>
+                        <td colSpan={7} className="pt-5">
+                            <div style={{borderWidth: '2px'}} className="border border-blue-400 grid grid-cols-3 text-[11px] font-bold uppercase overflow-hidden">
+                                <div className="p-2 border-r border-blue-400 text-[11px]">
+                                    DOCUMENT NO: <br />
+                                    <div className="flex justify-center text-center w-full">
+                                        <span className="border-b border-black w-40">UEP-GSU-FM-005</span>
+                                    </div>
+                                </div>
+                                <div className="p-2 border-r border-blue-400 flex text-[11px] flex-col justify-center">
+                                    REVISION NO: <br />
+                                    <div className="flex justify-center text-center w-full">
+                                        <span className="border-b border-black w-40">00</span>
+                                    </div>
+                                </div>
+                                <div className="p-2 border-blue-400 text-[11px]">
+                                    EFFECTIVITY DATE: <br />
+                                    <div className="flex justify-center text-center">
+                                        <span className="border-b border-black w-40">SEPTEMBER 12, 2022</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
             </table>
 
-            <div style={{borderWidth: '2px'}} className="print-footer mt-2 border border-blue-400 grid grid-cols-3 text-[11px] font-bold uppercase overflow-hidden">
-                <div className="p-2 border-r border-blue-400 text-[11px]">
-                    DOCUMENT NO: <br />
-                    <div className="flex justify-center text-center w-full">
-                        <span className="border-b border-black w-40">UEP-GSU-FM-005</span>
-                    </div>
-                </div>
-                <div style={{borderWidth: '0 1px 0 1px'}} className="border-r p-2 border-blue-400 flex text-[11px] flex-col justify-center">
-                    REVISION NO: <br />
-                    <div className="flex justify-center text-center w-full">
-                        <span className="border-b border-black w-40">00</span>
-                    </div>
-                </div>
-                <div style={{borderWidth: '0 0 0 1px'}} className="p-2 border-blue-400 text-[11px]">
-                    EFFECTIVITY DATE: <br />
-                    <div className="flex justify-center text-center">
-                        <span className="border-b border-black w-40">SEPTEMBER 12, 2022</span>
-                    </div>
-                </div>
-            </div>
-
             <style jsx>{`
-                .print-footer {
-                    display: none
-                }
-
                 @media print {
                     @page {
-                    size: A4 landscape;
-                    margin: 0;
+                        size: A4 landscape;
+                        padding: 10mm;
+                        margin: 55mm 10mm 10mm 10mm;
                     }
 
-                    .print-footer {
-                        display: grid;
-                        position: fixed;
-                        bottom: 10;
-                        left: 10mm;
-                        right: 10mm;
-                        background: white;
+                    thead {
+                        display: table-header-group;
+                    }
+
+                    tfoot {
+                        display: table-footer-group;
+                    }
+
+                    tbody {
+                        display: table-row-group;
+                    }
+
+                    table {
                         -webkit-print-color-adjust: exact;
                         print-color-adjust: exact;
                     }
 
-                    table { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-
-                    thead tr { background-color: #bfdbfe; }
+                    thead tr {
+                        background-color: #bfdbfe;
+                    }
                 }
             `}</style>
 

@@ -30,7 +30,7 @@ interface JobRequest {
 }
 
 const JobRequestTable = () => {
-  const [activeTab, setActiveTab] = useState('Pending');
+  const [activeTab, setActiveTab] = useState('All Requests');
   const tabs = ['Pending', 'All Requests', 'Approved', 'Disapproved', 'Cancelled'];
   const router = useRouter();
   const [requests, setRequests] = useState<JobRequest[]>([]);
@@ -61,6 +61,15 @@ const JobRequestTable = () => {
     if (activeTab === 'All Requests') return true;
     return req.status === activeTab;
   });
+
+  useEffect(() => {
+      const AssignedRequest = requests.filter(request => {
+          return request.status === 'Pending';
+      });
+
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (AssignedRequest.length > 0) {setActiveTab("Pending")}
+  }, [requests])
 
 
   return (

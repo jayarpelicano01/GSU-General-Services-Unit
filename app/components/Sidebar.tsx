@@ -1,9 +1,11 @@
 "use client";
+import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
 const Sidebar = () => {
   const [step, setStep] = useState(0); // 0 = Preview, 1 = Print, 2 = Done
   const steps = ["Preview", "Print", "Done"];
+  const router = useRouter();
 
   const handlePrint = () => {
   // Move to step 1 (Print) as soon as the dialog opens
@@ -113,7 +115,7 @@ const Sidebar = () => {
         
         {step !== 1 && (
             <button 
-            onClick={() => window.history.back()}
+            onClick={() => router.push('/job-order-list')}
             className="w-full bg-white border border-slate-200 text-slate-600 py-3 rounded-xl text-[12px] font-bold uppercase hover:bg-slate-50"
             >
             Back to Dashboard
