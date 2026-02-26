@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { API } from '@/app/utils/api/api';
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import Modal from '@/app/components/modal/modal';
 
 interface JobRequest {
@@ -88,20 +88,48 @@ const JobOrderTable = () => {
         }
 
         try {
-            const response = await API.patch(`/job-orders/${cancelOrder?.id}/cancel`, {
+            const response = await API.patch(`/job-orders/${cancelOrder?.id}/status`, {
+                status: "Cancelled",
                 reason: cancelReason
             });
 
             if (response.data.status === "success") {
                 setCancelOrder(null);
-                fetchOrders(); // Refresh your table data
-                // Optional: Show a success toast/alert
+                fetchOrders();
             }
         } catch (error) {
             console.error("Error cancelling order:", error);
         }
     };
-    
+
+    const handleIssueOrder = async (order: JobOrder) => {
+        try {
+            const response = await API.patch(`/job-orders/${order.id}/status`, {
+                status: "Assigned"
+            });
+            
+            console.log(response.data);
+
+            const jobOrderData = response.data.data;
+            const jobRequestData = jobOrderData.job_request;
+
+            const updatedRequestData = { 
+                ...jobRequestData, 
+                jo_number: jobOrderData.jo_number 
+            };
+
+            if (response.data.status === "success") {
+                setSelectedOrder(null);
+                localStorage.setItem("job-request", JSON.stringify(updatedRequestData));
+                localStorage.setItem("job-order", JSON.stringify(jobOrderData));
+                router.push(`/job-order/print-job-order`);
+            }
+            
+        } catch (error) {
+            console.error("Error issuing order:", error);
+        }
+    };
+        
     // Update your state to use the order's existing data as defaults
     const [formData, setFormData] = useState({
         date_started: completeOrder?.date_started || '', 
@@ -298,6 +326,16 @@ const JobOrderTable = () => {
                             <circle cx="12" cy="12" r="1" /><circle cx="12" cy="5" r="1" /><circle cx="12" cy="19" r="1" />
                             </svg>
                         </button>
+                        ) : order.status === 'Pending' ? (
+                            <button 
+                                type="button"
+                                onClick={() => setSelectedOrder(order)}
+                                className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="1" /><circle cx="12" cy="5" r="1" /><circle cx="12" cy="19" r="1" />
+                                </svg>
+                            </button>
                         ) : (
                         /* Simple View Details for everything else (Completed, Pending, etc.) */
                         <button 
@@ -381,6 +419,50 @@ const JobOrderTable = () => {
                             </div>
                         </button>
 
+                        {/* 3. Cancel Order Action (Keep Rose for warnings) */}
+                        <button 
+                            className="group w-full text-left px-4 py-4 rounded-xl hover:bg-rose-50 border border-transparent hover:border-rose-100 transition-all flex items-center gap-4 mt-1"
+                            onClick={() => {
+                                setCancelOrder(selectedOrder); 
+                                setCancelReason(""); 
+                                setSelectedOrder(null); 
+                            }}
+                        >
+                            <div className="p-2.5 text-rose-400 group-hover:text-rose-600 group-hover:bg-rose-100 rounded-lg transition-colors">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                    <path d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </div>
+                            <span className="text-rose-600 font-bold text-sm">Cancel Order</span>
+                        </button>
+                    </>
+                )}
+                {selectedOrder.status === 'Pending' && (
+                    <>
+                        {/* Divider with text */}
+                        <div className="flex items-center my-3 px-2">
+                            <div className="h-px bg-slate-100 flex-1" />
+                            <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest px-4">Update Status</span>
+                            <div className="h-px bg-slate-100 flex-1" />
+                        </div>
+
+                        {/* 2. Complete Order Action (Now Indigo) */}
+                        <button 
+                            className="group w-full text-left px-4 py-4 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-100 hover:border-blue-200 transition-all flex items-center gap-4 shadow-sm"
+                            onClick={() => {
+                                handleIssueOrder(selectedOrder); 
+                            }}
+                        >
+                            <div className="p-2.5 bg-white rounded-lg text-blue-600 shadow-sm group-hover:scale-110 transition-transform">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                    <path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <span className="text-blue-900 font-extrabold text-sm block">Issue Job Order</span>
+                                <span className="text-blue-600/70 text-[11px] font-medium block mt-0.5">Officially dispatch this job order</span>
+                            </div>
+                        </button>
                         {/* 3. Cancel Order Action (Keep Rose for warnings) */}
                         <button 
                             className="group w-full text-left px-4 py-4 rounded-xl hover:bg-rose-50 border border-transparent hover:border-rose-100 transition-all flex items-center gap-4 mt-1"

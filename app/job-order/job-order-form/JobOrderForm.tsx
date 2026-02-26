@@ -467,6 +467,7 @@ const JobOrderForm = () => {
 
       <ConfirmDialog
         isOpen={showConfirm}
+        onClose={() => setShowConfirm(false)}
         title="Process Job Order?"
         message="Finalize and Print the Order or save to draft first?"
         confirmLabel="Yes, Process"

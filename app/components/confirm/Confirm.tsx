@@ -11,6 +11,7 @@ interface ConfirmDialogProps {
   type?: "danger" | "primary";
   onConfirm: () => void;
   onCancel: () => void;
+  onClose?: () => void;
 }
 
 export default function ConfirmDialog({
@@ -22,6 +23,7 @@ export default function ConfirmDialog({
   type = "primary",
   onConfirm,
   onCancel,
+  onClose
 }: ConfirmDialogProps) {
   if (!isOpen) return null;
 
@@ -32,7 +34,6 @@ export default function ConfirmDialog({
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
-        onClick={onCancel}
       />
 
       {/* Dialog Box */}
@@ -42,7 +43,16 @@ export default function ConfirmDialog({
           p-6 overflow-hidden custom-confirm-bounce
         `}
       >
-        <div className="flex flex-col items-center text-center">
+        {/* X Button */}
+        <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-1.5 rounded-xl text-slate-300 hover:text-slate-500 hover:bg-slate-100 transition-all"
+        >
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+          <div className="flex flex-col items-center text-center">
           {/* Icon Section */}
           <div className={`
             w-14 h-14 rounded-2xl flex items-center justify-center mb-4
