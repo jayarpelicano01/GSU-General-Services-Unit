@@ -73,7 +73,7 @@
         {/* 3. DATE AND NO. */}
         <div className="text-[11px] flex flex-col items-end text-sm space-y-1 mb-1">
           <div className="flex gap-2">
-            <span className="">JO No.:</span>
+            <span className="">JR No.:</span>
             <span className="border-b border-black w-32 text-center font-mono">{data.jo_number}</span>
           </div>
           <div className="flex gap-2">

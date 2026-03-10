@@ -1,8 +1,6 @@
 "use client";
-import { API } from '@/app/utils/api/api';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
 interface Personnel {
     id: number;
@@ -33,35 +31,14 @@ interface JobOrder {
 }
 
 interface Props {
-  selectedField: string;
+    selectedField: string;
+    JobOrders: JobOrder[];
 }
 
-const AccomplishmentReport = ({selectedField}: Props) => {
+const AccomplishmentReport = ({selectedField, JobOrders}: Props) => {
     const searchParams = useSearchParams();
     const month = searchParams.get('month');
-    
-    const [jobOrders, setJobOrders] = useState<JobOrder[]>([]);
-
-    useEffect(() => {
-
-        const fetchJobOrders = async () => {
-            const response = await API.get('/job-orders/completed/');
-            const data = response.data.data;
-            setJobOrders(data);
-        }
-
-        fetchJobOrders();
-    }, [])
-
-    const filteredByFieldWorkOrders = selectedField === "All"
-    ? jobOrders
-    : jobOrders.filter(order => order.job_request?.field_work === selectedField);
-
-    const filteredOrders = filteredByFieldWorkOrders.filter(order => {
-        if (!month) return true;
-        const orderMonth = new Date(order.date_started).toISOString().slice(0, 7);
-        return orderMonth === month;
-    });
+    const year = searchParams.get('year');
     
     return (
         <div 
@@ -95,7 +72,7 @@ const AccomplishmentReport = ({selectedField}: Props) => {
                 alt="UEP Logo" 
                 width={68}
                 height={80}
-                className="w-17 h-20 absolute right-30" 
+                className="w-17 h-20 absolute right-35" 
                 />
             </div>
 
@@ -103,21 +80,28 @@ const AccomplishmentReport = ({selectedField}: Props) => {
                 GENERAL SERVICES UNIT
             </div>
 
-            <div className="text-red-500 text-center font-bold text-xl mb-2">
-                MONTHLY ACCOMPLISHMENT REPORT{' '}
-                {month && (
-                    <span>
-                        ({new Date(month + '-01T00:00:00').toLocaleDateString('en-US', { 
-                            month: 'long', 
-                            year: 'numeric'
-                        }).toUpperCase()} 
-                        {selectedField !== "All" && (
-                                <span> - {selectedField}</span>
-                            )}
-                        )
-                    </span>
-                )} 
-            </div>
+            {month ?  
+                (<div className="text-red-500 text-center font-bold text-xl mb-2">
+                    MONTHLY ACCOMPLISHMENT REPORT{' '}
+                        <span>
+                            ({new Date(month + '-01T00:00:00').toLocaleDateString('en-US', { 
+                                month: 'long', 
+                                year: 'numeric'
+                            }).toUpperCase()} 
+                            {selectedField !== "All" && (
+                                    <span> - {selectedField}</span>
+                                )}
+                            )
+                        </span>
+                </div>
+            ) : (
+                <div className="text-red-500 text-center font-bold text-xl mb-2">
+                    CONSOLIDATED APPROVED JOB REQUEST From JANUARY – DECEMBER {year}
+                    {selectedField !== "All" && (
+                        <span> ( {selectedField} )</span>
+                    )}
+                </div>
+            )}
 
             <table className="w-full text-black text-[12px] mt-4">
             {/* Blue Header */}
@@ -126,8 +110,8 @@ const AccomplishmentReport = ({selectedField}: Props) => {
                 <th className=" border border-black px-2 py-2 font-bold whitespace-nowrap">JR No.</th>
                 <th className="  border border-black px-2 py-2 font-bold whitespace-nowrap">Job Order</th>
                 <th className=" px-2 py-2 font-bold whitespace-nowrap border border-black">Requesting Office/Unit</th>
-                <th className=" px-2 py-2 font-bold whitespace-nowrap border border-black">Date Started</th>
-                <th className=" px-2 py-2 font-bold whitespace-nowrap border border-black">Date Completion</th>
+                <th className=" px-3 py-2 font-bold whitespace-nowrap border border-black">Date Started</th>
+                <th className=" px-2 py-2 font-bold whitespace-nowrap border border-black">Date Completed</th>
                 <th className=" px-2 py-2 font-bold whitespace-nowrap border border-black">Assigned Personnel</th>
                 <th className=" px-2 py-2 font-bold whitespace-nowrap border border-black">Remarks</th>
                 </tr>
@@ -136,7 +120,7 @@ const AccomplishmentReport = ({selectedField}: Props) => {
             {/* Body */}
             <tbody className='border border-black'>
                 {/* Replace with your actual data */}
-                {filteredOrders.map((order) => (
+                {JobOrders.map((order) => (
                 <tr key={order.id} className='border border-black'>
                     <td className="border border-black px-2 py-2 text-center">{order.jo_number}</td>
                     <td className="border border-black px-2 py-2 text-center">{order.specific_work}</td>

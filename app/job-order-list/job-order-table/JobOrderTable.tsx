@@ -56,11 +56,12 @@ const JobOrderTable = () => {
 
     const [selectedOrder, setSelectedOrder] = useState<JobOrder | null>(null);
     const [completeOrder, setCompleteOrder] = useState<JobOrder | null>(null);
+    const [reportType, setReportType] = useState<"month" | "year">("month");
+    const [selectedYear, setSelectedYear] = useState("");
 
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
     const [viewingOrder, setViewingOrder] = useState<JobOrder | null>(null);
 
-    // const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
     const [cancelOrder, setCancelOrder] = useState<JobOrder | null>(null);
     const [cancelReason, setCancelReason] = useState("");
 
@@ -107,8 +108,6 @@ const JobOrderTable = () => {
             const response = await API.patch(`/job-orders/${order.id}/status`, {
                 status: "Assigned"
             });
-            
-            console.log(response.data);
 
             const jobOrderData = response.data.data;
             const jobRequestData = jobOrderData.job_request;
@@ -146,7 +145,6 @@ const JobOrderTable = () => {
         console.log(order.date_started);
 
         if (order.date_started) {
-            // Only attempt to format if the date actually exists
             startDateValue = new Date(order.date_started).toISOString().split('T')[0];
         }
         
@@ -158,8 +156,6 @@ const JobOrderTable = () => {
 
 
     const router = useRouter();
-      
-  console.log(orders);
   
 
     const [showModal, setShowModal] = useState(false);
@@ -170,8 +166,13 @@ const JobOrderTable = () => {
     };
 
     const handleConfirm = () => {
-        if (!selectedMonth) return;
-        router.push(`/accomplishment-report?month=${selectedMonth}`);
+        if (reportType === "month") {
+            if (!selectedMonth) return;
+            router.push(`/accomplishment-report?month=${selectedMonth}`);
+        } else {
+            if (!selectedYear) return;
+            router.push(`/accomplishment-report?year=${selectedYear}`);
+        }
         setShowModal(false);
     };
 
@@ -205,7 +206,7 @@ const JobOrderTable = () => {
                     console.error('Error fetching job orders:', error);
                 }
     }
-            fetchOrders(); // Call your existing fetch function to update the UI
+            fetchOrders();
 
             alert("Order completed!");
         } catch (error) {
@@ -291,7 +292,7 @@ const JobOrderTable = () => {
                   
                   {/* Work Description */}
                   <td className="px-4 py-6 max-w-50">
-                    <div className="font-bold text-slate-700 truncate text-sm" title={order.specific_work}>
+                    <div className="font-bold text-slate-700 text-sm" title={order.specific_work}>
                       {order.specific_work}
                     </div>
                     <div className="text-indigo-500 text-[10px] font-bold uppercase mt-1">
@@ -678,37 +679,71 @@ const JobOrderTable = () => {
       </div>
   )}
 
-  {showModal && (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-        <div className="bg-white rounded-xl shadow-xl p-6 w-80 space-y-4">
-        <h2 className="text-slate-800 font-bold text-lg">Generate Report</h2>
-        <p className="text-slate-400 text-sm">Select a month to generate the accomplishment report.</p>
-        
-        <input
-            type="month"
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-slate-700 focus:border-indigo-500 outline-none"
-        />
+{showModal && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <div className="bg-white rounded-xl shadow-xl p-6 w-80 space-y-4">
+      <h2 className="text-slate-800 font-bold text-lg">Generate Report</h2>
+      <p className="text-slate-400 text-sm">Select a period to generate the accomplishment report.</p>
 
-        <div className="flex gap-3 justify-end">
-            <button
-            onClick={() => setShowModal(false)}
-            className="px-4 py-2 text-sm text-slate-400 hover:text-slate-600 font-semibold transition-colors"
-            >
-            Cancel
-            </button>
-            <button
-            onClick={handleConfirm}
-            disabled={!selectedMonth}
-            className="px-4 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white font-bold rounded-lg transition-all"
-            >
-            Generate
-            </button>
-        </div>
-        </div>
+      {/* Tab Toggle */}
+      <div className="flex bg-slate-100 rounded-lg p-1">
+        <button
+          onClick={() => setReportType("month")}
+          className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${
+            reportType === "month" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-400"
+          }`}
+        >
+          By Month
+        </button>
+        <button
+          onClick={() => setReportType("year")}
+          className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${
+            reportType === "year" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-400"
+          }`}
+        >
+          By Year
+        </button>
+      </div>
+
+      {/* Input */}
+      {reportType === "month" ? (
+        <input
+          type="month"
+          value={selectedMonth}
+          onChange={(e) => setSelectedMonth(e.target.value)}
+          className="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-slate-700 focus:border-indigo-500 outline-none"
+        />
+      ) : (
+        <select
+          value={selectedYear}
+          onChange={(e) => setSelectedYear(e.target.value)}
+          className="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-slate-700 focus:border-indigo-500 outline-none"
+        >
+          <option value="">Select a year...</option>
+          {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map(year => (
+            <option key={year} value={year}>{year}</option>
+          ))}
+        </select>
+      )}
+
+      <div className="flex gap-3 justify-end">
+        <button
+          onClick={() => setShowModal(false)}
+          className="px-4 py-2 text-sm text-slate-400 hover:text-slate-600 font-semibold transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleConfirm}
+          disabled={reportType === "month" ? !selectedMonth : !selectedYear}
+          className="px-4 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white font-bold rounded-lg transition-all"
+        >
+          Generate
+        </button>
+      </div>
     </div>
-    )}
+  </div>
+)}
   
     </div>
   );

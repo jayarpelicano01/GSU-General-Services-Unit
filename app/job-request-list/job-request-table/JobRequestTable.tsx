@@ -31,7 +31,7 @@ interface JobRequest {
 
 const JobRequestTable = () => {
   const [activeTab, setActiveTab] = useState('All Requests');
-  const tabs = ['Pending', 'All Requests', 'Approved', 'Disapproved', 'Cancelled'];
+  const tabs = ['All Requests', 'Pending', 'Under Inspection', 'Awaiting Materials', 'Approved', 'Disapproved', 'Cancelled'];
   const router = useRouter();
   const [requests, setRequests] = useState<JobRequest[]>([]);
   useEffect(() => {
@@ -49,12 +49,17 @@ const JobRequestTable = () => {
     
   }, []); // Refetch if the number of requests changes
       
-  console.log(requests);
+  // console.log(requests);
   
 
   const handleNavigateToJobOrderForm = (requestId: number) => {
     localStorage.setItem('selectedRequestId', requestId.toString());
     router.push('/job-order');
+  }
+
+  const handleScheduleInspection = (requestId: number) => {
+    localStorage.setItem('selectedRequestId', requestId.toString());
+    router.push('/schedule-inspection');
   }
 
   const filteredRequests = requests.filter(req => {
@@ -76,6 +81,16 @@ const JobRequestTable = () => {
     <div className="min-h-screen bg-[#f8f9ff] p-8">
       {/* Table Container */}
       <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+
+        <div className="px-8 pt-6 pb-2 flex items-center justify-between">
+          <div>
+            <h2 className="text-slate-800 text-lg font-extrabold tracking-tight">Job Requests</h2>
+            <p className="text-slate-400 text-[12px] font-medium mt-0.5">Manage and monitor all incoming job requests</p>
+          </div>
+          <span className="bg-indigo-50 text-indigo-500 text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-indigo-100">
+            {filteredRequests.length} {activeTab === 'All Requests' ? 'Total' : activeTab}
+          </span>
+        </div>
         
         {/* Navigation Tabs (From Screenshot) */}
         <div className="flex items-center border-b border-slate-100 px-8 py-2 gap-8">
@@ -104,8 +119,6 @@ const JobRequestTable = () => {
                 <th className="px-4 py-5">Requesting Unit</th>
                 <th className="px-4 py-5">Field of Work</th>
                 <th className="px-4 py-5">Work Description</th>
-                <th className="px-4 py-5 text-center">Materials</th>
-                <th className="px-4 py-5 text-center">Status</th>
                 <th className="px-8 py-5 text-right">Action</th>
               </tr>
             </thead>
@@ -145,40 +158,18 @@ const JobRequestTable = () => {
                     </div>
                   </td>
 
-                  {/* Materials Status */}
-                  <td className="px-4 py-6 text-center">
-                    {req.status_of_materials ? (
-                      <span className={`text-[10px] font-bold uppercase tracking-tight px-2.5 py-1 rounded border ${
-                        req.status_of_materials.toLowerCase() === 'available' 
-                        ? 'text-emerald-600 border-emerald-100 bg-emerald-50' 
-                        : 'text-amber-600 border-amber-100 bg-amber-50'
-                      }`}>
-                        {req.status_of_materials}
-                      </span>
-                    ) : (
-                      <span className="text-[10px] font-bold uppercase tracking-tight px-2.5 py-1 rounded border text-slate-400 border-slate-100 bg-slate-50">
-                        Not Specified
-                      </span>
-                    )}
-                  </td>
-
-                  {/* Overall Status Badge */}
-                  <td className="px-4 py-6 text-center">
-                    <span className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold tracking-tight inline-block min-w-20 ${
-                      req.status === 'Approved' ? 'bg-emerald-100 text-emerald-600' :
-                      req.status === 'Pending' ? 'bg-amber-100 text-amber-600 border border-amber-200' :
-                      req.status === 'Disapproved' ? 'bg-rose-100 text-rose-600' :
-                      'bg-slate-100 text-slate-600'
-                    }`}>
-                      {req.status?.toUpperCase() || 'UNKNOWN'}
-                    </span>
-                  </td>
-
                   {/* Action */}
                   <td className="px-8 py-6 text-right">
                     {req.status === 'Pending' ? (
                       <button 
                         className="bg-white border border-indigo-600 text-indigo-600 px-4 py-2 rounded-lg text-[11px] font-bold uppercase hover:text-white tracking-tight hover:bg-indigo-600 transition-all shadow-sm active:scale-95"
+                        onClick={() => handleScheduleInspection(req.id)}
+                      >
+                        Schedule Inspection
+                      </button>
+                    ) : req.status === 'Approved' ? (
+                      <button 
+                        className="bg-white border border-emerald-600 text-emerald-600 px-4 py-2 rounded-lg text-[11px] font-bold uppercase hover:text-white tracking-tight hover:bg-emerald-600 transition-all shadow-sm active:scale-95"
                         onClick={() => handleNavigateToJobOrderForm(req.id)}
                       >
                         Create Job Order

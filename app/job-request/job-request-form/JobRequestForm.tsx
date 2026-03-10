@@ -6,7 +6,7 @@ export enum FieldWork {
   Welding = "Welding",
   Painting = "Painting",
   Carpentry = "Carpentry/Masonry",
-  GrassCutter = "Grass Cutter",
+  BrushCutter = "Brush Cutter",
   Electrical = "Electrical",
   Plumbing = "Plumbing",
   ArtAndSign = "Art & Sign",
@@ -19,10 +19,6 @@ interface JobRequestFormData {
   unitId: number | '';
   fieldWork: FieldWork | '';
   specificWorkToBeDone: string;
-  resultOfAssessment: string;
-  estimatedValue: number;
-  estimatedUnit: "Hours" | "Days" | "";
-  statusOfMaterials: "Available" | "Not Available" | null;
 }
 
 interface Unit {
@@ -37,11 +33,7 @@ const JobRequestForm = () => {
     {
       unitId: '',
       fieldWork: '',
-      specificWorkToBeDone: "",
-      resultOfAssessment: "",
-      estimatedValue: 0,
-      estimatedUnit: "Hours",
-      statusOfMaterials: null,
+      specificWorkToBeDone: ""
   });
 
 
@@ -65,10 +57,6 @@ const JobRequestForm = () => {
       unit_id: formData.unitId,
       field_work: formData.fieldWork,
       specific_work: formData.specificWorkToBeDone,
-      assessment_results: formData.resultOfAssessment,
-      estimated_duration_value: formData.estimatedValue,
-      estimated_duration_unit: formData.estimatedUnit,
-      status_of_materials: formData.statusOfMaterials,
     };
 
     try {
@@ -78,11 +66,7 @@ const JobRequestForm = () => {
       setFormData({
         unitId: '',
         fieldWork: '',
-        specificWorkToBeDone: "",
-        resultOfAssessment: "",
-        estimatedValue: 0,
-        estimatedUnit: "Hours",
-        statusOfMaterials: null,
+        specificWorkToBeDone: ""
       });
 
       if (response.status === 201 || response.status === 200) {
@@ -91,10 +75,6 @@ const JobRequestForm = () => {
           unitId: 0,
           fieldWork: '',
           specificWorkToBeDone: "",
-          resultOfAssessment: "",
-          estimatedValue: 0,
-          estimatedUnit: "Hours",
-          statusOfMaterials: null,
         });
       }
     } catch (error) {
@@ -113,7 +93,7 @@ const JobRequestForm = () => {
   const fieldWorkOptions = [
     { column: 1, items: [FieldWork.Carpentry, FieldWork.ArtAndSign, FieldWork.Electrical] },
     { column: 2, items: [FieldWork.Painting, FieldWork.Landscaping, FieldWork.Plumbing] },
-    { column: 3, items: [FieldWork.Welding, FieldWork.RefrigerationAndAirConditioning, FieldWork.GrassCutter] },
+    { column: 3, items: [FieldWork.Welding, FieldWork.RefrigerationAndAirConditioning, FieldWork.BrushCutter] },
     { column: 4, items: [FieldWork.Utility] },
   ];
 
@@ -225,79 +205,6 @@ return (
               required
             />
           </div>
-
-          <div>
-            <label htmlFor="resultOfAssessment" className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-              Assessment Results
-            </label>
-            <textarea
-              id="resultOfAssessment"
-              name="resultOfAssessment"
-              value={formData.resultOfAssessment}
-              onChange={handleInputChange}
-              rows={4}
-              className="w-full border border-slate-200 rounded-lg px-4 py-3 text-slate-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
-              placeholder="For office use..."
-            />
-          </div>
-        </div>
-
-        {/* Status and Duration - Now Stacked Vertically */}
-        <div className="space-y-8">
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-              Estimated Duration
-            </label>
-            <div className="flex gap-4">
-              <input
-                type="number"
-                name="estimatedValue"
-                value={formData.estimatedValue}
-                onChange={handleInputChange}
-                className="flex-1 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-700 focus:border-indigo-500 outline-none"
-                placeholder="0"
-              />
-              <select
-                name="estimatedUnit"
-                value={formData.estimatedUnit}
-                onChange={handleInputChange}
-                className="w-40 border border-slate-200 bg-white rounded-lg px-3 py-2.5 text-slate-700 focus:border-indigo-500 outline-none cursor-pointer text-sm"
-              >
-                <option value="Hours">Hours</option>
-                <option value="Days">Days</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-              Material Status
-            </label>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setFormData(p => ({...p, statusOfMaterials: "Available"}))}
-                className={`flex-1 py-3 rounded-lg text-xs font-bold tracking-widest uppercase transition-all border ${
-                  formData.statusOfMaterials === "Available"
-                  ? "bg-emerald-50 border-emerald-200 text-emerald-600 shadow-sm"
-                  : "bg-white border-slate-200 text-slate-400 hover:bg-slate-50"
-                }`}
-              >
-                Available
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormData(p => ({...p, statusOfMaterials: "Not Available"}))}
-                className={`flex-1 py-3 rounded-lg text-xs font-bold tracking-widest uppercase transition-all border ${
-                  formData.statusOfMaterials === "Not Available"
-                  ? "bg-rose-50 border-rose-200 text-rose-600 shadow-sm"
-                  : "bg-white border-slate-200 text-slate-400 hover:bg-slate-50"
-                }`}
-              >
-                Not Available
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Action Buttons */}
@@ -309,11 +216,7 @@ return (
                 setFormData({
                   unitId: 0,
                   fieldWork: FieldWork.Carpentry,
-                  specificWorkToBeDone: '',
-                  resultOfAssessment: '',
-                  estimatedValue: 0,
-                  estimatedUnit: 'Hours',
-                  statusOfMaterials: null,
+                  specificWorkToBeDone: ''
                 });
               }
             }}
