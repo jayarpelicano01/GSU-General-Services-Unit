@@ -218,10 +218,17 @@ const JobOrderTable = () => {
   return (
     
     <div className="min-h-screen bg-[#f8f9ff] p-8">
-        
-         
-        
         <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+
+            <div className="px-8 pt-6 pb-2 flex items-center justify-between">
+                <div>
+                    <h2 className="text-slate-800 text-lg font-extrabold tracking-tight">Job Orders</h2>
+                    <p className="text-slate-400 text-[12px] font-medium mt-0.5">Manage and monitor all job orders</p>
+                </div>
+                <span className="bg-indigo-50 text-indigo-500 text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-indigo-100">
+                    {filteredOrders.length} {activeTab === 'All Requests' ? 'Total' : activeTab}
+                </span>
+            </div>
         
             <div className="flex items-center justify-between border-b border-slate-100 px-8 py-2 gap-8">
             
@@ -253,6 +260,7 @@ const JobOrderTable = () => {
 
         {/* Table Body */}
         <div className="overflow-x-auto">
+            
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="text-slate-400 text-[11px] font-bold uppercase tracking-widest border-b border-slate-100">

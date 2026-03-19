@@ -128,7 +128,6 @@ const JobOrderForm = () => {
     person => person.field === requestData?.field_work
   );
 
-  // People selected via the assist dropdown (not in filteredPersonnel)
   const assistPersonnel = personnelList.filter(p => 
     JobOrderFormData.personnels.includes(String(p.id)) && 
     !filteredPersonnel.some(fp => fp.id === p.id)

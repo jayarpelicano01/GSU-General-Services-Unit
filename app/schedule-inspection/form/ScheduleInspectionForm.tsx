@@ -192,12 +192,6 @@ const ScheduleInspectionForm = () => {
     setShowConfirm(true); // Show the confirmation dialog instead of submitting
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setJobOrderFormData((prev) => ({ ...prev, [name]: value }));
-  };
 
   if (!requestData) return <div className="p-8 text-center text-slate-400">Loading...</div>;
 
@@ -324,40 +318,7 @@ const ScheduleInspectionForm = () => {
               </div>
 
             </div>
-            {/* Text Areas */}
-            <div className="space-y-6">
-                <div>
-                    <label htmlFor="specificWorkOrder" className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-                        Specific Work to be Done <span className="text-red-400">*</span>
-                    </label>
-                    <textarea
-                        id="specificWorkOrder"
-                        name="specificWorkOrder"
-                        value={JobOrderFormData.specificWorkOrder}
-                        onChange={handleInputChange}
-                        rows={4}
-                        className="w-full border border-slate-200 rounded-lg px-4 py-3 text-slate-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
-                        placeholder="Detailed instructions for the personnel..."
-                        required
-                    />
-                </div>
-
-                <div>
-                    <label htmlFor="remarks" className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-                        Remarks
-                    </label>
-                    <textarea
-                        id="remarks"
-                        name="remarks"
-                        value={JobOrderFormData.remarks}
-                        onChange={handleInputChange}
-                        rows={3}
-                        className="w-full border border-slate-200 rounded-lg px-4 py-3 text-slate-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
-                        placeholder="Any additional notes or constraints..."
-                    />
-                </div>
-            </div>
-          </div>
+                     </div>
 
           {/* Action Buttons */}
           <div className="pt-8 border-t border-slate-100 flex items-center justify-between">
