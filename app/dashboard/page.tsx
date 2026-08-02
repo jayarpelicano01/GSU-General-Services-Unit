@@ -1,13 +1,8 @@
 "use client"
 
-import { useEffect, useState, useMemo, Suspense } from "react"
+import { useEffect, useState, useMemo, useCallback, Suspense } from "react"
 import {
   ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
   Tooltip,
   PieChart,
   Pie,
@@ -19,20 +14,24 @@ import { useAuth } from "@/app/context/AuthContext"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
-import { Skeleton } from "@/components/ui/skeleton"
+import { MonthlyRequestsByUnit, UnitRequestsByField, UnitMonthlyTrend } from "@/app/components/dashboard/DashboardCharts"
+import { DashboardSkeleton } from "@/app/components/dashboard/DashboardSkeleton"
 import {
   FileText,
   Clock,
   Activity,
   CheckCircle2,
+  SearchCheck,
+  Package,
   ArrowUpRight,
   ArrowDownRight,
   ChevronRight,
 } from "lucide-react"
 import Link from "next/link"
-import { format } from "date-fns"
+import { format, subDays, startOfMonth, subMonths } from "date-fns"
 import { API } from "@/app/utils/api/api"
 import { cn } from "@/lib/utils"
+import { getFirstName } from "@/lib/rbac"
 import type { JobRequest, JobOrder, User } from "@/app/types"
 
 export const dynamic = "force-dynamic"
@@ -55,6 +54,8 @@ const donutColors: Record<string, string> = {
   "Awaiting Materials": "#3b82f6",
   "Under Inspection": "#6366f1",
   Cancelled: "#64748b",
+  Assigned: "#0ea5e9",
+  Completed: "#22c55e",
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -77,16 +78,6 @@ function getGreeting() {
   return "Good Evening"
 }
 
-function getFirstName(user: User | null) {
-  if (!user) return ""
-  return (
-    user.unit_head?.first_name ||
-    user.gsu_head?.first_name ||
-    user.unit?.head?.first_name ||
-    "there"
-  )
-}
-
 function getRoleLabel(user: User | null) {
   if (!user) return ""
   switch (user.role) {
@@ -106,6 +97,59 @@ function getScopedUnitId(user: User | null): number | null {
   if (user.role === "UNIT_HEAD") return user.unit_head?.unit_id ?? null
   if (user.role === "UNIT_STAFF") return user.unit?.id ?? null
   return null
+}
+
+function computeDelta(current: number, previous: number): { change: string; changeUp: boolean } {
+  if (previous === 0) {
+    return current === 0 ? { change: "—", changeUp: true } : { change: "New", changeUp: true }
+  }
+  const pct = Math.round(((current - previous) / previous) * 100)
+  return {
+    change: `${pct > 0 ? "+" : ""}${pct}%`,
+    changeUp: pct >= 0,
+  }
+}
+
+const LAST_MONTHS = 6
+
+function monthKeys(count: number) {
+  const now = new Date()
+  const months: { key: string; label: string }[] = []
+  for (let i = count - 1; i >= 0; i--) {
+    const d = startOfMonth(subMonths(now, i))
+    months.push({ key: format(d, "yyyy-MM"), label: format(d, "MMM") })
+  }
+  return months
+}
+
+function buildMonthlyTrend(requests: JobRequest[], unitId: number | null) {
+  const months = monthKeys(LAST_MONTHS)
+  const counts = new Map(months.map((m) => [m.key, 0]))
+  requests.forEach((r) => {
+    if (unitId && r.unit_id !== unitId) return
+    const key = format(new Date(r.request_date), "yyyy-MM")
+    if (counts.has(key)) counts.set(key, (counts.get(key) || 0) + 1)
+  })
+  return months.map((m) => ({ month: m.label, requests: counts.get(m.key) || 0 }))
+}
+
+function buildMonthlyByUnit(requests: JobRequest[]) {
+  const months = monthKeys(LAST_MONTHS)
+  const unitNames = new Map<number, string>()
+  requests.forEach((r) => unitNames.set(r.unit_id, r.unit.unit_acronym))
+  const units = [...unitNames.entries()].sort((a, b) => a[0] - b[0])
+
+  const rows: { month: string; [unit: string]: string | number }[] = months.map((m) => ({ month: m.label }))
+  units.forEach(([, acronym]) => rows.forEach((row) => (row[acronym] = 0)))
+
+  requests.forEach((r) => {
+    const key = format(new Date(r.request_date), "yyyy-MM")
+    const idx = months.findIndex((m) => m.key === key)
+    if (idx < 0) return
+    const acronym = unitNames.get(r.unit_id)
+    if (acronym) rows[idx][acronym] = Number(rows[idx][acronym]) + 1
+  })
+  return rows
 }
 
 function StatCard({
@@ -133,12 +177,13 @@ function StatCard({
             <Icon className={cn("w-6 h-6", textColor)} aria-hidden="true" />
           </div>
           <span
+            title="Compared to the previous 30 days"
             className={cn(
               "inline-flex items-center gap-0.5 text-xs font-semibold",
               changeUp ? "text-emerald-600" : "text-rose-600"
             )}
           >
-            {changeUp ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
+            {change === "—" ? null : changeUp ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
             {change}
           </span>
         </div>
@@ -156,55 +201,89 @@ function DashboardContent() {
   const [requests, setRequests] = useState<JobRequest[]>([])
   const [orders, setOrders] = useState<JobOrder[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      setError(false)
+      const [requestsRes, ordersRes] = await Promise.all([
+        API.get("/job-requests"),
+        API.get("/job-orders"),
+      ])
+
+      const allRequests = requestsRes.data.data || []
+      const allOrders = ordersRes.data.data || []
+
+      const unitId = getScopedUnitId(user)
+      const scopedRequests = unitId
+        ? allRequests.filter((r: JobRequest) => r.unit_id === unitId)
+        : allRequests
+      const scopedOrders = unitId
+        ? allOrders.filter((o: JobOrder) => o.job_request.unit_id === unitId)
+        : allOrders
+
+      setRequests(scopedRequests)
+      setOrders(scopedOrders)
+    } catch (error) {
+      console.error("Failed to fetch dashboard data:", error)
+      setError(true)
+    } finally {
+      setLoading(false)
+    }
+  }, [user])
 
   useEffect(() => {
     if (authLoading || !isAuthenticated) {
       return
     }
 
-    async function fetchDashboardData() {
-      try {
-        const [requestsRes, ordersRes] = await Promise.all([
-          API.get("/job-requests"),
-          API.get("/job-orders"),
-        ])
-
-        const allRequests = requestsRes.data.data || []
-        const allOrders = ordersRes.data.data || []
-
-        const unitId = getScopedUnitId(user)
-        const scopedRequests = unitId
-          ? allRequests.filter((r: JobRequest) => r.unit_id === unitId)
-          : allRequests
-        const scopedOrders = unitId
-          ? allOrders.filter((o: JobOrder) => o.job_request.unit_id === unitId)
-          : allOrders
-
-        setRequests(scopedRequests)
-        setOrders(scopedOrders)
-      } catch (error) {
-        console.error("Failed to fetch dashboard data:", error)
-        setRequests([])
-        setOrders([])
-      } finally {
-        setLoading(false)
-      }
-    }
-
+    setLoading(true)
     fetchDashboardData()
-  }, [isAuthenticated, authLoading, user])
+  }, [authLoading, isAuthenticated, fetchDashboardData])
 
   const stats = useMemo(() => {
     const pending = requests.filter((r) => r.status === "Pending").length
     const underInspection = requests.filter((r) => r.status === "Under Inspection").length
     const awaitingMaterials = requests.filter((r) => r.status === "Awaiting Materials").length
-    const inProgress = underInspection + awaitingMaterials
     const completedOrders = orders.filter((o) => o.status === "Completed").length
+
+    const now = Date.now()
+    const currentStart = subDays(new Date(), 30).getTime()
+    const previousStart = subDays(new Date(), 60).getTime()
+
+    const inWindow = (dateStr: string, start: number, end: number) => {
+      const t = new Date(dateStr).getTime()
+      return Number.isFinite(t) && t >= start && t < end
+    }
+
+    const reqCount = (pred: (r: JobRequest) => boolean, current: boolean) =>
+      requests.filter((r) =>
+        pred(r) &&
+        inWindow(r.request_date, current ? currentStart : previousStart, current ? now : currentStart)
+      ).length
+
+    const completedCount = (current: boolean) =>
+      orders.filter((o) =>
+        o.status === "Completed" &&
+        inWindow(o.date_accomplished || o.date_started, current ? currentStart : previousStart, current ? now : currentStart)
+      ).length
+
+    const series = (pred: (r: JobRequest) => boolean) =>
+      computeDelta(reqCount(pred, true), reqCount(pred, false))
+
     return {
       totalRequests: requests.length,
       pending,
-      inProgress,
+      underInspection,
+      awaitingMaterials,
       completedOrders,
+      trends: {
+        totalRequests: series(() => true),
+        pending: series((r) => r.status === "Pending"),
+        underInspection: series((r) => r.status === "Under Inspection"),
+        awaitingMaterials: series((r) => r.status === "Awaiting Materials"),
+        completedOrders: computeDelta(completedCount(true), completedCount(false)),
+      },
     }
   }, [requests, orders])
 
@@ -215,10 +294,15 @@ function DashboardContent() {
       counts[key] = (counts[key] || 0) + 1
     })
     return Object.entries(counts)
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count)
+      .map(([field, requests]) => ({ field, requests }))
+      .sort((a, b) => b.requests - a.requests)
       .slice(0, 8)
   }, [requests])
+
+  const unitId = getScopedUnitId(user)
+  const isGsuStaff = user?.role === "GSU_STAFF"
+  const monthlyTrend = useMemo(() => buildMonthlyTrend(requests, isGsuStaff ? null : unitId), [requests, unitId, isGsuStaff])
+  const monthlyByUnit = useMemo(() => buildMonthlyByUnit(requests), [requests])
 
   const statusData = useMemo(() => {
     const statuses = [
@@ -259,25 +343,26 @@ function DashboardContent() {
   )
 
   if (loading) {
+    return <DashboardSkeleton />
+  }
+
+  if (error) {
     return (
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div className="space-y-2">
-          <Skeleton className="h-9 w-72" />
-          <Skeleton className="h-5 w-96" />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-36 rounded-xl" />
-          ))}
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Skeleton className="h-80 rounded-xl" />
-          <Skeleton className="h-80 rounded-xl" />
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Skeleton className="h-80 rounded-xl" />
-          <Skeleton className="h-80 rounded-xl" />
-        </div>
+      <div className="max-w-7xl mx-auto">
+        <Card className="rounded-xl shadow-sm border border-slate-200">
+          <CardContent className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="rounded-full bg-rose-50 p-4 mb-4">
+              <Activity className="w-8 h-8 text-rose-500" aria-hidden="true" />
+            </div>
+            <h2 className="text-lg font-bold text-slate-900">Unable to load dashboard</h2>
+            <p className="text-sm text-slate-500 mt-1 max-w-sm">
+              Something went wrong while fetching your dashboard data. Please try again.
+            </p>
+            <Button className="mt-6" onClick={() => { setLoading(true); fetchDashboardData() }}>
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     )
   }
@@ -289,8 +374,7 @@ function DashboardContent() {
       icon: FileText,
       bgColor: "bg-blue-50",
       textColor: "text-blue-600",
-      change: "+12%",
-      changeUp: true,
+      ...stats.trends.totalRequests,
     },
     {
       name: "Pending",
@@ -298,17 +382,23 @@ function DashboardContent() {
       icon: Clock,
       bgColor: "bg-amber-50",
       textColor: "text-amber-600",
-      change: "+5%",
-      changeUp: false,
+      ...stats.trends.pending,
     },
     {
-      name: "In Progress",
-      value: stats.inProgress,
-      icon: Activity,
-      bgColor: "bg-emerald-50",
-      textColor: "text-emerald-600",
-      change: "+3%",
-      changeUp: true,
+      name: "Under Inspection",
+      value: stats.underInspection,
+      icon: SearchCheck,
+      bgColor: "bg-indigo-50",
+      textColor: "text-indigo-600",
+      ...stats.trends.underInspection,
+    },
+    {
+      name: "Awaiting Materials",
+      value: stats.awaitingMaterials,
+      icon: Package,
+      bgColor: "bg-blue-50",
+      textColor: "text-blue-600",
+      ...stats.trends.awaitingMaterials,
     },
     {
       name: "Completed",
@@ -316,8 +406,7 @@ function DashboardContent() {
       icon: CheckCircle2,
       bgColor: "bg-green-50",
       textColor: "text-green-600",
-      change: "+8%",
-      changeUp: true,
+      ...stats.trends.completedOrders,
     },
   ]
 
@@ -340,7 +429,7 @@ function DashboardContent() {
       </div>
 
       {/* Stats Cards Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         {statCards.map((stat) => (
           <StatCard
             key={stat.name}
@@ -358,48 +447,24 @@ function DashboardContent() {
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Bar Chart */}
-        <Card className="rounded-xl shadow-sm border border-slate-200">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Activity className="w-5 h-5 text-indigo-600" />
-              Requests by Field Work
-            </CardTitle>
-            <CardDescription>Number of requests per field work type</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {fieldWorkData.length === 0 ? (
+        {fieldWorkData.length === 0 ? (
+          <Card className="rounded-xl shadow-sm border border-slate-200">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Activity className="w-5 h-5 text-indigo-600" />
+                Requests by Field Work
+              </CardTitle>
+              <CardDescription>Number of requests per field work type</CardDescription>
+            </CardHeader>
+            <CardContent>
               <div className="h-72 flex items-center justify-center text-slate-400 text-sm">
                 No data available
               </div>
-            ) : (
-              <ResponsiveContainer width="100%" height={288}>
-                <BarChart data={fieldWorkData} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                  <XAxis
-                    dataKey="name"
-                    tickLine={false}
-                    axisLine={false}
-                    interval={0}
-                    tick={{ fontSize: 11, fill: "#64748b" }}
-                    angle={-20}
-                    textAnchor="end"
-                    height={56}
-                  />
-                  <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "#64748b" }} />
-                  <Tooltip
-                    cursor={{ fill: "#f1f5f9" }}
-                    contentStyle={{
-                      borderRadius: 12,
-                      border: "1px solid #e2e8f0",
-                      fontSize: 12,
-                    }}
-                  />
-                  <Bar dataKey="count" fill="#6366f1" radius={[6, 6, 0, 0]} maxBarSize={48} />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ) : (
+          <UnitRequestsByField data={fieldWorkData} />
+        )}
 
         {/* Donut Chart */}
         <Card className="rounded-xl shadow-sm border border-slate-200">
@@ -464,6 +529,47 @@ function DashboardContent() {
             )}
           </CardContent>
         </Card>
+      </div>
+
+      {/* Monthly Trend Row */}
+      <div className="grid grid-cols-1 gap-6">
+        {isGsuStaff ? (
+          requests.length === 0 ? (
+            <Card className="rounded-xl shadow-sm border border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-indigo-600" />
+                  Monthly Requests by Unit
+                </CardTitle>
+                <CardDescription>Requests per unit over the last 6 months</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-72 flex items-center justify-center text-slate-400 text-sm">
+                  No data available
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <MonthlyRequestsByUnit data={monthlyByUnit} />
+          )
+        ) : requests.length === 0 ? (
+          <Card className="rounded-xl shadow-sm border border-slate-200">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Activity className="w-5 h-5 text-indigo-600" />
+                Monthly Trend
+              </CardTitle>
+              <CardDescription>Requests over the last 6 months</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-72 flex items-center justify-center text-slate-400 text-sm">
+                No data available
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <UnitMonthlyTrend data={monthlyTrend} />
+        )}
       </div>
 
       {/* Data Tables Row */}
@@ -602,23 +708,7 @@ function DashboardContent() {
 export default function DashboardPage() {
   return (
     <DashboardLayout>
-      <Suspense fallback={
-        <div className="max-w-7xl mx-auto space-y-6">
-          <div className="space-y-2">
-            <Skeleton className="h-9 w-72" />
-            <Skeleton className="h-5 w-96" />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-36 rounded-xl" />
-            ))}
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Skeleton className="h-80 rounded-xl" />
-            <Skeleton className="h-80 rounded-xl" />
-          </div>
-        </div>
-      }>
+      <Suspense fallback={<DashboardSkeleton />}>
         <ProtectedRoute>
           <DashboardContent />
         </ProtectedRoute>

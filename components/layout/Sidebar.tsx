@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import {
   LayoutDashboard,
@@ -11,7 +11,6 @@ import {
   Users,
   Settings,
   Building2,
-  Wrench,
   Calendar,
   FileCheck,
   LogOut,
@@ -22,21 +21,35 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
+import { useAuth } from "@/app/context/AuthContext"
+import { getUserDisplay } from "@/lib/rbac"
+import type { Role } from "@/lib/rbac"
 
-const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Job Requests", href: "/job-request-list", icon: FileText },
-  { name: "Job Orders", href: "/job-order-list", icon: ClipboardList },
-  { name: "Inspections", href: "/schedule-inspection", icon: Calendar },
-  { name: "Personnel", href: "/personnel", icon: Users },
-  { name: "Units", href: "/units", icon: Building2 },
-  { name: "Accomplishment Report", href: "/accomplishment-report", icon: FileCheck },
+const navigation: { name: string; href: string; icon: React.ComponentType<{ className?: string }>; roles: readonly Role[] }[] = [
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["GSU_STAFF", "UNIT_HEAD", "UNIT_STAFF"] },
+  { name: "Job Requests", href: "/job-request-list", icon: FileText, roles: ["GSU_STAFF", "UNIT_HEAD", "UNIT_STAFF"] },
+  { name: "Job Orders", href: "/job-order-list", icon: ClipboardList, roles: ["GSU_STAFF", "UNIT_HEAD", "UNIT_STAFF"] },
+  { name: "Inspections", href: "/schedule-inspection", icon: Calendar, roles: ["GSU_STAFF"] },
+  { name: "Personnel", href: "/personnel", icon: Users, roles: ["GSU_STAFF"] },
+  { name: "Units", href: "/units", icon: Building2, roles: ["GSU_STAFF"] },
+  { name: "Accomplishment Report", href: "/accomplishment-report", icon: FileCheck, roles: ["GSU_STAFF", "UNIT_HEAD"] },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
+  const { user, logout } = useAuth()
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  const display = getUserDisplay(user)
+  const visibleNavigation = navigation.filter((item) => !user || item.roles.includes(user.role))
+
+  const handleLogout = async () => {
+    await logout()
+    router.push("/login")
+    router.refresh()
+  }
 
   return (
     <>
@@ -62,9 +75,11 @@ export function Sidebar() {
         <div className={cn("flex items-center justify-between h-16 px-4 border-b border-slate-200", collapsed && "justify-center")}>
           {!collapsed && (
             <Link href="/dashboard" className="flex items-center gap-3" aria-label="GSU System Home">
-              <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center flex-shrink-0">
-                <Wrench className="w-5 h-5 text-white" />
-              </div>
+              <img
+                src="/UEP-Logo.png"
+                alt="University of Eastern Philippines"
+                className="w-9 h-9 object-contain flex-shrink-0"
+              />
               <div className="overflow-hidden">
                 <span className="text-lg font-extrabold text-slate-900 truncate block">GSU System</span>
                 <p className="text-[10px] text-slate-400 uppercase tracking-wider truncate">Job Requesting & Ordering</p>
@@ -73,9 +88,11 @@ export function Sidebar() {
           )}
           {collapsed && (
             <Link href="/dashboard" className="flex items-center justify-center" aria-label="GSU System Home">
-              <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center">
-                <Wrench className="w-5 h-5 text-white" />
-              </div>
+              <img
+                src="/UEP-Logo.png"
+                alt="University of Eastern Philippines"
+                className="w-9 h-9 object-contain"
+              />
             </Link>
           )}
           <Button
@@ -91,7 +108,7 @@ export function Sidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto" aria-label="Main navigation">
-          {navigation.map((item) => {
+          {visibleNavigation.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
             return (
               <Link
@@ -122,8 +139,8 @@ export function Sidebar() {
             </div>
             {!collapsed && (
               <div className="flex-1 min-w-0 overflow-hidden">
-                <p className="text-sm font-medium text-slate-900 truncate">Unit Staff</p>
-                <p className="text-xs text-slate-500 truncate">General Services Unit</p>
+                <p className="text-sm font-medium text-slate-900 truncate">{display.name}</p>
+                <p className="text-xs text-slate-500 truncate">{display.subtitle}</p>
               </div>
             )}
           </div>
@@ -136,7 +153,11 @@ export function Sidebar() {
                 <Settings className="w-5 h-5" />
                 <span>Settings</span>
               </Link>
-              <Button variant="ghost" className="w-full justify-start gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                onClick={handleLogout}
+              >
                 <LogOut className="w-5 h-5" />
                 <span>Logout</span>
               </Button>
