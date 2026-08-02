@@ -1,13 +1,6 @@
 "use client"
 
 import { useEffect, useState, useMemo, useCallback, Suspense } from "react"
-import {
-  ResponsiveContainer,
-  Tooltip,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
 import { useAuth } from "@/app/context/AuthContext"
@@ -23,6 +16,8 @@ import {
   CheckCircle2,
   SearchCheck,
   Package,
+  Wrench,
+  Timer,
   ArrowUpRight,
   ArrowDownRight,
   ChevronRight,
@@ -44,28 +39,31 @@ const statusColors: Record<string, string> = {
   Disapproved: "bg-rose-100 text-rose-800",
   Cancelled: "bg-slate-100 text-slate-800",
   Assigned: "bg-blue-100 text-blue-800",
+  Ongoing: "bg-emerald-100 text-emerald-800",
   Completed: "bg-emerald-100 text-emerald-800",
 }
 
-const donutColors: Record<string, string> = {
-  Pending: "#f59e0b",
-  Approved: "#10b981",
-  Disapproved: "#f43f5e",
-  "Awaiting Materials": "#3b82f6",
-  "Under Inspection": "#6366f1",
-  Cancelled: "#64748b",
-  Assigned: "#0ea5e9",
-  Completed: "#22c55e",
+const statusDotColors: Record<string, string> = {
+  Pending: "bg-amber-500",
+  "Under Inspection": "bg-indigo-500",
+  Approved: "bg-emerald-500",
+  "Awaiting Materials": "bg-blue-500",
+  Disapproved: "bg-rose-500",
+  Cancelled: "bg-slate-400",
+  Assigned: "bg-blue-500",
+  Ongoing: "bg-emerald-500",
+  Completed: "bg-emerald-500",
 }
 
 function StatusBadge({ status }: { status: string }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
+        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
         statusColors[status] || "bg-slate-100 text-slate-800"
       )}
     >
+      <span className={cn("w-1.5 h-1.5 rounded-full", statusDotColors[status] || "bg-slate-400")} />
       {status}
     </span>
   )
@@ -160,6 +158,7 @@ function StatCard({
   textColor,
   change,
   changeUp,
+  valueSuffix,
 }: {
   name: string
   value: number
@@ -168,6 +167,7 @@ function StatCard({
   textColor: string
   change: string
   changeUp: boolean
+  valueSuffix?: string
 }) {
   return (
     <Card className="rounded-xl shadow-sm border border-slate-200">
@@ -188,12 +188,45 @@ function StatCard({
           </span>
         </div>
         <div className="mt-3">
-          <p className="text-3xl font-extrabold text-slate-900">{value.toLocaleString()}</p>
+          <p className="text-3xl font-extrabold text-slate-900">
+            {value.toLocaleString()}
+            {valueSuffix ? <span className="ml-1 text-base font-semibold text-slate-400">{valueSuffix}</span> : null}
+          </p>
           <p className="text-sm font-medium text-slate-500 mt-1">{name}</p>
         </div>
       </CardContent>
     </Card>
   )
+}
+
+function EmptyChartCard({ title, description }: { title: string; description: string }) {
+  return (
+    <Card className="rounded-xl shadow-sm border border-slate-200">
+      <CardHeader>
+        <CardTitle className="text-base flex items-center gap-2">
+          <Activity className="w-5 h-5 text-indigo-600" />
+          {title}
+        </CardTitle>
+        <CardDescription>{description}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="h-72 flex items-center justify-center text-slate-400 text-sm">
+          No data available
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+interface StatCardData {
+  name: string
+  value: number
+  icon: React.ComponentType<{ className?: string }>
+  bgColor: string
+  textColor: string
+  change: string
+  changeUp: boolean
+  valueSuffix?: string
 }
 
 function DashboardContent() {
@@ -241,48 +274,76 @@ function DashboardContent() {
     fetchDashboardData()
   }, [authLoading, isAuthenticated, fetchDashboardData])
 
-  const stats = useMemo(() => {
-    const pending = requests.filter((r) => r.status === "Pending").length
-    const underInspection = requests.filter((r) => r.status === "Under Inspection").length
-    const awaitingMaterials = requests.filter((r) => r.status === "Awaiting Materials").length
-    const completedOrders = orders.filter((o) => o.status === "Completed").length
+  const unitId = getScopedUnitId(user)
+  const isGsuStaff = user?.role === "GSU_STAFF"
+  const isUnitStaff = user?.role === "UNIT_STAFF"
 
+  const stats = useMemo(() => {
     const now = Date.now()
     const currentStart = subDays(new Date(), 30).getTime()
     const previousStart = subDays(new Date(), 60).getTime()
+    const monthStart = startOfMonth(new Date()).getTime()
+    const prevMonthStart = startOfMonth(subMonths(new Date(), 1)).getTime()
 
     const inWindow = (dateStr: string, start: number, end: number) => {
       const t = new Date(dateStr).getTime()
       return Number.isFinite(t) && t >= start && t < end
     }
 
-    const reqCount = (pred: (r: JobRequest) => boolean, current: boolean) =>
+    const completedThisMonth = orders.filter((o) => {
+      if (o.status !== "Completed") return false
+      const t = new Date(o.date_accomplished || o.date_started).getTime()
+      return Number.isFinite(t) && t >= monthStart && t <= now
+    }).length
+
+    const completedPrevMonth = orders.filter((o) => {
+      if (o.status !== "Completed") return false
+      const t = new Date(o.date_accomplished || o.date_started).getTime()
+      return Number.isFinite(t) && t >= prevMonthStart && t < monthStart
+    }).length
+
+    const countReq = (status: string, current: boolean) =>
       requests.filter((r) =>
-        pred(r) &&
+        r.status === status &&
         inWindow(r.request_date, current ? currentStart : previousStart, current ? now : currentStart)
       ).length
 
-    const completedCount = (current: boolean) =>
+    const countOrderByStatus = (statuses: string[], current: boolean) =>
       orders.filter((o) =>
-        o.status === "Completed" &&
-        inWindow(o.date_accomplished || o.date_started, current ? currentStart : previousStart, current ? now : currentStart)
+        statuses.includes(o.status) &&
+        inWindow(o.date_started, current ? currentStart : previousStart, current ? now : currentStart)
       ).length
 
-    const series = (pred: (r: JobRequest) => boolean) =>
-      computeDelta(reqCount(pred, true), reqCount(pred, false))
+    const completedOrders = orders.filter(
+      (o) => o.status === "Completed" && o.date_started && o.date_accomplished
+    )
+    const avgDaysToComplete = completedOrders.length
+      ? Math.round(
+          (completedOrders.reduce((sum, o) => {
+            const s = new Date(o.date_started!).getTime()
+            const a = new Date(o.date_accomplished!).getTime()
+            return sum + (a - s) / 86400000
+          }, 0) /
+            completedOrders.length) *
+            10
+        ) / 10
+      : 0
 
     return {
-      totalRequests: requests.length,
-      pending,
-      underInspection,
-      awaitingMaterials,
-      completedOrders,
+      pendingInspections: requests.filter((r) => r.status === "Under Inspection").length,
+      awaitingMaterials: requests.filter((r) => r.status === "Awaiting Materials").length,
+      ordersToAssign: orders.filter((o) => o.status === "Pending").length,
+      completedThisMonth,
+      inProgress: orders.filter((o) => o.status === "Assigned" || o.status === "Ongoing").length,
+      myPendingRequests: requests.filter((r) => r.status === "Pending").length,
+      avgDaysToComplete,
       trends: {
-        totalRequests: series(() => true),
-        pending: series((r) => r.status === "Pending"),
-        underInspection: series((r) => r.status === "Under Inspection"),
-        awaitingMaterials: series((r) => r.status === "Awaiting Materials"),
-        completedOrders: computeDelta(completedCount(true), completedCount(false)),
+        pendingInspections: computeDelta(countReq("Under Inspection", true), countReq("Under Inspection", false)),
+        awaitingMaterials: computeDelta(countReq("Awaiting Materials", true), countReq("Awaiting Materials", false)),
+        ordersToAssign: computeDelta(countOrderByStatus(["Pending"], true), countOrderByStatus(["Pending"], false)),
+        completedThisMonth: computeDelta(completedThisMonth, completedPrevMonth),
+        inProgress: computeDelta(countOrderByStatus(["Assigned", "Ongoing"], true), countOrderByStatus(["Assigned", "Ongoing"], false)),
+        myPendingRequests: computeDelta(countReq("Pending", true), countReq("Pending", false)),
       },
     }
   }, [requests, orders])
@@ -299,27 +360,23 @@ function DashboardContent() {
       .slice(0, 8)
   }, [requests])
 
-  const unitId = getScopedUnitId(user)
-  const isGsuStaff = user?.role === "GSU_STAFF"
+  const fieldWorkData30d = useMemo(() => {
+    const cutoff = subDays(new Date(), 30).getTime()
+    const counts: Record<string, number> = {}
+    requests.forEach((r) => {
+      const t = new Date(r.request_date).getTime()
+      if (!Number.isFinite(t) || t < cutoff) return
+      const key = r.field_work || "Unspecified"
+      counts[key] = (counts[key] || 0) + 1
+    })
+    return Object.entries(counts)
+      .map(([field, requests]) => ({ field, requests }))
+      .sort((a, b) => b.requests - a.requests)
+      .slice(0, 8)
+  }, [requests])
+
   const monthlyTrend = useMemo(() => buildMonthlyTrend(requests, isGsuStaff ? null : unitId), [requests, unitId, isGsuStaff])
   const monthlyByUnit = useMemo(() => buildMonthlyByUnit(requests), [requests])
-
-  const statusData = useMemo(() => {
-    const statuses = [
-      "Pending",
-      "Approved",
-      "Disapproved",
-      "Awaiting Materials",
-      "Under Inspection",
-      "Cancelled",
-    ]
-    return statuses
-      .map((status) => ({
-        name: status,
-        value: requests.filter((r) => r.status === status).length,
-      }))
-      .filter((d) => d.value > 0)
-  }, [requests])
 
   const recentRequests = useMemo(
     () =>
@@ -329,17 +386,6 @@ function DashboardContent() {
         )
         .slice(0, 5),
     [requests]
-  )
-
-  const recentOrders = useMemo(
-    () =>
-      [...orders]
-        .sort(
-          (a, b) =>
-            new Date(b.date_started).getTime() - new Date(a.date_started).getTime()
-        )
-        .slice(0, 5),
-    [orders]
   )
 
   if (loading) {
@@ -367,30 +413,14 @@ function DashboardContent() {
     )
   }
 
-  const statCards = [
+  const gsuStatCards: StatCardData[] = [
     {
-      name: "Total Requests",
-      value: stats.totalRequests,
-      icon: FileText,
-      bgColor: "bg-blue-50",
-      textColor: "text-blue-600",
-      ...stats.trends.totalRequests,
-    },
-    {
-      name: "Pending",
-      value: stats.pending,
-      icon: Clock,
-      bgColor: "bg-amber-50",
-      textColor: "text-amber-600",
-      ...stats.trends.pending,
-    },
-    {
-      name: "Under Inspection",
-      value: stats.underInspection,
+      name: "Pending Inspections",
+      value: stats.pendingInspections,
       icon: SearchCheck,
       bgColor: "bg-indigo-50",
       textColor: "text-indigo-600",
-      ...stats.trends.underInspection,
+      ...stats.trends.pendingInspections,
     },
     {
       name: "Awaiting Materials",
@@ -401,14 +431,65 @@ function DashboardContent() {
       ...stats.trends.awaitingMaterials,
     },
     {
-      name: "Completed",
-      value: stats.completedOrders,
+      name: "Job Orders to Assign",
+      value: stats.ordersToAssign,
+      icon: Wrench,
+      bgColor: "bg-amber-50",
+      textColor: "text-amber-600",
+      ...stats.trends.ordersToAssign,
+    },
+    {
+      name: "Completed This Month",
+      value: stats.completedThisMonth,
       icon: CheckCircle2,
       bgColor: "bg-green-50",
       textColor: "text-green-600",
-      ...stats.trends.completedOrders,
+      ...stats.trends.completedThisMonth,
     },
   ]
+
+  const unitStatCards: StatCardData[] = [
+    {
+      name: "Completed This Month",
+      value: stats.completedThisMonth,
+      icon: CheckCircle2,
+      bgColor: "bg-green-50",
+      textColor: "text-green-600",
+      ...stats.trends.completedThisMonth,
+    },
+    {
+      name: "In Progress",
+      value: stats.inProgress,
+      icon: Activity,
+      bgColor: "bg-emerald-50",
+      textColor: "text-emerald-600",
+      ...stats.trends.inProgress,
+    },
+    {
+      name: "My Pending Requests",
+      value: stats.myPendingRequests,
+      icon: Clock,
+      bgColor: "bg-amber-50",
+      textColor: "text-amber-600",
+      ...stats.trends.myPendingRequests,
+    },
+    {
+      name: "Avg Days to Complete",
+      value: stats.avgDaysToComplete,
+      icon: Timer,
+      bgColor: "bg-blue-50",
+      textColor: "text-blue-600",
+      change: "—",
+      changeUp: true,
+      valueSuffix: "days",
+    },
+  ]
+
+  const statCards = isGsuStaff ? gsuStatCards : unitStatCards
+  const recentRequestsTitle = isUnitStaff ? "My Recent Requests" : "Recent Job Requests"
+  const recentRequestsDescription = isUnitStaff
+    ? "Latest requests you have submitted"
+    : "Latest requests submitted"
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -429,7 +510,7 @@ function DashboardContent() {
       </div>
 
       {/* Stats Cards Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {statCards.map((stat) => (
           <StatCard
             key={stat.name}
@@ -440,150 +521,64 @@ function DashboardContent() {
             textColor={stat.textColor}
             change={stat.change}
             changeUp={stat.changeUp}
+            valueSuffix={stat.valueSuffix}
           />
         ))}
       </div>
 
       {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Bar Chart */}
-        {fieldWorkData.length === 0 ? (
-          <Card className="rounded-xl shadow-sm border border-slate-200">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Activity className="w-5 h-5 text-indigo-600" />
-                Requests by Field Work
-              </CardTitle>
-              <CardDescription>Number of requests per field work type</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-72 flex items-center justify-center text-slate-400 text-sm">
-                No data available
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <UnitRequestsByField data={fieldWorkData} />
-        )}
-
-        {/* Donut Chart */}
-        <Card className="rounded-xl shadow-sm border border-slate-200">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-indigo-600" />
-              Request Status Distribution
-            </CardTitle>
-            <CardDescription>Breakdown of requests by current status</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {statusData.length === 0 ? (
-              <div className="h-72 flex items-center justify-center text-slate-400 text-sm">
-                No data available
-              </div>
-            ) : (
-              <div className="flex flex-col items-center gap-4">
-                <div className="relative">
-                  <ResponsiveContainer width="100%" height={200}>
-                    <PieChart>
-                      <Pie
-                        data={statusData}
-                        dataKey="value"
-                        nameKey="name"
-                        innerRadius={64}
-                        outerRadius={90}
-                        paddingAngle={3}
-                        stroke="none"
-                      >
-                        {statusData.map((entry) => (
-                          <Cell key={entry.name} fill={donutColors[entry.name] || "#94a3b8"} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{
-                          borderRadius: 12,
-                          border: "1px solid #e2e8f0",
-                          fontSize: 12,
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span className="text-3xl font-extrabold text-slate-900">
-                      {stats.totalRequests.toLocaleString()}
-                    </span>
-                    <span className="text-xs text-slate-400 uppercase tracking-wide">Total</span>
-                  </div>
-                </div>
-                <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5">
-                  {statusData.map((entry) => (
-                    <span key={entry.name} className="inline-flex items-center gap-1.5 text-xs text-slate-600">
-                      <span
-                        className="w-2.5 h-2.5 rounded-full"
-                        style={{ backgroundColor: donutColors[entry.name] || "#94a3b8" }}
-                      />
-                      {entry.name} ({entry.value})
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Monthly Trend Row */}
-      <div className="grid grid-cols-1 gap-6">
-        {isGsuStaff ? (
-          requests.length === 0 ? (
-            <Card className="rounded-xl shadow-sm border border-slate-200">
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-indigo-600" />
-                  Monthly Requests by Unit
-                </CardTitle>
-                <CardDescription>Requests per unit over the last 6 months</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-72 flex items-center justify-center text-slate-400 text-sm">
-                  No data available
-                </div>
-              </CardContent>
-            </Card>
+      {isGsuStaff ? (
+        <div className="grid grid-cols-1 gap-6">
+          {requests.length === 0 ? (
+            <EmptyChartCard
+              title="Monthly Requests by Unit"
+              description="Requests per unit over the last 6 months"
+            />
           ) : (
             <MonthlyRequestsByUnit data={monthlyByUnit} />
-          )
-        ) : requests.length === 0 ? (
-          <Card className="rounded-xl shadow-sm border border-slate-200">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Activity className="w-5 h-5 text-indigo-600" />
-                Monthly Trend
-              </CardTitle>
-              <CardDescription>Requests over the last 6 months</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-72 flex items-center justify-center text-slate-400 text-sm">
-                No data available
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <UnitMonthlyTrend data={monthlyTrend} />
-        )}
-      </div>
+          )}
+          {fieldWorkData30d.length === 0 ? (
+            <EmptyChartCard
+              title="Requests by Field Work (30 days)"
+              description="Total requests in the past 30 days by field work type"
+            />
+          ) : (
+            <UnitRequestsByField data={fieldWorkData30d} />
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {fieldWorkData.length === 0 ? (
+            <EmptyChartCard title="Requests by Field" description="Number of requests per field work type" />
+          ) : (
+            <UnitRequestsByField data={fieldWorkData} />
+          )}
+          {monthlyTrend.every((d) => d.requests === 0) ? (
+            <EmptyChartCard title="Unit Monthly Trend" description="Your requests over the last 6 months" />
+          ) : (
+            <UnitMonthlyTrend data={monthlyTrend} />
+          )}
+        </div>
+      )}
 
-      {/* Data Tables Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Job Requests */}
+      {/* Recent Requests */}
+      <div className="grid grid-cols-1 gap-6">
         <Card className="rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <div>
-              <CardTitle className="text-base flex items-center gap-2">
-                <FileText className="w-5 h-5 text-indigo-600" />
-                Recent Job Requests
-              </CardTitle>
-              <CardDescription>Latest requests submitted</CardDescription>
+          <div className="" />
+          <CardHeader className="flex flex-row items-start justify-between px-6 pt-5 pb-4">
+            <div className="flex items-start gap-3">
+              <div>
+                <CardTitle className="text-base">{recentRequestsTitle}</CardTitle>
+                <CardDescription>{recentRequestsDescription}</CardDescription>
+              </div>
             </div>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-semibold">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+              </span>
+              {recentRequests.length} records
+            </span>
           </CardHeader>
           <CardContent className="p-0">
             {recentRequests.length === 0 ? (
@@ -598,101 +593,54 @@ function DashboardContent() {
               <>
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-16">ID</TableHead>
-                      <TableHead>Unit</TableHead>
-                      <TableHead>Field Work</TableHead>
-                      <TableHead className="hidden md:table-cell">Status</TableHead>
-                      <TableHead className="w-28">Date</TableHead>
+                    <TableRow className="hover:bg-transparent border-slate-100">
+                      <TableHead className="w-16 text-[11px] uppercase tracking-wider text-slate-400 font-semibold">ID</TableHead>
+                      <TableHead className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Unit</TableHead>
+                      <TableHead className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Field Work</TableHead>
+                      <TableHead className="hidden md:table-cell text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Status</TableHead>
+                      <TableHead className="w-28 text-right text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Date</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {recentRequests.map((request) => (
-                      <TableRow key={request.id}>
-                        <TableCell className="font-mono text-sm font-medium">#{request.id}</TableCell>
-                        <TableCell>
-                          <div className="font-medium">{request.unit.unit_acronym}</div>
-                          <div className="text-xs text-slate-500 truncate max-w-[140px]">
-                            {request.unit.unit_name}
+                      <TableRow key={request.id} className="hover:bg-slate-50/70 border-slate-100">
+                        <TableCell className="py-3.5">
+                          <span className="inline-flex font-mono text-xs font-semibold text-slate-500 bg-slate-100 rounded-md px-2 py-1 tabular-nums">
+                            #{request.id.toString().padStart(3, "0")}
+                          </span>
+                        </TableCell>
+                        <TableCell className="py-3.5">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500/10 to-violet-500/10 border border-indigo-100 text-indigo-600 flex items-center justify-center text-[11px] font-bold flex-shrink-0">
+                              {request.unit.unit_acronym.slice(0, 1)}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="font-semibold text-slate-800 leading-tight">{request.unit.unit_acronym}</div>
+                              <div className="text-xs text-slate-400 truncate max-w-[150px]">{request.unit.unit_name}</div>
+                            </div>
                           </div>
                         </TableCell>
-                        <TableCell className="max-w-[160px] truncate">{request.field_work}</TableCell>
-                        <TableCell className="hidden md:table-cell">
+                        <TableCell className="py-3.5">
+                          <span className="inline-flex max-w-[170px] truncate px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 text-xs font-medium">
+                            {request.field_work}
+                          </span>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell py-3.5">
                           <StatusBadge status={request.status} />
                         </TableCell>
-                        <TableCell className="text-sm text-slate-500">
-                          {format(new Date(request.request_date), "MMM d, yyyy")}
+                        <TableCell className="py-3.5 text-right">
+                          <div className="text-sm font-medium text-slate-700 tabular-nums">{format(new Date(request.request_date), "MMM d")}</div>
+                          <div className="text-xs text-slate-400 tabular-nums">{format(new Date(request.request_date), "yyyy")}</div>
                         </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
-                <div className="border-t border-slate-100">
-                  <Button variant="ghost" size="sm" className="w-full justify-center text-indigo-600 hover:text-indigo-700" asChild>
+                <div className="border-t border-slate-100 bg-slate-50/50">
+                  <Button variant="ghost" size="sm" className="w-full justify-center py-2.5 text-indigo-600 hover:text-indigo-700 hover:bg-transparent group" asChild>
                     <Link href="/job-request-list">
                       View All Requests
-                      <ChevronRight className="w-4 h-4 ml-1" />
-                    </Link>
-                  </Button>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Recent Job Orders */}
-        <Card className="rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <div>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Activity className="w-5 h-5 text-emerald-600" />
-                Recent Job Orders
-              </CardTitle>
-              <CardDescription>Latest orders created</CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            {recentOrders.length === 0 ? (
-              <div className="p-6 text-center text-slate-500">
-                <Activity className="w-12 h-12 mx-auto text-slate-300 mb-3" />
-                <p>No job orders yet</p>
-                <p className="text-sm">Orders are created from approved requests</p>
-              </div>
-            ) : (
-              <>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-20">JO No.</TableHead>
-                      <TableHead>Request</TableHead>
-                      <TableHead className="hidden md:table-cell">Status</TableHead>
-                      <TableHead className="w-28">Started</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recentOrders.map((order) => (
-                      <TableRow key={order.id}>
-                        <TableCell className="font-mono text-sm font-medium text-indigo-600">
-                          JO-{order.jo_number?.toString().padStart(4, "0") || order.id}
-                        </TableCell>
-                        <TableCell className="max-w-[180px] truncate">
-                          {order.job_request.field_work} - {order.job_request.specific_work}
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          <StatusBadge status={order.status} />
-                        </TableCell>
-                        <TableCell className="text-sm text-slate-500">
-                          {format(new Date(order.date_started), "MMM d, yyyy")}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                <div className="border-t border-slate-100">
-                  <Button variant="ghost" size="sm" className="w-full justify-center text-indigo-600 hover:text-indigo-700" asChild>
-                    <Link href="/job-order-list">
-                      View All Orders
-                      <ChevronRight className="w-4 h-4 ml-1" />
+                      <ChevronRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-0.5" />
                     </Link>
                   </Button>
                 </div>
