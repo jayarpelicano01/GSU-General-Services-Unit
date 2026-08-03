@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 
 interface Feature {
   icon: React.ReactNode;
@@ -47,29 +47,46 @@ const features: Feature[] = [
   },
 ];
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+  visible: { opacity: 1, transition: { staggerChildren: 0.12 } },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: "easeOut" } },
+};
+
+const headerVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
 export default function Features() {
   return (
-    <section id="features" className="py-16 sm:py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="features" className="relative py-16 sm:py-24 bg-white overflow-hidden">
+      {/* Ambient background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-96 h-72 bg-indigo-50 rounded-full blur-2xl animate-aurora" />
+        <div className="absolute bottom-0 right-0 w-80 h-80 bg-violet-50 rounded-full blur-2xl animate-float-slow" />
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
+        <motion.div
+          variants={headerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="text-center max-w-2xl mx-auto mb-16"
+        >
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 mb-4">
             Built for Your Workflow
           </h2>
           <p className="text-lg text-slate-600">
             Every feature designed around the actual GSU process — no forced workflows, no missing steps.
           </p>
-        </div>
+        </motion.div>
 
         {/* Feature Cards Grid */}
         <motion.div
@@ -79,14 +96,19 @@ export default function Features() {
           viewport={{ once: true, margin: "-100px" }}
           className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8"
         >
-          {features.map((feature, index) => (
+          {features.map((feature) => (
             <motion.article
               key={feature.title}
               variants={itemVariants}
-              className="group p-6 sm:p-8 bg-white rounded-2xl border border-slate-200 hover:border-indigo-200 hover:shadow-lg transition-all duration-300"
+              whileHover={{ y: -6 }}
+              transition={{ type: "spring", stiffness: 300, damping: 22 }}
+              className="group relative p-6 sm:p-8 bg-white rounded-2xl border border-slate-200 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-100 transition-colors duration-300"
             >
+              {/* Top accent line on hover */}
+              <span className="absolute top-0 left-6 right-6 h-0.5 bg-indigo-500 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300" />
+
               {/* Icon Wrapper */}
-              <div className={`${feature.bgColor} ${feature.color} w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform duration-300`}>
+              <div className={`${feature.bgColor} ${feature.color} w-14 h-14 rounded-xl flex items-center justify-center mb-6 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3`}>
                 {feature.icon}
               </div>
 
@@ -105,26 +127,38 @@ export default function Features() {
 
         {/* Additional capabilities list */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
           className="mt-16"
         >
           <h3 className="text-lg font-semibold text-slate-900 mb-6 text-center">Also Includes</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={containerVariants}
+            className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center"
+          >
             {[
               { label: "Role-based dashboards", icon: "👥" },
               { label: "Printable reports", icon: "📄" },
               { label: "Real-time status", icon: "⚡" },
               { label: "Audit logging", icon: "📋" },
             ].map((item) => (
-              <div key={item.label} className="p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-                <span className="text-2xl mb-2 block">{item.icon}</span>
+              <motion.div
+                key={item.label}
+                variants={itemVariants}
+                whileHover={{ y: -4 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="group p-4 bg-slate-50 rounded-xl border border-transparent hover:border-indigo-100 hover:bg-white hover:shadow-md hover:shadow-indigo-100 transition-all duration-200 cursor-default"
+              >
+                <span className="text-2xl mb-2 block group-hover:scale-125 group-hover:-rotate-6 transition-transform duration-300">{item.icon}</span>
                 <span className="text-sm font-medium text-slate-700">{item.label}</span>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </section>

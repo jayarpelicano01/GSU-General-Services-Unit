@@ -57,9 +57,10 @@ export default function Footer() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-slate-300 hover:text-white transition-colors"
+                    className="group inline-flex items-center gap-1 text-sm text-slate-300 hover:text-white transition-colors"
                   >
                     {link.label}
+                    <span className="inline-block -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-200">→</span>
                   </Link>
                 </li>
               ))}
@@ -74,9 +75,10 @@ export default function Footer() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-slate-300 hover:text-white transition-colors"
+                    className="group inline-flex items-center gap-1 text-sm text-slate-300 hover:text-white transition-colors"
                   >
                     {link.label}
+                    <span className="inline-block -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-200">→</span>
                   </Link>
                 </li>
               ))}
@@ -91,9 +93,10 @@ export default function Footer() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-slate-300 hover:text-white transition-colors"
+                    className="group inline-flex items-center gap-1 text-sm text-slate-300 hover:text-white transition-colors"
                   >
                     {link.label}
+                    <span className="inline-block -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-200">→</span>
                   </Link>
                 </li>
               ))}

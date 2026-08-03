@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 
 interface WorkflowStep {
   number: number;
@@ -115,35 +115,75 @@ const workflowSteps: WorkflowStep[] = [
   },
 ];
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
+};
+
+const circleVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.6 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { type: "spring", stiffness: 260, damping: 18 },
+  },
+};
+
+const statsVariants: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
 export default function WorkflowDiagram() {
   return (
-    <section id="workflow" className="py-16 sm:py-24 bg-[#f8f9ff]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="workflow" className="relative py-16 sm:py-24 bg-[#f8f9ff] overflow-hidden">
+      {/* Ambient background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute -top-24 -right-24 w-80 h-80 bg-indigo-100/60 rounded-full blur-2xl animate-aurora" />
+        <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-emerald-50 rounded-full blur-2xl animate-float-slow" />
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-12 lg:mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="text-center max-w-2xl mx-auto mb-12 lg:mb-16"
+        >
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 mb-4">
             The Complete GSU Workflow
           </h2>
           <p className="text-lg text-slate-600">
             Seven connected steps — each with clear ownership, audit trail, and digital documentation.
           </p>
-        </div>
+        </motion.div>
 
         {/* Desktop: Horizontal Stepper */}
         <div className="hidden lg:block">
           <div className="relative">
-            {/* Connecting line */}
-            <div className="absolute top-10 left-0 right-0 h-0.5 bg-slate-200" />
+            {/* Connecting line with draw animation */}
+            <motion.div
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.4, ease: "easeInOut" }}
+              className="absolute top-10 left-0 right-0 h-0.5 origin-left bg-slate-200"
+            />
+            {/* Animated progress fill on the line */}
+            <motion.div
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.4, delay: 0.3, ease: "easeInOut" }}
+              className="absolute top-10 left-0 right-0 h-0.5 origin-left bg-indigo-400"
+            />
 
             <motion.div
               variants={containerVariants}
@@ -156,10 +196,15 @@ export default function WorkflowDiagram() {
                 <motion.div
                   key={step.number}
                   variants={itemVariants}
-                  className="flex flex-col items-center relative z-10 w-full"
+                  whileHover={{ y: -6 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="flex flex-col items-center relative z-10 w-full group"
                 >
                   {/* Step Circle & Number */}
-                  <div className={`relative w-20 h-20 rounded-full border-4 flex items-center justify-center ${step.bgColor} ${step.borderColor} shadow-sm`}>
+                  <motion.div
+                    variants={circleVariants}
+                    className={`relative w-20 h-20 rounded-full border-4 flex items-center justify-center ${step.bgColor} ${step.borderColor} shadow-sm transition-shadow duration-300 group-hover:shadow-md`}
+                  >
                     <span className={`text-2xl font-extrabold ${step.color}`}>
                       {step.number}
                     </span>
@@ -167,7 +212,9 @@ export default function WorkflowDiagram() {
                     {index === 0 && (
                       <div className="absolute inset-0 rounded-full border-4 border-current animate-ping opacity-75" style={{ borderColor: step.color.replace('text-', '') }} />
                     )}
-                  </div>
+                    {/* Hover ring */}
+                    <div className="absolute -inset-2 rounded-full border-2 border-transparent group-hover:border-indigo-200 transition-colors duration-300" />
+                  </motion.div>
 
                   {/* Role Badge */}
                   <span className={`mt-3 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full ${step.bgColor} ${step.color}`}>
@@ -175,7 +222,7 @@ export default function WorkflowDiagram() {
                   </span>
 
                   {/* Title */}
-                  <h3 className="mt-3 text-center text-sm font-bold text-slate-900 max-w-[140px]">
+                  <h3 className="mt-3 text-center text-sm font-bold text-slate-900 max-w-[140px] group-hover:text-indigo-600 transition-colors duration-200">
                     {step.title}
                   </h3>
 
@@ -202,15 +249,20 @@ export default function WorkflowDiagram() {
               <motion.article
                 key={step.number}
                 variants={itemVariants}
-                className="flex gap-4 p-4 bg-white rounded-xl border border-slate-200"
+                whileHover={{ x: 6 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="flex gap-4 p-4 bg-white rounded-xl border border-slate-200 hover:border-indigo-200 hover:shadow-md transition-colors duration-200 group"
               >
                 {/* Step Indicator */}
                 <div className="flex flex-col items-center shrink-0">
-                  <div className={`relative w-12 h-12 rounded-full border-3 flex items-center justify-center ${step.bgColor} ${step.borderColor}`}>
+                  <motion.div
+                    variants={circleVariants}
+                    className={`relative w-12 h-12 rounded-full border-3 flex items-center justify-center ${step.bgColor} ${step.borderColor}`}
+                  >
                     <span className={`text-xl font-extrabold ${step.color}`}>
                       {step.number}
                     </span>
-                  </div>
+                  </motion.div>
                   {index < workflowSteps.length - 1 && (
                     <div className="w-0.5 h-16 bg-slate-200 mt-2" />
                   )}
@@ -233,10 +285,10 @@ export default function WorkflowDiagram() {
 
         {/* Summary Stats */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          variants={statsVariants}
+          initial="hidden"
+          whileInView="visible"
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.5 }}
           className="mt-12 lg:mt-16 grid grid-cols-2 lg:grid-cols-4 gap-4"
         >
           {[
@@ -245,9 +297,14 @@ export default function WorkflowDiagram() {
             { label: "Status States", value: "7", color: "emerald" },
             { label: "Document Types", value: "5+", color: "amber" },
           ].map((stat) => (
-            <div
+            <motion.div
               key={stat.label}
-              className={`p-4 rounded-xl text-center ${stat.color}-50 border ${stat.color}-100`}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ type: "spring", stiffness: 200, damping: 18, delay: 0.1 }}
+              whileHover={{ y: -4 }}
+              className={`p-4 rounded-xl text-center ${stat.color}-50 border ${stat.color}-100 hover:shadow-md transition-shadow duration-200`}
             >
               <div className={`text-3xl font-extrabold text-${stat.color}-600`}>
                 {stat.value}
@@ -255,7 +312,7 @@ export default function WorkflowDiagram() {
               <div className="text-sm font-medium text-slate-600 mt-1">
                 {stat.label}
               </div>
-            </div>
+            </motion.div>
           ))}
         </motion.div>
       </div>
