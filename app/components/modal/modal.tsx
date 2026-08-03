@@ -8,7 +8,7 @@ interface ModalProps {
   title?: string;
   subtitle?: string; // Added subtitle for better context
   children: React.ReactNode;
-  maxWidth?: "md" | "lg" | "xl" | "2xl"; // Flexible sizing
+  maxWidth?: "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl"; // Flexible sizing
 }
 
 export default function Modal({ isOpen, onClose, title, subtitle, children, maxWidth = "md" }: ModalProps) {
@@ -35,6 +35,8 @@ export default function Modal({ isOpen, onClose, title, subtitle, children, maxW
     lg: "max-w-lg",
     xl: "max-w-xl",
     "2xl": "max-w-2xl",
+    "3xl": "max-w-3xl",
+    "4xl": "max-w-4xl",
   }[maxWidth];
 
   return (
@@ -45,11 +47,11 @@ export default function Modal({ isOpen, onClose, title, subtitle, children, maxW
     >
       {/* Modal Box: Refined rounded corners and shadow */}
       <div
-        className={`relative w-full ${maxWidthClass} rounded-2xl bg-white shadow-2xl animate-in fade-in zoom-in duration-200 overflow-hidden`}
+        className={`relative w-full ${maxWidthClass} max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-2xl bg-white shadow-2xl animate-in fade-in zoom-in duration-200`}
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
       >
         {/* Header: Matching your form/table headers */}
-        <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-white">
+        <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10">
           <div>
             {title && (
               <h2 className="text-lg font-bold text-slate-800 leading-tight">

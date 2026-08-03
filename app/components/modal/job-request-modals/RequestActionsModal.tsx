@@ -23,10 +23,30 @@ export const RequestActionsModal = ({
     onClose={onClose}
     title="Request Actions"
     subtitle={`Job Request #${selectedRequest?.id} • ${selectedRequest?.unit?.unit_name}`}
-    maxWidth="md"
+    maxWidth="lg"
   >
     {selectedRequest && (
       <div className="flex flex-col gap-2">
+
+        {/* Status + summary header */}
+        <div className="px-4 py-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Work Description</p>
+            <p className="text-sm font-bold text-slate-700 truncate mt-0.5">{selectedRequest.specific_work}</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">{selectedRequest.field_work}</p>
+          </div>
+          <span className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold tracking-tight inline-block shrink-0 ${
+            selectedRequest.status === 'Approved'           ? 'bg-emerald-100 text-emerald-600' :
+            selectedRequest.status === 'Pending'            ? 'bg-amber-100 text-amber-600 border border-amber-200' :
+            selectedRequest.status === 'Under Inspection'   ? 'bg-blue-100 text-blue-600' :
+            selectedRequest.status === 'Awaiting Materials' ? 'bg-orange-100 text-orange-600' :
+            selectedRequest.status === 'Disapproved'        ? 'bg-rose-100 text-rose-600' :
+            selectedRequest.status === 'Cancelled'          ? 'bg-slate-100 text-slate-500' :
+            'bg-slate-100 text-slate-500'
+          }`}>
+            {selectedRequest.status.toUpperCase()}
+          </span>
+        </div>
 
         <button
           className="group w-full text-left px-4 py-4 rounded-xl hover:bg-slate-50 border border-slate-100 transition-all flex items-center justify-between"
