@@ -4,6 +4,8 @@ import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { useAuth } from "@/app/context/AuthContext"
+import { useToast } from "@/app/context/ToastContext"
+import { getErrorMessage } from "@/app/utils/errors"
 
 // Inner component that uses useSearchParams - must be wrapped in Suspense
 const LoginPageInner = () => {
@@ -11,6 +13,7 @@ const LoginPageInner = () => {
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get("redirect") || "/dashboard"
   const { login, isAuthenticated, loading: authLoading } = useAuth()
+  const { success, error: toastError } = useToast()
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -25,8 +28,10 @@ const LoginPageInner = () => {
     }
   }, [authLoading, isAuthenticated, callbackUrl, router])
 
-  // While the auth provider restores an existing session, avoid flashing the form
-  if (authLoading) {
+  // Only show the full-page skeleton while restoring an existing session on
+  // first load. During an active submit the form stays visible and the button
+  // shows its own spinner/disabled state instead.
+  if (authLoading && !loading) {
     return <LoginPageSkeleton />
   }
 
@@ -37,9 +42,12 @@ const LoginPageInner = () => {
 
     try {
       await login(email, password, false)
+      success("Signed in successfully.")
       // Redirect happens via the effect above once the session becomes active
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed")
+      const reason = getErrorMessage(err, "Unable to sign in. Please check your credentials.")
+      setError(reason)
+      toastError(reason)
     } finally {
       setLoading(false)
     }

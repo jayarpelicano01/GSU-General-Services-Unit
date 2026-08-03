@@ -5,6 +5,7 @@ import { API } from '@/app/utils/api/api';
 import { useRouter } from "next/navigation";
 import Modal from '@/app/components/modal/modal';
 import { useAuth } from '@/app/context/AuthContext';
+import { JobOrderDetailsModal } from '@/app/components/modal/job-order-modals/JobOrderDetailsModal';
 
 interface JobRequest {
         id: number;
@@ -64,7 +65,6 @@ const JobOrderTable = () => {
     const [selectedOrder, setSelectedOrder] = useState<JobOrder | null>(null);
     const [completeOrder, setCompleteOrder] = useState<JobOrder | null>(null);
 
-    const [isDetailsOpen, setIsDetailsOpen] = useState(false);
     const [viewingOrder, setViewingOrder] = useState<JobOrder | null>(null);
 
     const [cancelOrder, setCancelOrder] = useState<JobOrder | null>(null);
@@ -407,7 +407,7 @@ const JobOrderTable = () => {
                         /* View only for unit staff/head */
                         <button 
                             type="button"
-                            onClick={() => {setIsDetailsOpen(true); setViewingOrder(order)}}
+                            onClick={() => setViewingOrder(order)}
                             className="text-indigo-600 hover:text-indigo-800 transition-colors font-bold text-[11px] uppercase tracking-wider underline underline-offset-4"
                         >
                             View Details
@@ -437,7 +437,7 @@ const JobOrderTable = () => {
                         /* Simple View Details for everything else (Completed, Pending, etc.) */
                         <button 
                             type="button"
-                            onClick={() => {setIsDetailsOpen(true); setViewingOrder(order)}}
+                            onClick={() => setViewingOrder(order)}
                             className="text-indigo-600 hover:text-indigo-800 transition-colors font-bold text-[11px] uppercase tracking-wider underline underline-offset-4"
                         >
                             View Details
@@ -497,7 +497,6 @@ const JobOrderTable = () => {
                 <button 
                     className="group w-full text-left px-4 py-4 rounded-xl hover:bg-slate-50 border border-slate-100 transition-all flex items-center justify-between" 
                     onClick={() => {
-                        setIsDetailsOpen(true); 
                         setViewingOrder(selectedOrder); 
                         setSelectedOrder(null);
                     }}
@@ -711,96 +710,7 @@ const JobOrderTable = () => {
         </div>
     </Modal>
       
-    {isDetailsOpen && viewingOrder && (
-      <div className="fixed inset-0 z-100 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm">
-          {/* Slide-over Panel Animation */}
-          <div className="bg-white h-full w-full max-w-2xl shadow-2xl animate-in slide-in-from-right duration-300 overflow-y-auto">
-              
-              {/* Header */}
-              <div className="p-8 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
-                  <div>
-                      <div className="flex items-center gap-3">
-                          <h2 className="text-2xl font-bold text-slate-800">Job Order Details</h2>
-                          <span className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase ${
-                              viewingOrder.status === 'Completed' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'
-                          }`}>
-                              {viewingOrder.status}
-                          </span>
-                      </div>
-                      <p className="text-slate-400 text-sm mt-1">JO Number: <span className="font-mono text-indigo-600 font-bold">{viewingOrder.jo_number}</span></p>
-                  </div>
-                  <button onClick={() => setIsDetailsOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
-                      <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
-                  </button>
-              </div>
-
-              <div className="p-8 space-y-10">
-                  {/* Section 1: Requesting Unit */}
-                  <section>
-                      <h3 className="text-[11px] font-bold text-indigo-500 uppercase tracking-[0.2em] mb-4">Requesting Unit Info</h3>
-                      <div className="grid grid-cols-2 gap-6 bg-slate-50 p-6 rounded-2xl">
-                          <div>
-                              <label className="text-[10px] text-slate-400 uppercase font-bold">Office/Department</label>
-                              <p className="text-sm font-bold text-slate-700">{viewingOrder.job_request.unit.unit_name}</p>
-                              <p className="text-xs text-slate-500">{viewingOrder.job_request.unit.unit_acronym}</p>
-                          </div>
-                          <div>
-                              <label className="text-[10px] text-slate-400 uppercase font-bold">Location</label>
-                              <p className="text-sm font-bold text-slate-700">{viewingOrder.job_request.unit.location.location_name}</p>
-                          </div>
-                          <div className="col-span-2">
-                              <label className="text-[10px] text-slate-400 uppercase font-bold">Unit Head</label>
-                              <p className="text-sm font-bold text-slate-700">
-                                  {viewingOrder.job_request.unit.head.first_name} {viewingOrder.job_request.unit.head.last_name} {viewingOrder.job_request.unit.head.suffix}
-                              </p>
-                          </div>
-                      </div>
-                  </section>
-
-                  {/* Section 2: Work Specifics */}
-                  <section>
-                      <h3 className="text-[11px] font-bold text-indigo-500 uppercase tracking-[0.2em] mb-4">Work Description</h3>
-                      <div className="space-y-4">
-                          <div className="border-l-4 border-indigo-500 pl-4">
-                              <p className="text-slate-700 text-sm leading-relaxed italic">&quot;{viewingOrder.specific_work}&quot;</p>
-                          </div>
-                          <div className="flex gap-8 text-[12px]">
-                              <div>
-                                  <span className="text-slate-400">Field:</span> <span className="font-bold text-slate-700">{viewingOrder.job_request.field_work}</span>
-                              </div>
-                              <div>
-                                  <span className="text-slate-400">Duration:</span> <span className="font-bold text-slate-700">{viewingOrder.job_request.estimated_duration_value} {viewingOrder.job_request.estimated_duration_unit}</span>
-                              </div>
-                          </div>
-                      </div>
-                  </section>
-
-                  {/* Section 3: Personnel Assigned */}
-                  <section>
-                      <h3 className="text-[11px] font-bold text-indigo-500 uppercase tracking-[0.2em] mb-4">Assigned Personnel</h3>
-                      <div className="flex flex-wrap gap-2">
-                          {viewingOrder.personnels.map((p, idx) => (
-                              <div key={idx} className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-2 rounded-xl shadow-sm">
-                                  <div className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px] font-bold">
-                                      {p.first_name[0]}
-                                  </div>
-                                  <span className="text-xs font-medium text-slate-600">{p.first_name} {p.last_name}</span>
-                              </div>
-                          ))}
-                      </div>
-                  </section>
-
-                  {/* Section 4: Remarks & Assessment */}
-                  <section>
-                      <h3 className="text-[11px] font-bold text-indigo-500 uppercase tracking-[0.2em] mb-4">Admin Remarks</h3>
-                      <div className="bg-amber-50/50 border border-amber-100 p-4 rounded-xl">
-                          <p className="text-sm text-amber-800 leading-relaxed">{viewingOrder.remarks || "No internal remarks recorded."}</p>
-                      </div>
-                  </section>
-              </div>
-          </div>
-      </div>
-  )}
+    <JobOrderDetailsModal viewingOrder={viewingOrder} onClose={() => setViewingOrder(null)} />
 
       {/* Floating Report Button */}
       {canAccessReport && (

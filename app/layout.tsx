@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { DM_Sans } from "next/font/google"
 import "./globals.css"
 import { AuthProvider } from "@/app/context/AuthContext"
+import { ToastProvider } from "@/app/context/ToastContext"
 import { RouteProgress } from "@/app/components/navigation/RouteProgress"
 
 const dmSans = DM_Sans({
@@ -24,7 +25,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${dmSans.variable} antialiased`}>
         <RouteProgress />
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </AuthProvider>
       </body>
     </html>
   )

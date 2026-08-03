@@ -9,8 +9,9 @@ import { ScheduleInspectionModal } from '@/app/components/modal/job-request-moda
 import { InspectionResultsModal } from '@/app/components/modal/job-request-modals/InspectionResultsModal';
 import PageSkeleton from '@/app/components/loading/page-skeleton/PageSkeleton';
 import { DisapproveModal } from '@/app/components/modal/job-request-modals/DisapproveModal';
-import Alert from '@/app/components/alert/Alert';
 import { useAuth } from '@/app/context/AuthContext';
+import { useToast } from '@/app/context/ToastContext';
+import { getErrorMessage } from '@/app/utils/errors';
 
 interface JobRequest {
   id: number;
@@ -55,10 +56,10 @@ interface InspectionFormData {
 
 const JobRequestTable = () => {
   const { user } = useAuth();
+  const { success, error } = useToast();
   const isGsuStaff = user?.role === "GSU_STAFF";
   const isUnitUser = user?.role === "UNIT_STAFF" || user?.role === "UNIT_HEAD";
   const canAccessReport = isGsuStaff;
-  const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [activeTab, setActiveTab] = useState('All Requests');
   const tabs = ['All Requests', 'Pending', 'Under Inspection', 'Awaiting Materials', 'Approved', 'Disapproved', 'Cancelled'];
   const [searchQuery, setSearchQuery] = useState('');
@@ -136,10 +137,10 @@ const JobRequestTable = () => {
       );
       setDisapproveTarget(null);
       setDisapproveReason('');
-      setAlert({ type: 'success', message: 'Request has been disapproved successfully.' });
-    } catch (error) {
-      console.error('Failed to disapprove request:', error);
-      setAlert({ type: 'error', message: 'Failed to disapprove request. Please try again.' });
+      success('Request has been disapproved successfully.');
+    } catch (err) {
+      console.error('Failed to disapprove request:', err);
+      error(getErrorMessage(err, 'Failed to disapprove request. Please try again.'));
     }
   };
 
@@ -174,10 +175,10 @@ const JobRequestTable = () => {
         } : r)
       );
       setInspectionResultTarget(null);
-      setAlert({ type: 'success', message: 'Inspection results submitted successfully.' });
-    } catch (error) {
-      console.error('Failed to submit inspection results:', error);
-      setAlert({ type: 'error', message: 'Failed to submit inspection results. Please try again.' });
+      success('Inspection results submitted successfully.');
+    } catch (err) {
+      console.error('Failed to submit inspection results:', err);
+      error(getErrorMessage(err, 'Failed to submit inspection results. Please try again.'));
     }
   };
 
@@ -201,9 +202,11 @@ const JobRequestTable = () => {
           personnelList.find(p => String(p.id) === id)
       ),
       }));
+      success('Inspection scheduled successfully.');
       router.push('/inspection');
-    } catch (error) {
-      console.error('Failed to schedule inspection:', error);
+    } catch (err) {
+      console.error('Failed to schedule inspection:', err);
+      error(getErrorMessage(err, 'Failed to schedule inspection. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -559,19 +562,6 @@ const JobRequestTable = () => {
         onClose={() => setDisapproveTarget(null)}
         onConfirm={handleSubmitDisapproval}
       />
-
-      {/* Alert */}
-      <div className="fixed top-6 right-6 z-9999 w-full max-w-sm pointer-events-none">
-        <div className="pointer-events-auto">
-          {alert && (
-            <Alert
-              type={alert.type}
-              message={alert.message}
-              onClose={() => setAlert(null)}
-            />
-          )}
-        </div>
-      </div>
 
       {/* Floating Report Button */}
       {canAccessReport && (

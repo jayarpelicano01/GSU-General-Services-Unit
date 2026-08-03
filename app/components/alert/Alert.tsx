@@ -61,7 +61,7 @@ export default function Alert({ type, message, onClose, autoClose = 1500 }: Aler
 
       <div className="flex-1">
         <p className="text-[13px] font-bold leading-tight">
-          {type === 'success' ? 'Success' : type.toUpperCase()}
+          {type === 'success' ? 'Success' : type === 'error' ? 'Error' : type === 'warning' ? 'Warning' : 'Info'}
         </p>
         <p className="text-[12px] font-medium opacity-80 mt-0.5">
           {message}

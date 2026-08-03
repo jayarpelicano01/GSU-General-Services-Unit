@@ -2,8 +2,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { API } from "@/app/utils/api/api";
-import Alert from "@/app/components/alert/Alert";
 import ConfirmDialog from "@/app/components/confirm/Confirm";
+import { useToast } from "@/app/context/ToastContext";
+import { getErrorMessage } from "@/app/utils/errors";
 
 interface JobRequestData {
   id: number;
@@ -50,8 +51,8 @@ interface Personnel {
 
 const ScheduleInspectionForm = () => {
   const router = useRouter();
+  const { success, error } = useToast();
   const [personnelList, setPersonnelList] = useState<Personnel[]>([]);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
@@ -171,7 +172,7 @@ const ScheduleInspectionForm = () => {
 
         localStorage.setItem("job-request", JSON.stringify(updatedRequestData))
         localStorage.setItem("job-order", JSON.stringify(updatedOrderDate))
-        setShowSuccess(true);
+        success(status === "Assigned" ? "Job Order created and personnel assigned." : "Job Order created successfully.");
 
         if (status === "Assigned") {
           setTimeout(() => {
@@ -182,8 +183,9 @@ const ScheduleInspectionForm = () => {
             router.push(`/job-order-list`);
           }, 1500);
         }
-    } catch (error) {
-      console.error('Error creating job order:', error);
+    } catch (err) {
+      console.error('Error creating job order:', err);
+      error(getErrorMessage(err, 'Failed to process job order. Please try again.'));
     }
   }
 
@@ -346,18 +348,6 @@ const ScheduleInspectionForm = () => {
             </div>
           </div>
         </form>
-      </div>
-
-      <div className="fixed top-6 right-6 z-9999 w-full max-w-sm pointer-events-none">
-        <div className="pointer-events-auto">
-          {showSuccess && (
-            <Alert 
-              type="success" 
-              message="Job Order processed successfully. Redirecting..." 
-              onClose={() => setShowSuccess(false)}
-            />
-          )}
-        </div>
       </div>
 
       <ConfirmDialog
