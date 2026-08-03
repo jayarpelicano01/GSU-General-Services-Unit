@@ -3,6 +3,9 @@ import { useEffect, useState, Suspense } from "react";
 import AccomplishmentReport from "../components/printouts/compilations/AccomplishmentReport";
 import { API } from "../utils/api/api";
 import { useSearchParams } from "next/navigation";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { useAuth } from "@/app/context/AuthContext";
 
 const FIELD_WORK_OPTIONS = [
   "All",
@@ -48,6 +51,8 @@ interface JobOrder {
 
 // Inner component that uses useSearchParams - must be wrapped in Suspense
 const AccomplishmentReportInner = () => {
+  const { user } = useAuth();
+  const canPrint = user?.role === "GSU_STAFF";
   const [selectedField, setSelectedField] = useState("All");
   const [jobOrders, setJobOrders] = useState<JobOrder[]>([]);
   const searchParams = useSearchParams();
@@ -92,108 +97,89 @@ const AccomplishmentReportInner = () => {
   }, {} as Record<string, number>);
 
   return (
-    <div className="flex h-screen bg-slate-50">
-      {/* Sidebar - hidden on print */}
-      <div className="no-print fixed left-0 top-0 h-screen w-64 bg-slate-100 p-4 border-r border-slate-200 overflow-y-auto">
-        <h2 className="font-bold text-slate-700 mb-1">Filter by Field</h2>
-        <p className="text-xs text-slate-400 mb-4">
-          Only selected field will appear in the report.
-        </p>
-
-        <div className="space-y-1">
-          {FIELD_WORK_OPTIONS.map((field) => {
-            const count = fieldCounts[field] ?? 0;
-            const hasRecords = count > 0;
-
-            return (
-              <button
-                key={field}
-                onClick={() => setSelectedField(field)}
-                className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-between
-                  ${selectedField === field
-                    ? "bg-indigo-600 text-white"
-                    : hasRecords
-                    ? "text-slate-600 hover:bg-slate-200"
-                    : "text-slate-300 hover:bg-slate-200"
-                  }`}
-              >
-                <span>{field}</span>
-                <span
-                  className={`text-[11px] font-bold px-1.5 py-0.5 rounded-full min-w-5 text-center
-                    ${selectedField === field
-                      ? "bg-white/20 text-white"
-                      : hasRecords
-                      ? "bg-indigo-100 text-indigo-600"
-                      : "bg-slate-200 text-slate-400"
-                    }`}
-                >
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="mt-6 border-t border-slate-200 pt-4">
-          <button
-            onClick={() => window.print()}
-            className="w-full bg-indigo-600 text-white py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 transition-all"
-          >
-            Print Report
-          </button>
+    <div className="space-y-4">
+      {/* Filter toolbar */}
+      <div className="no-print bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <div>
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+              Filter by Field
+            </label>
+            <select
+              value={selectedField}
+              onChange={(e) => setSelectedField(e.target.value)}
+              className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+            >
+              {FIELD_WORK_OPTIONS.map((field) => {
+                const count = fieldCounts[field] ?? 0;
+                return (
+                  <option key={field} value={field}>
+                    {field} ({count})
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+          <div className="text-xs text-slate-400 font-medium">
+            {month ? `Filtering by month: ${month}` : year ? `Filtering by year: ${year}` : "Showing all completed job orders"}
+          </div>
         </div>
       </div>
 
-      {/* Report Content - offset by sidebar width */}
-      <div className="ml-64 flex-1">
+      {/* Report Content */}
+      <div className="overflow-x-auto pb-20">
         <AccomplishmentReport
           selectedField={selectedField}
           JobOrders={filteredOrders}
         />
       </div>
 
-      <style jsx global>{`
-        @media print {
-          .no-print { display: none !important; }
-          .ml-64 { margin-left: 0 !important; }
-        }
-      `}</style>
+      {/* Floating Print Button */}
+      {canPrint && (
+        <button
+          onClick={() => window.print()}
+          className="no-print fixed bottom-6 right-6 z-40 bg-indigo-600 hover:bg-indigo-700 text-white pl-4 pr-5 py-3 rounded-full shadow-xl shadow-indigo-200 flex items-center gap-2 text-sm font-bold transition-all"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 9V2h12v7" />
+            <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" />
+            <rect x="6" y="14" width="12" height="8" />
+          </svg>
+          Print Report
+        </button>
+      )}
     </div>
   );
 };
 
 // Skeleton for Suspense fallback
 const AccomplishmentReportSkeleton = () => (
-  <div className="flex h-screen bg-slate-50">
-    <div className="no-print fixed left-0 top-0 h-screen w-64 bg-slate-100 p-4 border-r border-slate-200">
-      <div className="space-y-2">
-        {[...Array(12)].map((_, i) => (
-          <div
-            key={i}
-            className="h-10 w-full animate-pulse bg-slate-200 rounded-lg"
-          />
+  <div className="space-y-4">
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex items-center justify-between">
+      <div className="h-10 w-56 animate-pulse bg-slate-200 rounded-lg" />
+      <div className="h-10 w-32 animate-pulse bg-slate-200 rounded-lg" />
+    </div>
+    <div className="p-8 animate-pulse space-y-6 bg-white rounded-xl shadow-sm border border-slate-200">
+      <div className="h-8 w-1/3 bg-slate-200 rounded" />
+      <div className="grid grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-24 bg-slate-200 rounded-xl" />
         ))}
       </div>
-    </div>
-    <div className="ml-64 flex-1">
-      <div className="p-8 animate-pulse space-y-6">
-        <div className="h-8 w-1/3 bg-slate-200 rounded" />
-        <div className="grid grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-24 bg-slate-200 rounded-xl" />
-          ))}
-        </div>
-        <div className="h-64 bg-slate-200 rounded-xl" />
-      </div>
+      <div className="h-64 bg-slate-200 rounded-xl" />
     </div>
   </div>
 );
 
 const AccomplishmentReportPage = () => {
   return (
-    <Suspense fallback={<AccomplishmentReportSkeleton />}>
-      <AccomplishmentReportInner />
-    </Suspense>
+    <DashboardLayout>
+      <ProtectedRoute>
+        <Suspense fallback={<AccomplishmentReportSkeleton />}>
+          <AccomplishmentReportInner />
+        </Suspense>
+      </ProtectedRoute>
+    </DashboardLayout>
   );
 };
 
