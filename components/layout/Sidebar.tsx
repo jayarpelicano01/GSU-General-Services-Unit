@@ -13,6 +13,7 @@ import {
   Building2,
   Calendar,
   FileCheck,
+  Clock,
   LogOut,
   Menu,
   X,
@@ -31,7 +32,7 @@ const navigation: { name: string; href: string; icon: React.ComponentType<{ clas
   { name: "Job Orders", href: "/job-order-list", icon: ClipboardList, roles: ["GSU_STAFF", "UNIT_HEAD", "UNIT_STAFF"] },
   { name: "Inspections", href: "/schedule-inspection", icon: Calendar, roles: ["GSU_STAFF"] },
   { name: "Personnel", href: "/personnel", icon: Users, roles: ["GSU_STAFF"] },
-  { name: "Units", href: "/units", icon: Building2, roles: ["GSU_STAFF"] },
+  { name: "Waiting for Materials", href: "/waiting-materials", icon: Clock, roles: ["GSU_STAFF"] },
   { name: "Accomplishment Report", href: "/accomplishment-report", icon: FileCheck, roles: ["GSU_STAFF", "UNIT_HEAD"] },
 ]
 
@@ -56,7 +57,7 @@ export function Sidebar() {
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          className="no-print fixed inset-0 z-40 bg-black/50 lg:hidden"
           onClick={() => setMobileOpen(false)}
           aria-hidden="true"
         />
@@ -65,7 +66,7 @@ export function Sidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-0 z-50 h-screen bg-white border-r border-slate-200 transition-all duration-300 flex flex-col",
+          "no-print fixed left-0 top-0 z-50 h-screen bg-white border-r border-slate-200 transition-all duration-300 flex flex-col",
           collapsed ? "w-20" : "w-72",
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
@@ -198,7 +199,7 @@ export function Sidebar() {
       <Button
         variant="ghost"
         size="icon"
-        className="lg:hidden fixed left-4 top-4 z-50"
+        className="no-print lg:hidden fixed left-4 top-4 z-50"
         onClick={() => setMobileOpen(true)}
         aria-label="Open menu"
         aria-expanded={mobileOpen}

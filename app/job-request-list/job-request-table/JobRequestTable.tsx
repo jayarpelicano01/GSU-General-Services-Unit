@@ -160,13 +160,23 @@ const JobRequestTable = () => {
   const handleSubmitInspectionResult = async () => {
     if (!inspectionResultTarget) return;
     try {
+      const isAvailable = inspectionResultForm.status_of_materials === 'Available';
       await API.patch(`/job-requests/${inspectionResultTarget.id}`, {
         assessment_results: inspectionResultForm.assessment_results,
         estimated_duration_value: inspectionResultForm.estimated_duration_value,
         estimated_duration_unit: inspectionResultForm.estimated_duration_unit,
         status_of_materials: inspectionResultForm.status_of_materials,
-        status: inspectionResultForm.status_of_materials === 'Available' ? 'Approved' : 'Awaiting Materials',
+        status: isAvailable ? 'Approved' : 'Awaiting Materials',
       });
+
+      const scheduledRef = localStorage.getItem('inspection-schedule');
+      const inspectionId = scheduledRef ? JSON.parse(scheduledRef)?.id : null;
+      if (inspectionId) {
+        await API.patch(`/inspections/${inspectionId}`, {
+          recommedation: isAvailable ? 'Approved' : 'Disapproved',
+          status: 'Completed',
+        });
+      }
       setRequests(prev =>
         prev.map(r => r.id === inspectionResultTarget.id ? {
           ...r,
@@ -188,14 +198,21 @@ const JobRequestTable = () => {
     try {
       await API.patch(`/job-requests/${inspectionTarget.id}/status`, {
         status: 'Under Inspection',
-      //   scheduled_date: inspectionForm.scheduledDate,
-      //   personnel_ids: inspectionForm.personnels,
       });
+
+      const inspectionRes = await API.post('/inspections', {
+        job_request_id: inspectionTarget.id,
+        inspection_date: inspectionForm.scheduledDate,
+        personnel_ids: inspectionForm.personnels.map((id) => Number(id)),
+      });
+      const inspectionId = inspectionRes.data.data?.id ?? null;
+
       setRequests(prev =>
         prev.map(r => r.id === inspectionTarget.id ? { ...r, status: 'Under Inspection' } : r)
       );
       // setInspectionTarget(null);
       localStorage.setItem('inspection-schedule', JSON.stringify({
+        id: inspectionId,
         request: inspectionTarget,
         scheduledDate: inspectionForm.scheduledDate,
         personnels: inspectionForm.personnels.map(id =>
@@ -450,7 +467,15 @@ const JobRequestTable = () => {
                         >
                           View Details
                         </button>
-                      ) : req.status === 'Pending' || req.status === 'Under Inspection' || req.status === 'Approved' ? (
+                      ) : req.status === 'Awaiting Materials' ? (
+                        <button
+                          type="button"
+                          onClick={() => handleNavigateToJobOrderForm(req.id)}
+                          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wider shadow-sm shadow-indigo-100 transition-all"
+                        >
+                          Create Job Order
+                        </button>
+                      ) : req.status === 'Pending' || req.status === 'Under Inspection' ? (
                         <button
                           type="button"
                           onClick={() => setSelectedRequest(req)}

@@ -1,6 +1,5 @@
 "use client";
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
 
 interface Personnel {
     id: number;
@@ -33,12 +32,20 @@ interface JobOrder {
 interface Props {
     selectedField: string;
     JobOrders: JobOrder[];
+    month: number | '';
+    year: number | '';
 }
 
-const AccomplishmentReport = ({selectedField, JobOrders}: Props) => {
-    const searchParams = useSearchParams();
-    const month = searchParams.get('month');
-    const year = searchParams.get('year');
+const AccomplishmentReport = ({selectedField, JobOrders, month, year}: Props) => {
+    const monthLabel = month
+        ? new Date(`${year}-${String(month).padStart(2, '0')}-01`).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()
+        : null;
+
+    const reportTitle = month
+        ? `MONTHLY ACCOMPLISHMENT REPORT (${monthLabel})`
+        : year
+        ? `CONSOLIDATED ACCOMPLISHMENT REPORT YEAR ${year}`
+        : 'CONSOLIDATED ACCOMPLISHMENT REPORT';
     
     return (
         <div 
@@ -80,26 +87,14 @@ const AccomplishmentReport = ({selectedField, JobOrders}: Props) => {
                 GENERAL SERVICES UNIT
             </div>
 
-            {month ?  
-                (<div className="text-red-500 text-center font-bold text-xl mb-2">
-                    MONTHLY ACCOMPLISHMENT REPORT{' '}
-                        <span>
-                            ({new Date(month + '-01T00:00:00').toLocaleDateString('en-US', { 
-                                month: 'long', 
-                                year: 'numeric'
-                            }).toUpperCase()} 
-                            {selectedField !== "All" && (
-                                    <span> - {selectedField}</span>
-                                )}
-                            )
-                        </span>
-                </div>
-            ) : (
+            {selectedField !== "All" && (
                 <div className="text-red-500 text-center font-bold text-xl mb-2">
-                    CONSOLIDATED APPROVED JOB REQUEST From JANUARY – DECEMBER {year}
-                    {selectedField !== "All" && (
-                        <span> ( {selectedField} )</span>
-                    )}
+                    {reportTitle} <span className="text-base">( {selectedField} )</span>
+                </div>
+            )}
+            {selectedField === "All" && (
+                <div className="text-red-500 text-center font-bold text-xl mb-2">
+                    {reportTitle}
                 </div>
             )}
 
@@ -183,8 +178,7 @@ const AccomplishmentReport = ({selectedField, JobOrders}: Props) => {
                 @media print {
                     @page {
                         size: A4 landscape;
-                        padding: 10mm;
-                        margin: 55mm 10mm 10mm 10mm;
+                        margin: 0;
                     }
 
                     thead {

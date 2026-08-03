@@ -1,15 +1,15 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
-import InspectionsTable from "./inspections-table/InspectionsTable";
+import WaitingMaterialsTable from "./waiting-materials-table/WaitingMaterialsTable";
 
-const ScheduleInspectionPage = () => {
+const WaitingMaterialsPage = () => {
     return (
         <DashboardLayout>
             <ProtectedRoute>
-                <InspectionsTable />
+                <WaitingMaterialsTable />
             </ProtectedRoute>
         </DashboardLayout>
-     );
+    );
 }
 
-export default ScheduleInspectionPage;
+export default WaitingMaterialsPage;

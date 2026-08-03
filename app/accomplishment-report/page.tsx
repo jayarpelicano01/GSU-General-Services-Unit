@@ -1,8 +1,8 @@
 'use client';
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, useMemo } from "react";
 import AccomplishmentReport from "../components/printouts/compilations/AccomplishmentReport";
+import JobRequestReport from "../components/printouts/compilations/JobRequestReport";
 import { API } from "../utils/api/api";
-import { useSearchParams } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useAuth } from "@/app/context/AuthContext";
@@ -21,6 +21,23 @@ const FIELD_WORK_OPTIONS = [
   "Utility",
 ];
 
+const MONTHS = [
+  { value: 1, label: "January" },
+  { value: 2, label: "February" },
+  { value: 3, label: "March" },
+  { value: 4, label: "April" },
+  { value: 5, label: "May" },
+  { value: 6, label: "June" },
+  { value: 7, label: "July" },
+  { value: 8, label: "August" },
+  { value: 9, label: "September" },
+  { value: 10, label: "October" },
+  { value: 11, label: "November" },
+  { value: 12, label: "December" },
+];
+
+type ReportType = "job-order" | "job-request";
+
 interface Personnel {
   id: number;
   first_name: string;
@@ -32,7 +49,7 @@ interface Unit {
   unit_acronym: string;
 }
 
-interface JobRequest {
+interface JobRequestRef {
   id: number;
   unit: Unit;
   field_work: string;
@@ -45,65 +62,151 @@ interface JobOrder {
   date_started: string | Date;
   date_accomplished: string | Date;
   status: string;
-  job_request: JobRequest;
+  job_request: JobRequestRef;
   personnels: Personnel[];
 }
 
-// Inner component that uses useSearchParams - must be wrapped in Suspense
+interface JobRequest {
+  id: number;
+  request_date?: string | Date;
+  unit: Unit;
+  field_work: string;
+  specific_work: string;
+  estimated_duration_value?: number;
+  estimated_duration_unit?: string;
+  status: string;
+}
+
 const AccomplishmentReportInner = () => {
   const { user } = useAuth();
   const canPrint = user?.role === "GSU_STAFF";
+
+  const [reportType, setReportType] = useState<ReportType>("job-order");
   const [selectedField, setSelectedField] = useState("All");
+  const [filterMonth, setFilterMonth] = useState<number | "">("");
+  const [filterYear, setFilterYear] = useState<number | "">(new Date().getFullYear());
   const [jobOrders, setJobOrders] = useState<JobOrder[]>([]);
-  const searchParams = useSearchParams();
-  const month = searchParams.get("month");
-  const year = searchParams.get("year");
+  const [jobRequests, setJobRequests] = useState<JobRequest[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchJobOrders = async () => {
-      const response = await API.get("/job-orders/completed/");
-      const data = response.data.data;
-      setJobOrders(data);
+    const fetchData = async () => {
+      try {
+        const [ordersRes, requestsRes] = await Promise.all([
+          API.get("/job-orders/completed/"),
+          API.get("/job-requests"),
+        ]);
+        setJobOrders(ordersRes.data.data ?? []);
+        setJobRequests(
+          (requestsRes.data.data ?? []).filter(
+            (r: JobRequest) => r.status === "Approved"
+          )
+        );
+      } catch (error) {
+        console.error("Error fetching report data:", error);
+      } finally {
+        setLoading(false);
+      }
     };
-    fetchJobOrders();
+    fetchData();
   }, []);
 
-  const monthFilteredOrders = jobOrders.filter((order) => {
-    if (month) {
-      return new Date(order.date_started).toISOString().slice(0, 7) === month;
-    }
-    if (year) {
-      return new Date(order.date_started).getFullYear().toString() === year;
-    }
+  const availableYears = useMemo(() => {
+    const years = new Set<number>();
+    jobOrders.forEach((o) => years.add(new Date(o.date_started).getFullYear()));
+    jobRequests.forEach((r) => {
+      if (r.request_date) years.add(new Date(r.request_date).getFullYear());
+    });
+    years.add(new Date().getFullYear());
+    return Array.from(years).sort((a, b) => b - a);
+  }, [jobOrders, jobRequests]);
+
+  const matchesMonthYear = (date: string | Date | undefined) => {
+    if (!date) return true;
+    const dt = new Date(date);
+    if (filterYear && dt.getFullYear() !== filterYear) return false;
+    if (filterMonth && dt.getMonth() + 1 !== filterMonth) return false;
     return true;
-  });
+  };
+
+  const monthYearFilteredOrders = jobOrders.filter((o) =>
+    matchesMonthYear(o.date_started)
+  );
+  const monthYearFilteredRequests = jobRequests.filter((r) =>
+    matchesMonthYear(r.request_date)
+  );
 
   const filteredOrders =
     selectedField === "All"
-      ? monthFilteredOrders
-      : monthFilteredOrders.filter(
+      ? monthYearFilteredOrders
+      : monthYearFilteredOrders.filter(
           (order) => order.job_request?.field_work === selectedField
+        );
+
+  const filteredRequests =
+    selectedField === "All"
+      ? monthYearFilteredRequests
+      : monthYearFilteredRequests.filter(
+          (r) => r.field_work === selectedField
         );
 
   const fieldCounts = FIELD_WORK_OPTIONS.reduce((acc, field) => {
     if (field === "All") {
-      acc[field] = monthFilteredOrders.length;
-    } else {
-      acc[field] = monthFilteredOrders.filter(
+      acc[field] =
+        reportType === "job-order"
+          ? monthYearFilteredOrders.length
+          : monthYearFilteredRequests.length;
+    } else if (reportType === "job-order") {
+      acc[field] = monthYearFilteredOrders.filter(
         (o) => o.job_request?.field_work === field
+      ).length;
+    } else {
+      acc[field] = monthYearFilteredRequests.filter(
+        (r) => r.field_work === field
       ).length;
     }
     return acc;
   }, {} as Record<string, number>);
 
+  const activeDataCount =
+    reportType === "job-order" ? filteredOrders.length : filteredRequests.length;
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 print:space-y-0">
       {/* Filter toolbar */}
-      <div className="no-print bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-3">
+      <div className="no-print bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-wrap items-end justify-between gap-3">
+        <div className="flex flex-wrap items-end gap-4">
+          {/* Report type */}
           <div>
             <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
-              Filter by Field
+              Report Type
+            </label>
+            <div className="flex rounded-lg border border-slate-200 p-0.5 bg-slate-50">
+              {(
+                [
+                  { value: "job-order", label: "Job Order" },
+                  { value: "job-request", label: "Job Request" },
+                ] as { value: ReportType; label: string }[]
+              ).map((type) => (
+                <button
+                  key={type.value}
+                  onClick={() => setReportType(type.value)}
+                  className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
+                    reportType === type.value
+                      ? "bg-indigo-600 text-white shadow-sm"
+                      : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  {type.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Field of work */}
+          <div>
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+              Field of Work
             </label>
             <select
               value={selectedField}
@@ -120,18 +223,88 @@ const AccomplishmentReportInner = () => {
               })}
             </select>
           </div>
-          <div className="text-xs text-slate-400 font-medium">
-            {month ? `Filtering by month: ${month}` : year ? `Filtering by year: ${year}` : "Showing all completed job orders"}
+
+          {/* Month */}
+          <div>
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+              Month
+            </label>
+            <select
+              value={filterMonth}
+              onChange={(e) =>
+                setFilterMonth(e.target.value === "" ? "" : Number(e.target.value))
+              }
+              className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+            >
+              <option value="">All Months</option>
+              {MONTHS.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
           </div>
+
+          {/* Year */}
+          <div>
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+              Year
+            </label>
+            <select
+              value={filterYear}
+              onChange={(e) =>
+                setFilterYear(e.target.value === "" ? "" : Number(e.target.value))
+              }
+              className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+            >
+              <option value="">All Years</option>
+              {availableYears.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="text-xs text-slate-400 font-medium pb-2">
+          {reportType === "job-order"
+            ? `${activeDataCount} completed job order(s)`
+            : `${activeDataCount} job request(s)`}
         </div>
       </div>
 
       {/* Report Content */}
-      <div className="overflow-x-auto pb-20">
-        <AccomplishmentReport
-          selectedField={selectedField}
-          JobOrders={filteredOrders}
-        />
+      <div className="overflow-x-auto pb-20 print:overflow-visible print:p-0">
+        {loading ? (
+          <div className="p-8 animate-pulse space-y-6 bg-white rounded-xl shadow-sm border border-slate-200">
+            <div className="h-8 w-1/3 bg-slate-200 rounded" />
+            <div className="h-64 bg-slate-200 rounded-xl" />
+          </div>
+        ) : activeDataCount === 0 ? (
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-16 text-center">
+            <p className="text-slate-700 font-bold text-sm">
+              No {reportType === "job-order" ? "job orders" : "job requests"} found
+            </p>
+            <p className="text-slate-400 text-xs mt-1">
+              Try adjusting the field of work, month, or year filters.
+            </p>
+          </div>
+        ) : reportType === "job-order" ? (
+          <AccomplishmentReport
+            selectedField={selectedField}
+            JobOrders={filteredOrders}
+            month={filterMonth}
+            year={filterYear}
+          />
+        ) : (
+          <JobRequestReport
+            selectedField={selectedField}
+            JobRequests={filteredRequests}
+            month={filterMonth}
+            year={filterYear}
+          />
+        )}
       </div>
 
       {/* Floating Print Button */}
@@ -152,32 +325,11 @@ const AccomplishmentReportInner = () => {
   );
 };
 
-// Skeleton for Suspense fallback
-const AccomplishmentReportSkeleton = () => (
-  <div className="space-y-4">
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex items-center justify-between">
-      <div className="h-10 w-56 animate-pulse bg-slate-200 rounded-lg" />
-      <div className="h-10 w-32 animate-pulse bg-slate-200 rounded-lg" />
-    </div>
-    <div className="p-8 animate-pulse space-y-6 bg-white rounded-xl shadow-sm border border-slate-200">
-      <div className="h-8 w-1/3 bg-slate-200 rounded" />
-      <div className="grid grid-cols-4 gap-4">
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-24 bg-slate-200 rounded-xl" />
-        ))}
-      </div>
-      <div className="h-64 bg-slate-200 rounded-xl" />
-    </div>
-  </div>
-);
-
 const AccomplishmentReportPage = () => {
   return (
     <DashboardLayout>
       <ProtectedRoute>
-        <Suspense fallback={<AccomplishmentReportSkeleton />}>
-          <AccomplishmentReportInner />
-        </Suspense>
+        <AccomplishmentReportInner />
       </ProtectedRoute>
     </DashboardLayout>
   );
