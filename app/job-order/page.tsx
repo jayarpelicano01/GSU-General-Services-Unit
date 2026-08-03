@@ -1,9 +1,15 @@
-import JobOrderForm from "./job-order-form/JobOrderForm";
+import { DashboardLayout } from "@/components/layout/DashboardLayout"
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
+import JobOrderForm from "./job-order-form/JobOrderForm"
 
 const JobOrderFormLayout = () => {
   return (
-    <JobOrderForm/>
-  );
+    <DashboardLayout>
+      <ProtectedRoute>
+        <JobOrderForm />
+      </ProtectedRoute>
+    </DashboardLayout>
+  )
 }
 
-export default JobOrderFormLayout;
+export default JobOrderFormLayout

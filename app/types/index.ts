@@ -1,44 +1,25 @@
+export interface Unit {
+  id: number;
+  unit_name: string;
+  unit_acronym: string;
+  head_id: number | null;
+  location_id: number | null;
+  location?: {
+    id: number;
+    location_name: string;
+  } | null;
+}
+
 export interface User {
   id: number;
   email: string;
   role: 'GSU_STAFF' | 'UNIT_HEAD' | 'UNIT_STAFF';
-  reference_id: number;
-  gsu_head?: {
-    id: number;
-    first_name: string;
-    middle_name: string | null;
-    last_name: string;
-    suffix: string | null;
-  };
-  unit_head?: {
-    id: number;
-    first_name: string;
-    middle_name: string | null;
-    last_name: string;
-    suffix: string | null;
-    unit_id: number;
-    unit: {
-      id: number;
-      unit_name: string;
-      unit_acronym: string;
-    };
-  };
-  unit?: {
-    id: number;
-    unit_name: string;
-    unit_acronym: string;
-    head_id: number;
-    head: {
-      first_name: string;
-      middle_name: string | null;
-      last_name: string;
-      suffix: string | null;
-    };
-    location_id: number;
-    location: {
-      location_name: string;
-    };
-  };
+  first_name: string;
+  middle_name: string | null;
+  last_name: string;
+  suffix: string | null;
+  unit_id: number | null;
+  unit: Unit | null;
 }
 
 export interface JobRequest {

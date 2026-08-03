@@ -4,9 +4,11 @@ import React, { useEffect, useState } from 'react';
 import { API } from '@/app/utils/api/api';
 import { useRouter } from "next/navigation";
 import Modal from '@/app/components/modal/modal';
+import { useAuth } from '@/app/context/AuthContext';
 
 interface JobRequest {
         id: number;
+        request_date: string;
         unit: {
         head: {
             first_name: string;
@@ -43,21 +45,24 @@ interface JobOrder {
     jo_number: number;
     personnels: [Personnel];
     date_started?: string;
+    date_accomplished?: string;
     status: string;
 }
 
 const JobOrderTable = () => {
+    const { user } = useAuth();
     const [activeTab, setActiveTab] = useState('All Orders');
     const tabs = ['Assigned', 'All Orders', 'Pending', 'Completed', 'Cancelled'];
     const [orders, setOrders] = useState<JobOrder[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [sortKey, setSortKey] = useState<'jo' | 'unit' | 'date' | 'status'>('jo');
+    const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
     
     const today = new Date().toISOString().split('T')[0];
 
 
     const [selectedOrder, setSelectedOrder] = useState<JobOrder | null>(null);
     const [completeOrder, setCompleteOrder] = useState<JobOrder | null>(null);
-    const [reportType, setReportType] = useState<"month" | "year">("month");
-    const [selectedYear, setSelectedYear] = useState("");
 
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
     const [viewingOrder, setViewingOrder] = useState<JobOrder | null>(null);
@@ -156,30 +161,61 @@ const JobOrderTable = () => {
 
 
     const router = useRouter();
-  
-
-    const [showModal, setShowModal] = useState(false);
-    const [selectedMonth, setSelectedMonth] = useState("");
+    const isGsuStaff = user?.role === "GSU_STAFF";
+    const isUnitUser = user?.role === "UNIT_STAFF" || user?.role === "UNIT_HEAD";
+    const canAccessReport = isGsuStaff;
 
     const handleGenerateReport = () => {
-        setShowModal(true);
-    };
-
-    const handleConfirm = () => {
-        if (reportType === "month") {
-            if (!selectedMonth) return;
-            router.push(`/accomplishment-report?month=${selectedMonth}`);
-        } else {
-            if (!selectedYear) return;
-            router.push(`/accomplishment-report?year=${selectedYear}`);
-        }
-        setShowModal(false);
+        router.push('/accomplishment-report');
     };
 
     const filteredOrders = orders.filter(order => {
-        if (activeTab === 'All Orders') return true;
-        return order.status === activeTab;
+        if (activeTab !== 'All Orders' && order.status !== activeTab) return false;
+
+        if (searchQuery.trim()) {
+            const q = searchQuery.trim().toLowerCase();
+            const haystack = [
+                String(order.jo_number),
+                String(order.id),
+                order.job_request?.unit?.unit_name,
+                order.job_request?.unit?.unit_acronym,
+                order.job_request?.field_work,
+                order.specific_work,
+                order.status,
+                order.date_started,
+            ].filter(Boolean).join(' ').toLowerCase();
+            if (!haystack.includes(q)) return false;
+        }
+
+        return true;
     });
+
+    const toggleSort = (key: 'jo' | 'unit' | 'date' | 'status') => {
+        if (sortKey === key) {
+            setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+        } else {
+            setSortKey(key);
+            setSortDir(key === 'jo' || key === 'date' ? 'desc' : 'asc');
+        }
+    };
+
+    const sortedOrders = [...filteredOrders].sort((a, b) => {
+        const dir = sortDir === 'asc' ? 1 : -1;
+        switch (sortKey) {
+            case 'unit':
+                return (a.job_request?.unit?.unit_name || '').localeCompare(b.job_request?.unit?.unit_name || '') * dir;
+            case 'status':
+                return (a.status || '').localeCompare(b.status || '') * dir;
+            case 'date':
+                return (new Date(a.date_started || 0).getTime() - new Date(b.date_started || 0).getTime()) * dir;
+            case 'jo':
+            default:
+                return ((a.jo_number || 0) - (b.jo_number || 0)) * dir;
+        }
+    });
+
+    const sortIndicator = (key: 'jo' | 'unit' | 'date' | 'status') =>
+        sortKey === key ? (sortDir === 'asc' ? '↑' : '↓') : '↕';
 
     useEffect(() => {
         const AssignedOrders = orders.filter(order => {
@@ -217,46 +253,67 @@ const JobOrderTable = () => {
 
   return (
     
-    <div className="min-h-screen bg-[#f8f9ff] p-8">
+    <div className="min-h-screen bg-[#f8f9ff] p-4 sm:p-6 lg:p-8">
         <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
 
-            <div className="px-8 pt-6 pb-2 flex items-center justify-between">
-                <div>
+            <div className="px-4 sm:px-8 pt-6 pb-3 flex items-start sm:items-center justify-between gap-3">
+                <div className="min-w-0">
                     <h2 className="text-slate-800 text-lg font-extrabold tracking-tight">Job Orders</h2>
                     <p className="text-slate-400 text-[12px] font-medium mt-0.5">Manage and monitor all job orders</p>
                 </div>
-                <span className="bg-indigo-50 text-indigo-500 text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-indigo-100">
-                    {filteredOrders.length} {activeTab === 'All Requests' ? 'Total' : activeTab}
+                <span className="bg-indigo-50 text-indigo-500 text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-indigo-100 whitespace-nowrap shrink-0">
+                    {filteredOrders.length} {activeTab === 'All Orders' ? 'Total' : activeTab}
                 </span>
             </div>
+
+            {/* Search bar */}
+            <div className="px-4 sm:px-8 py-3 border-b border-slate-100">
+                <div className="relative max-w-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="M21 21l-4.35-4.35" />
+                    </svg>
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search by JO no., unit, field of work, description, status, or date..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+                    />
+                </div>
+            </div>
         
-            <div className="flex items-center justify-between border-b border-slate-100 px-8 py-2 gap-8">
-            
-            <div className='flex gap-8'>
-                {tabs.map((tab) => (
-                    <button
-                    key={tab}
-                    className={`py-4 text-sm font-medium ${
-                        activeTab === tab
-                        ? 'text-indigo-600 border-b-2 border-indigo-600'
-                        : 'text-slate-400 hover:text-slate-600'
-                    }`}
-                    onClick={() => setActiveTab(tab)}
-                    >
-                    {tab}
-                    </button>
-                ))}
+            {/* Navigation Tabs (From Screenshot) */}
+            <div className="flex items-center border-b border-slate-100 px-4 sm:px-8 py-2 gap-5 sm:gap-8 overflow-x-auto">
+                {tabs.map((tab) => {
+                    const count = tab === 'All Orders'
+                        ? orders.length
+                        : orders.filter(o => o.status === tab).length;
+
+                    return (
+                        <button
+                            key={tab}
+                            className={`py-4 text-sm font-medium flex items-center gap-2 whitespace-nowrap ${
+                                activeTab === tab
+                                ? 'text-indigo-600 border-b-2 border-indigo-600'
+                                : 'text-slate-400 hover:text-slate-600'
+                            }`}
+                            onClick={() => setActiveTab(tab)}
+                        >
+                            {tab}
+                            {count > 0 && (
+                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                                    activeTab === tab
+                                    ? 'bg-indigo-100 text-indigo-600'
+                                    : 'bg-slate-100 text-slate-400'
+                                }`}>
+                                    {count}
+                                </span>
+                            )}
+                        </button>
+                    );
+                })}
             </div>
-            <div>
-                <button
-                    onClick={handleGenerateReport}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 right-20 rounded-lg text-sm font-bold transition-all"
-                    >
-                    Generate Report
-                </button> 
-            </div>
-            </div>
-             
 
         {/* Table Body */}
         <div className="overflow-x-auto">
@@ -264,20 +321,37 @@ const JobOrderTable = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="text-slate-400 text-[11px] font-bold uppercase tracking-widest border-b border-slate-100">
-                <th className="px-8 py-5">JO No.</th>
-                <th className="px-4 py-5">Requesting Unit</th>
+                <th className="px-4 sm:px-8 py-5">
+                  <button onClick={() => toggleSort('jo')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors">
+                    JO No. <span className="text-[9px]">{sortIndicator('jo')}</span>
+                  </button>
+                </th>
+                <th className="px-4 py-5">
+                  <button onClick={() => toggleSort('unit')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors">
+                    Requesting Unit <span className="text-[9px]">{sortIndicator('unit')}</span>
+                  </button>
+                </th>
                 <th className="px-4 py-5">Field of Work</th>
                 <th className="px-4 py-5">Work Description</th>
-                <th className="px-4 py-5 text-center">Status</th>
-                <th className="px-8 py-5 text-right">Action</th>
+                <th className="px-4 py-5 text-center">
+                  <button onClick={() => toggleSort('status')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors">
+                    Status <span className="text-[9px]">{sortIndicator('status')}</span>
+                  </button>
+                </th>
+                <th className="px-4 sm:px-8 py-5 text-right">
+                  <button onClick={() => toggleSort('date')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors">
+                    Date <span className="text-[9px]">{sortIndicator('date')}</span>
+                  </button>
+                </th>
+                <th className="px-4 py-5 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredOrders.map((order) => (
+              {sortedOrders.map((order) => (
                 <tr key={order.id} className="hover:bg-slate-50/50 transition-colors group">
                   
                   {/* ID */}
-                  <td className="px-8 py-6 text-slate-400 text-sm font-medium tabular-nums">
+                  <td className="px-4 sm:px-8 py-6 text-slate-400 text-sm font-medium tabular-nums whitespace-nowrap">
                     #{order.jo_number}
                   </td>
                   
@@ -321,10 +395,24 @@ const JobOrderTable = () => {
                     </span>
                   </td>
 
+                  {/* Date */}
+                  <td className="px-4 sm:px-8 py-6 text-slate-500 text-sm tabular-nums whitespace-nowrap">
+                    {order.date_started ? new Date(order.date_started).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '—'}
+                  </td>
+
                   {/* Action */}
-                <td className="px-8 py-6 text-right">
+                <td className="px-4 py-6 text-right">
                     <div className="flex justify-end items-center">
-                        {order.status === 'Assigned' ? (
+                        {isUnitUser ? (
+                        /* View only for unit staff/head */
+                        <button 
+                            type="button"
+                            onClick={() => {setIsDetailsOpen(true); setViewingOrder(order)}}
+                            className="text-indigo-600 hover:text-indigo-800 transition-colors font-bold text-[11px] uppercase tracking-wider underline underline-offset-4"
+                        >
+                            View Details
+                        </button>
+                        ) : order.status === 'Assigned' ? (
                         /* Triple Dot Button for Assigned Orders */
                         <button 
                             type="button"
@@ -359,6 +447,15 @@ const JobOrderTable = () => {
                 </td>
                 </tr>
               ))}
+              {sortedOrders.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="px-8 py-16 text-center">
+                    <div className="text-slate-400 text-sm font-medium">
+                      No job orders found{searchQuery ? ` matching "${searchQuery}"` : ''} in {activeTab}.
+                    </div>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -373,11 +470,29 @@ const JobOrderTable = () => {
         onClose={() => setSelectedOrder(null)}
         title="Order Actions"
         subtitle={`Manage Job Order #${selectedOrder?.jo_number}`}
-        maxWidth="md"
+        maxWidth="lg"
     >
         {selectedOrder && (
             <div className="flex flex-col gap-2">
-                
+
+                {/* Status + summary header */}
+                <div className="px-4 py-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
+                    <div className="min-w-0">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Work Description</p>
+                        <p className="text-sm font-bold text-slate-700 truncate mt-0.5">{selectedOrder.specific_work}</p>
+                        <p className="text-[11px] text-slate-400 mt-0.5">{selectedOrder.job_request?.field_work} • {selectedOrder.job_request?.unit?.unit_acronym}</p>
+                    </div>
+                    <span className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold tracking-tight inline-block shrink-0 ${
+                        selectedOrder.status === 'Completed' ? 'bg-emerald-100 text-emerald-600' :
+                        selectedOrder.status === 'Assigned' ? 'bg-amber-100 text-amber-600 border border-amber-200' :
+                        selectedOrder.status === 'Ongoing' ? 'bg-blue-100 text-blue-600' :
+                        selectedOrder.status === 'Pending' ? 'bg-slate-100 text-slate-600' :
+                        'bg-rose-100 text-rose-600'
+                    }`}>
+                        {selectedOrder.status?.toUpperCase() || 'UNKNOWN'}
+                    </span>
+                </div>
+
                 {/* 1. View Details Action */}
                 <button 
                     className="group w-full text-left px-4 py-4 rounded-xl hover:bg-slate-50 border border-slate-100 transition-all flex items-center justify-between" 
@@ -687,72 +802,20 @@ const JobOrderTable = () => {
       </div>
   )}
 
-{showModal && (
-  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-    <div className="bg-white rounded-xl shadow-xl p-6 w-80 space-y-4">
-      <h2 className="text-slate-800 font-bold text-lg">Generate Report</h2>
-      <p className="text-slate-400 text-sm">Select a period to generate the accomplishment report.</p>
-
-      {/* Tab Toggle */}
-      <div className="flex bg-slate-100 rounded-lg p-1">
+      {/* Floating Report Button */}
+      {canAccessReport && (
         <button
-          onClick={() => setReportType("month")}
-          className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${
-            reportType === "month" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-400"
-          }`}
+          onClick={handleGenerateReport}
+          className="fixed bottom-6 right-6 z-40 bg-indigo-600 hover:bg-indigo-700 text-white pl-4 pr-5 py-3 rounded-full shadow-xl shadow-indigo-200 flex items-center gap-2 text-sm font-bold transition-all"
         >
-          By Month
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+            <path d="M14 2v6h6" />
+          </svg>
+          Generate Report
         </button>
-        <button
-          onClick={() => setReportType("year")}
-          className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${
-            reportType === "year" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-400"
-          }`}
-        >
-          By Year
-        </button>
-      </div>
-
-      {/* Input */}
-      {reportType === "month" ? (
-        <input
-          type="month"
-          value={selectedMonth}
-          onChange={(e) => setSelectedMonth(e.target.value)}
-          className="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-slate-700 focus:border-indigo-500 outline-none"
-        />
-      ) : (
-        <select
-          value={selectedYear}
-          onChange={(e) => setSelectedYear(e.target.value)}
-          className="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-slate-700 focus:border-indigo-500 outline-none"
-        >
-          <option value="">Select a year...</option>
-          {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map(year => (
-            <option key={year} value={year}>{year}</option>
-          ))}
-        </select>
       )}
 
-      <div className="flex gap-3 justify-end">
-        <button
-          onClick={() => setShowModal(false)}
-          className="px-4 py-2 text-sm text-slate-400 hover:text-slate-600 font-semibold transition-colors"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleConfirm}
-          disabled={reportType === "month" ? !selectedMonth : !selectedYear}
-          className="px-4 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white font-bold rounded-lg transition-all"
-        >
-          Generate
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-  
     </div>
   );
 };

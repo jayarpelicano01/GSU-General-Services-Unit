@@ -1,15 +1,15 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
-import JobOrderTable from "./job-order-table/JobOrderTable"
+import JobRequestForm from "../job-request-form/JobRequestForm"
 
-const JobOrderListPage = () => {
+const JobRequestNewPage = () => {
   return (
     <DashboardLayout>
       <ProtectedRoute>
-        <JobOrderTable />
+        <JobRequestForm />
       </ProtectedRoute>
     </DashboardLayout>
   )
 }
 
-export default JobOrderListPage
+export default JobRequestNewPage

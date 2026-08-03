@@ -10,9 +10,11 @@ import { InspectionResultsModal } from '@/app/components/modal/job-request-modal
 import PageSkeleton from '@/app/components/loading/page-skeleton/PageSkeleton';
 import { DisapproveModal } from '@/app/components/modal/job-request-modals/DisapproveModal';
 import Alert from '@/app/components/alert/Alert';
+import { useAuth } from '@/app/context/AuthContext';
 
 interface JobRequest {
   id: number;
+  request_date?: string;
   unit: {
     unit_name: string;
     unit_acronym: string;
@@ -52,9 +54,16 @@ interface InspectionFormData {
 }
 
 const JobRequestTable = () => {
+  const { user } = useAuth();
+  const isGsuStaff = user?.role === "GSU_STAFF";
+  const isUnitUser = user?.role === "UNIT_STAFF" || user?.role === "UNIT_HEAD";
+  const canAccessReport = isGsuStaff;
   const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [activeTab, setActiveTab] = useState('All Requests');
   const tabs = ['All Requests', 'Pending', 'Under Inspection', 'Awaiting Materials', 'Approved', 'Disapproved', 'Cancelled'];
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortKey, setSortKey] = useState<'id' | 'unit' | 'date' | 'status'>('id');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const router = useRouter();
   const [requests, setRequests] = useState<JobRequest[]>([]);
   const [selectedRequest, setSelectedRequest] = useState<JobRequest | null>(null);
@@ -209,9 +218,51 @@ const JobRequestTable = () => {
   };
 
   const filteredRequests = requests.filter(req => {
-    if (activeTab === 'All Requests') return true;
-    return req.status === activeTab;
+    if (activeTab !== 'All Requests' && req.status !== activeTab) return false;
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      const haystack = [
+        String(req.id),
+        req.unit?.unit_name,
+        req.unit?.unit_acronym,
+        req.field_work,
+        req.specific_work,
+        req.status,
+        req.request_date,
+      ].filter(Boolean).join(' ').toLowerCase();
+      if (!haystack.includes(q)) return false;
+    }
+
+    return true;
   });
+
+  const toggleSort = (key: 'id' | 'unit' | 'date' | 'status') => {
+    if (sortKey === key) {
+      setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortKey(key);
+      setSortDir(key === 'id' || key === 'date' ? 'desc' : 'asc');
+    }
+  };
+
+  const sortedRequests = [...filteredRequests].sort((a, b) => {
+    const dir = sortDir === 'asc' ? 1 : -1;
+    switch (sortKey) {
+      case 'unit':
+        return (a.unit?.unit_name || '').localeCompare(b.unit?.unit_name || '') * dir;
+      case 'status':
+        return (a.status || '').localeCompare(b.status || '') * dir;
+      case 'date':
+        return (new Date(a.request_date || 0).getTime() - new Date(b.request_date || 0).getTime()) * dir;
+      case 'id':
+      default:
+        return (a.id - b.id) * dir;
+    }
+  });
+
+  const sortIndicator = (key: 'id' | 'unit' | 'date' | 'status') =>
+    sortKey === key ? (sortDir === 'asc' ? '↑' : '↓') : '↕';
 
   useEffect(() => {
     const hasPending = requests.some(r => r.status === 'Pending');
@@ -232,19 +283,39 @@ const JobRequestTable = () => {
   if (isLoading) { return < PageSkeleton />; }
 
   return (
-    <div className="min-h-screen bg-[#f8f9ff] p-8">
+    <div className="min-h-screen bg-[#f8f9ff] p-4 sm:p-6 lg:p-8">
       {/* Table Container */}
       <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
 
-        <div className="px-8 pt-6 pb-2 flex items-center justify-between">
-          <div>
-            <h2 className="text-slate-800 text-lg font-extrabold tracking-tight">Job Requests</h2>
+        <div className="px-4 sm:px-8 pt-6 pb-3 flex items-start sm:items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="text-lg font-extrabold tracking-tight text-slate-800">Job Requests</h2>
             <p className="text-slate-400 text-[12px] font-medium mt-0.5">Manage and monitor all incoming job requests</p>
           </div>
+          <span className="bg-indigo-50 text-indigo-500 text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-indigo-100 whitespace-nowrap shrink-0">
+            {filteredRequests.length} {activeTab === 'All Requests' ? 'Total' : activeTab}
+          </span>
         </div>
-        
+
+        {/* Search bar */}
+        <div className="px-4 sm:px-8 py-3 border-b border-slate-100">
+          <div className="relative max-w-md">
+            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by ID, unit, field of work, description, status, or date..."
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+            />
+          </div>
+        </div>
+
         {/* Navigation Tabs (From Screenshot) */}
-        <div className="flex items-center border-b border-slate-100 px-8 py-2 gap-8">
+        <div className="flex items-center border-b border-slate-100 px-4 sm:px-8 py-2 gap-5 sm:gap-8 overflow-x-auto">
           {tabs.map((tab) => {
             const count = tab === 'All Requests'
               ? requests.length
@@ -253,7 +324,7 @@ const JobRequestTable = () => {
             return (
               <button
                 key={tab}
-                className={`py-4 text-sm font-medium flex items-center gap-2 ${
+                className={`py-4 text-sm font-medium flex items-center gap-2 whitespace-nowrap ${
                   activeTab === tab
                     ? 'text-indigo-600 border-b-2 border-indigo-600'
                     : 'text-slate-400 hover:text-slate-600'
@@ -280,20 +351,37 @@ const JobRequestTable = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="text-slate-400 text-[11px] font-bold uppercase tracking-widest border-b border-slate-100">
-                <th className="px-8 py-5">ID</th>
-                <th className="px-4 py-5">Requesting Unit</th>
+                <th className="px-4 sm:px-8 py-5">
+                  <button onClick={() => toggleSort('id')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors">
+                    ID <span className="text-[9px]">{sortIndicator('id')}</span>
+                  </button>
+                </th>
+                <th className="px-4 py-5">
+                  <button onClick={() => toggleSort('unit')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors">
+                    Requesting Unit <span className="text-[9px]">{sortIndicator('unit')}</span>
+                  </button>
+                </th>
                 <th className="px-4 py-5">Field of Work</th>
                 <th className="px-4 py-5">Work Description</th>
-                <th className="px-4 py-5 text-center">Status</th>
-                <th className="px-8 py-5 text-right">Action</th>
+                <th className="px-4 py-5 text-center">
+                  <button onClick={() => toggleSort('status')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors">
+                    Status <span className="text-[9px]">{sortIndicator('status')}</span>
+                  </button>
+                </th>
+                <th className="px-4 sm:px-8 py-5 text-right">
+                  <button onClick={() => toggleSort('date')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors">
+                    Date <span className="text-[9px]">{sortIndicator('date')}</span>
+                  </button>
+                </th>
+                <th className="px-4 py-5 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredRequests.map((req) => (
+              {sortedRequests.map((req) => (
                 <tr key={req.id} className="hover:bg-slate-50/50 transition-colors group">
                   
                   {/* ID */}
-                  <td className="px-8 py-6 text-slate-400 text-sm font-medium tabular-nums">
+                  <td className="px-4 sm:px-8 py-6 text-slate-400 text-sm font-medium tabular-nums whitespace-nowrap">
                     #{req.id}
                   </td>
 
@@ -339,11 +427,27 @@ const JobRequestTable = () => {
                     </span>
                   </td>
 
+                  {/* Date */}
+                  <td className="px-4 sm:px-8 py-6 text-slate-500 text-sm tabular-nums whitespace-nowrap">
+                    {req.request_date ? new Date(req.request_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '—'}
+                  </td>
+
                   {/* Action */}
                   {/* Action Cell */}
-                  <td className="px-8 py-6 text-right">
+                  <td className="px-4 py-6 text-right">
                     <div className="flex justify-end items-center">
-                      {req.status === 'Pending' || req.status === 'Under Inspection' || req.status === 'Approved' ? (
+                      {isUnitUser ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setViewingRequest(req);
+                            setSelectedRequest(null);
+                          }}
+                          className="text-indigo-600 hover:text-indigo-800 transition-colors font-bold text-[11px] uppercase tracking-wider underline underline-offset-4"
+                        >
+                          View Details
+                        </button>
+                      ) : req.status === 'Pending' || req.status === 'Under Inspection' || req.status === 'Approved' ? (
                         <button
                           type="button"
                           onClick={() => setSelectedRequest(req)}
@@ -369,6 +473,15 @@ const JobRequestTable = () => {
                   </td>
                 </tr>
               ))}
+              {sortedRequests.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="px-8 py-16 text-center">
+                    <div className="text-slate-400 text-sm font-medium">
+                      No job requests found{searchQuery ? ` matching "${searchQuery}"` : ''} in {activeTab}.
+                    </div>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -459,6 +572,20 @@ const JobRequestTable = () => {
           )}
         </div>
       </div>
+
+      {/* Floating Report Button */}
+      {canAccessReport && (
+        <button
+          onClick={() => router.push('/accomplishment-report')}
+          className="fixed bottom-6 right-6 z-40 bg-indigo-600 hover:bg-indigo-700 text-white pl-4 pr-5 py-3 rounded-full shadow-xl shadow-indigo-200 flex items-center gap-2 text-sm font-bold transition-all"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+            <path d="M14 2v6h6" />
+          </svg>
+          Generate Report
+        </button>
+      )}
     </div>
   );
 };

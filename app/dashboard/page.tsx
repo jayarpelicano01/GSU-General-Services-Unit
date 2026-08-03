@@ -1,13 +1,12 @@
 "use client"
 
-import { useEffect, useState, useMemo, useCallback, Suspense } from "react"
+import { useEffect, useState, useMemo, useCallback, Suspense, lazy } from "react"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
 import { useAuth } from "@/app/context/AuthContext"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
-import { MonthlyRequestsByUnit, UnitRequestsByField, UnitMonthlyTrend } from "@/app/components/dashboard/DashboardCharts"
 import { DashboardSkeleton } from "@/app/components/dashboard/DashboardSkeleton"
 import {
   FileText,
@@ -28,8 +27,30 @@ import { API } from "@/app/utils/api/api"
 import { cn } from "@/lib/utils"
 import { getFirstName } from "@/lib/rbac"
 import type { JobRequest, JobOrder, User } from "@/app/types"
+import NewJobRequestModal from "@/app/components/modal/job-request-modals/NewJobRequestModal"
 
 export const dynamic = "force-dynamic"
+
+// Lazy-load charts so the heavy recharts bundle (460KB) only loads when needed
+const MonthlyRequestsByUnit = lazy(() =>
+  import("@/app/components/dashboard/DashboardCharts").then((m) => ({ default: m.MonthlyRequestsByUnit }))
+)
+const UnitRequestsByField = lazy(() =>
+  import("@/app/components/dashboard/DashboardCharts").then((m) => ({ default: m.UnitRequestsByField }))
+)
+const UnitMonthlyTrend = lazy(() =>
+  import("@/app/components/dashboard/DashboardCharts").then((m) => ({ default: m.UnitMonthlyTrend }))
+)
+
+function ChartFallback() {
+  return (
+    <Card className="rounded-xl shadow-sm border border-slate-200">
+      <CardContent className="h-72 flex items-center justify-center text-slate-400 text-sm">
+        Loading chart...
+      </CardContent>
+    </Card>
+  )
+}
 
 const statusColors: Record<string, string> = {
   Pending: "bg-amber-100 text-amber-800",
@@ -82,7 +103,7 @@ function getRoleLabel(user: User | null) {
     case "GSU_STAFF":
       return "General Services Unit · Oversight view"
     case "UNIT_HEAD":
-      return `Unit Head · ${user.unit_head?.unit?.unit_acronym || ""}`
+      return `Unit Head · ${user.unit?.unit_acronym || ""}`
     case "UNIT_STAFF":
       return `Unit Staff · ${user.unit?.unit_acronym || ""}`
     default:
@@ -92,9 +113,8 @@ function getRoleLabel(user: User | null) {
 
 function getScopedUnitId(user: User | null): number | null {
   if (!user) return null
-  if (user.role === "UNIT_HEAD") return user.unit_head?.unit_id ?? null
-  if (user.role === "UNIT_STAFF") return user.unit?.id ?? null
-  return null
+  if (user.role === "GSU_STAFF") return null
+  return user.unit_id ?? null
 }
 
 function computeDelta(current: number, previous: number): { change: string; changeUp: boolean } {
@@ -235,6 +255,7 @@ function DashboardContent() {
   const [orders, setOrders] = useState<JobOrder[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [newRequestOpen, setNewRequestOpen] = useState(false)
 
   const fetchDashboardData = useCallback(async () => {
     try {
@@ -351,6 +372,7 @@ function DashboardContent() {
   const fieldWorkData = useMemo(() => {
     const counts: Record<string, number> = {}
     requests.forEach((r) => {
+      if (unitId && r.unit_id !== unitId) return
       const key = r.field_work || "Unspecified"
       counts[key] = (counts[key] || 0) + 1
     })
@@ -358,7 +380,7 @@ function DashboardContent() {
       .map(([field, requests]) => ({ field, requests }))
       .sort((a, b) => b.requests - a.requests)
       .slice(0, 8)
-  }, [requests])
+  }, [requests, unitId])
 
   const fieldWorkData30d = useMemo(() => {
     const cutoff = subDays(new Date(), 30).getTime()
@@ -501,12 +523,12 @@ function DashboardContent() {
           </h1>
           <p className="text-slate-500 mt-1">{getRoleLabel(user)}</p>
         </div>
-        <Button asChild>
-          <Link href="/job-request/new">
+        {!isGsuStaff && (
+          <Button onClick={() => setNewRequestOpen(true)}>
             <FileText className="w-4 h-4 mr-2" />
             New Request
-          </Link>
-        </Button>
+          </Button>
+        )}
       </div>
 
       {/* Stats Cards Row */}
@@ -535,7 +557,9 @@ function DashboardContent() {
               description="Requests per unit over the last 6 months"
             />
           ) : (
-            <MonthlyRequestsByUnit data={monthlyByUnit} />
+            <Suspense fallback={<ChartFallback />}>
+              <MonthlyRequestsByUnit data={monthlyByUnit} />
+            </Suspense>
           )}
           {fieldWorkData30d.length === 0 ? (
             <EmptyChartCard
@@ -543,7 +567,9 @@ function DashboardContent() {
               description="Total requests in the past 30 days by field work type"
             />
           ) : (
-            <UnitRequestsByField data={fieldWorkData30d} />
+            <Suspense fallback={<ChartFallback />}>
+              <UnitRequestsByField data={fieldWorkData30d} />
+            </Suspense>
           )}
         </div>
       ) : (
@@ -551,12 +577,16 @@ function DashboardContent() {
           {fieldWorkData.length === 0 ? (
             <EmptyChartCard title="Requests by Field" description="Number of requests per field work type" />
           ) : (
-            <UnitRequestsByField data={fieldWorkData} />
+            <Suspense fallback={<ChartFallback />}>
+              <UnitRequestsByField data={fieldWorkData} />
+            </Suspense>
           )}
           {monthlyTrend.every((d) => d.requests === 0) ? (
             <EmptyChartCard title="Unit Monthly Trend" description="Your requests over the last 6 months" />
           ) : (
-            <UnitMonthlyTrend data={monthlyTrend} />
+            <Suspense fallback={<ChartFallback />}>
+              <UnitMonthlyTrend data={monthlyTrend} />
+            </Suspense>
           )}
         </div>
       )}
@@ -585,9 +615,11 @@ function DashboardContent() {
               <div className="p-6 text-center text-slate-500">
                 <FileText className="w-12 h-12 mx-auto text-slate-300 mb-3" />
                 <p>No job requests yet</p>
-                <Button asChild className="mt-4">
-                  <Link href="/job-request/new">Create First Request</Link>
-                </Button>
+                {!isGsuStaff && (
+                  <Button className="mt-4" onClick={() => setNewRequestOpen(true)}>
+                    Create First Request
+                  </Button>
+                )}
               </div>
             ) : (
               <>
@@ -649,6 +681,15 @@ function DashboardContent() {
           </CardContent>
         </Card>
       </div>
+
+      <NewJobRequestModal
+        isOpen={newRequestOpen}
+        onClose={() => setNewRequestOpen(false)}
+        onCreated={() => {
+          setLoading(true)
+          fetchDashboardData()
+        }}
+      />
     </div>
   )
 }

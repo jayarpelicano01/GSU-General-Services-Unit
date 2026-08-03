@@ -1,8 +1,14 @@
+import { DashboardLayout } from "@/components/layout/DashboardLayout"
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
 import ScheduleInspectionForm from "./form/ScheduleInspectionForm";
 
 const ScheduleInspectionPage = () => {
-    return ( 
-        <ScheduleInspectionForm />
+    return (
+        <DashboardLayout>
+            <ProtectedRoute>
+                <ScheduleInspectionForm />
+            </ProtectedRoute>
+        </DashboardLayout>
      );
 }
 

@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import PrintRequestAndOrder from "./print/PrintRequestAndOrder";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 interface JobRequest {
         id: number;
@@ -61,5 +63,11 @@ export default function PrintPage() {
     return null;
   });
 
-  return <PrintRequestAndOrder JobRequest={RequestData} JobOrder={OrderData} />;
+  return (
+    <DashboardLayout>
+      <ProtectedRoute>
+        <PrintRequestAndOrder JobRequest={RequestData} JobOrder={OrderData} />
+      </ProtectedRoute>
+    </DashboardLayout>
+  );
 }

@@ -5,6 +5,7 @@ export const API = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  timeout: 15000,
   withCredentials: true, // Important for HTTP-only cookies
 })
 
@@ -66,8 +67,16 @@ API.interceptors.response.use(
       // Use the API instance which has withCredentials: true
       const response = await API.post("/auth/refresh", {})
 
-      const { accessToken } = response.data
+      const { accessToken } = response.data?.data || {}
       isRefreshing = false
+
+      if (!accessToken) {
+        const err = new Error("Refresh response missing access token")
+        processQueue(err, null)
+        return Promise.reject(err)
+      }
+
+      setAuthToken(accessToken)
       processQueue(null, accessToken)
 
       // Retry original request with new token
