@@ -46,7 +46,7 @@ function ProtectedRouteInner({ children, allowedRoles }: ProtectedRouteProps) {
 export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
   return (
     <Suspense fallback={<ProtectedRouteSkeleton />}>
-      <ProtectedRouteInner children={children} allowedRoles={allowedRoles} />
+      <ProtectedRouteInner allowedRoles={allowedRoles}>{children}</ProtectedRouteInner>
     </Suspense>
   )
 }

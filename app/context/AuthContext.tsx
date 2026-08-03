@@ -1,50 +1,8 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react"
-import { API, setAuthToken } from "@/app/utils/api/api"
-
-interface User {
-  id: number
-  email: string
-  role: "GSU_STAFF" | "UNIT_HEAD" | "UNIT_STAFF"
-  reference_id: number
-  gsu_head?: {
-    id: number
-    first_name: string
-    middle_name: string | null
-    last_name: string
-    suffix: string | null
-  }
-  unit_head?: {
-    id: number
-    first_name: string
-    middle_name: string | null
-    last_name: string
-    suffix: string | null
-    unit_id: number
-    unit: {
-      id: number
-      unit_name: string
-      unit_acronym: string
-    }
-  }
-  unit?: {
-    id: number
-    unit_name: string
-    unit_acronym: string
-    head_id: number
-    head: {
-      first_name: string
-      middle_name: string | null
-      last_name: string
-      suffix: string | null
-    }
-    location_id: number
-    location: {
-      location_name: string
-    }
-  }
-}
+import { API, setAuthToken, getAuthToken } from "@/app/utils/api/api"
+import type { User } from "@/app/types"
 
 interface AuthContextType {
   user: User | null
@@ -78,7 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshAccessToken = useCallback(async (): Promise<boolean> => {
     try {
-      const { accessToken, user } = (await API.post("/auth/refresh", {})).data.data
+      const { accessToken, user } = (await API.post("/auth/refresh", {}, { timeout: 5000 })).data.data
       setSession({ accessToken, user })
       return true
     } catch (error: unknown) {
@@ -92,9 +50,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  // Restore an existing session on mount
+  // Restore an existing session on mount by fetching the full, fresh user profile.
+  // The access token travels as an HTTP-only cookie; if it has expired the response
+  // interceptor transparently refreshes it and retries before we read the result.
+  // On a fresh page load we have no token in JS state yet, so we rotate once via
+  // /auth/refresh to materialize an explicit token (and an equally fresh profile).
   useEffect(() => {
-    refreshAccessToken().finally(() => setLoading(false))
+    async function restoreSession() {
+      try {
+        const res = await API.get("/auth/me", { timeout: 5000 })
+        const meUser = res.data?.data?.user as User | undefined
+        if (meUser && getAuthToken()) {
+          setUser(meUser)
+          setAccessToken(getAuthToken() ?? null)
+          return
+        }
+      } catch {
+        // No valid access session - fall through to a full token refresh
+      }
+      await refreshAccessToken()
+    }
+    restoreSession().finally(() => setLoading(false))
   }, [refreshAccessToken])
 
   const login = async (email: string, password: string, rememberMe = false) => {

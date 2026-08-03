@@ -22,43 +22,35 @@ export interface UserDisplay {
   subtitle: string
 }
 
+function fullName(user: User): string {
+  const names = [user.first_name, user.middle_name, user.last_name, user.suffix].filter(
+    (part): part is string => !!part && part.trim() !== ""
+  )
+  return names.join(" ") || roleLabel(user.role)
+}
+
 export function getUserDisplay(user: User | null): UserDisplay {
   if (!user) {
     return { name: "Guest", subtitle: "General Services Unit" }
   }
 
   switch (user.role) {
-    case "GSU_STAFF": {
-      const p = user.gsu_head
+    case "GSU_STAFF":
+      return { name: fullName(user), subtitle: "General Services Unit" }
+    case "UNIT_HEAD":
       return {
-        name: [p?.first_name, p?.last_name].filter(Boolean).join(" ") || roleLabel("GSU_STAFF"),
-        subtitle: "General Services Unit",
+        name: fullName(user),
+        subtitle: `Unit Head · ${user.unit?.unit_acronym || "Unit"}`,
       }
-    }
-    case "UNIT_HEAD": {
-      const p = user.unit_head
+    case "UNIT_STAFF":
       return {
-        name: [p?.first_name, p?.last_name].filter(Boolean).join(" ") || roleLabel("UNIT_HEAD"),
-        subtitle: `Unit Head · ${p?.unit?.unit_acronym || "Unit"}`,
+        name: fullName(user),
+        subtitle: user.unit?.unit_name || "General Services Unit",
       }
-    }
-    case "UNIT_STAFF": {
-      const unit = user.unit
-      return {
-        name: unit?.unit_acronym ? `${unit.unit_acronym} Staff` : roleLabel("UNIT_STAFF"),
-        subtitle: unit?.unit_name || "General Services Unit",
-      }
-    }
   }
 }
 
 export function getFirstName(user: User | null): string {
   if (!user) return "there"
-  if (user.role === "GSU_STAFF") return user.gsu_head?.first_name || "GSU Staff"
-  if (user.role === "UNIT_HEAD") return user.unit_head?.first_name || "Unit Head"
-  if (user.role === "UNIT_STAFF") {
-    const unit = user.unit
-    return unit?.unit_acronym ? `${unit.unit_acronym} Staff` : "there"
-  }
-  return "there"
+  return user.first_name || roleLabel(user.role)
 }
