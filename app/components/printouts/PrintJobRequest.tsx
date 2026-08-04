@@ -34,7 +34,7 @@
 
     
     return (
-      <div className="print-area bg-white text-black font-sans pl-[10mm] pt-[10mm] pr-[10mm] w-[210mm] mx-auto overflow-hidden">
+      <div className="print-area bg-white text-black font-sans pl-[10mm] pb-[4mm] pr-[10mm] w-[210mm] mx-auto overflow-hidden">
         <div className="flex justify-center items-center relative mb-2">
           <Image 
             src="/UEP-Logo.png" 

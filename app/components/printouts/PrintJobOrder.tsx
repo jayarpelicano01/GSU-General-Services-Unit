@@ -52,7 +52,7 @@
     // const dateString =  new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     
     return (
-      <div style={{padding: "10mm 10mm 10mm 10mm"}} className=" bg-white text-black font-sans -pt-[10mm] w-[210mm] mx-auto overflow-hidden">
+      <div style={{padding: "4mm 10mm 10mm 10mm"}} className=" bg-white text-black font-sans -pt-[10mm] w-[210mm] mx-auto overflow-hidden">
         <div className="flex justify-center items-center relative mb-2">
           <Image 
             src="/UEP-Logo.png" 

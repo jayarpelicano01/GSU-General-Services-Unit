@@ -2,8 +2,6 @@
 import PrintJobRequest from "@/app/components/printouts/PrintJobRequest";
 import PrintJobOrder from "@/app/components/printouts/PrintJobOrder";
 import { useSyncExternalStore } from "react";
-import Sidebar from "@/app/components/Sidebar";
-
 
 const subscribe = () => () => {}; 
 const getSnapshot = () => true;
@@ -51,8 +49,8 @@ interface JobOrder {
 }
 
 interface PrintProps {
-    JobRequest: JobRequest;
-    JobOrder: JobOrder;
+    JobRequest: JobRequest | null;
+    JobOrder: JobOrder | null;
 }
 
 const PrintRequestAndOrder = ({ JobRequest, JobOrder}: PrintProps) => {
@@ -61,35 +59,10 @@ const PrintRequestAndOrder = ({ JobRequest, JobOrder}: PrintProps) => {
 
   if (!isClient) return null;
   return (
-    <div className="flex bg-gray-200">
-        
-        <Sidebar />
-
-        <div className="print-container ml-64 flex-1">
-            <div className="page-break">
-                <PrintJobRequest JobRequest={JobRequest} />
-            </div>
-            <div className="page-break">
-                <PrintJobOrder JobOrder={JobOrder} />
-            </div>
-
-            <style jsx global>{`
-                @media print {
-                    .no-print {
-                        display: none !important;
-                    }
-
-                    .page-break {
-                        display: block;
-                    }   
-
-                    .print-container {
-                        margin-left: 0 !important;
-                        padding: 0 !important;
-                    }
-                }
-            `}</style>
-        </div>
+    <div>
+        {JobRequest && <PrintJobRequest JobRequest={JobRequest} />}
+        <div className="page-break border-t-2 border-dashed border-gray-400 my-0 mx-1"></div>
+        {JobOrder && <PrintJobOrder JobOrder={JobOrder} />}
     </div>
   );
 };

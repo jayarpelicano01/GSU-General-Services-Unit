@@ -5,6 +5,7 @@ import { API } from '@/app/utils/api/api';
 import { useRouter } from "next/navigation";
 import Modal from '@/app/components/modal/modal';
 import { useAuth } from '@/app/context/AuthContext';
+import { useToast } from '@/app/context/ToastContext';
 import { JobOrderDetailsModal } from '@/app/components/modal/job-order-modals/JobOrderDetailsModal';
 
 interface JobRequest {
@@ -52,6 +53,8 @@ interface JobOrder {
 
 const JobOrderTable = () => {
     const { user } = useAuth();
+    const { success } = useToast();
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [activeTab, setActiveTab] = useState('All Orders');
     const tabs = ['All Orders', 'Assigned', 'Pending', 'Completed', 'Cancelled'];
     const [orders, setOrders] = useState<JobOrder[]>([]);
@@ -81,10 +84,7 @@ const JobOrderTable = () => {
 
         
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchOrders();
-
-        
     }, []);
 
     const handleCancelSubmit = async () => {
@@ -224,31 +224,20 @@ const JobOrderTable = () => {
             return order.status === 'Assigned';
         });
 
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         if (AssignedOrders.length > 0) {setActiveTab("Assigned")}
     }, [orders])
 
     const handleFinalSubmit = async () => {
+        setIsSubmitting(true);
         try {
-            // completeOrder is the JobOrder object we selected
             await API.patch(`/job-orders/${completeOrder?.id}/complete`, formData);
-            
-            // Refresh the table and close modal
             setCompleteOrder(null);
-
-            const fetchOrders = async () => {
-                try {
-                    const response = await API.get('/job-orders');
-                    setOrders(response.data.data);
-                } catch (error) {
-                    console.error('Error fetching job orders:', error);
-                }
-    }
             fetchOrders();
-
-            alert("Order completed!");
+            success("Order completed successfully!");
         } catch (error) {
             console.error("Submit failed:", error);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -660,16 +649,26 @@ const JobOrderTable = () => {
 
             <div className="flex items-center gap-3 pt-6 border-t border-slate-100">
                 <button 
+                    disabled={isSubmitting}
                     onClick={() => setCompleteOrder(null)} 
-                    className="flex-1 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 transition-colors"
+                    className="flex-1 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                     Cancel
                 </button>
                 <button 
-                    className="flex-2 px-4 py-3 text-xs font-bold uppercase tracking-widest text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg shadow-indigo-200 transition-all active:scale-[0.98]"
+                    disabled={isSubmitting}
+                    className="flex-2 px-4 py-3 text-xs font-bold uppercase tracking-widest text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg shadow-indigo-200 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
                     onClick={handleFinalSubmit}
                 >
-                    Submit Completion
+                    {isSubmitting ? (
+                        <span className="inline-flex items-center gap-2">
+                            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                            </svg>
+                            Processing...
+                        </span>
+                    ) : "Submit Completion"}
                 </button>
             </div>
         </div>
