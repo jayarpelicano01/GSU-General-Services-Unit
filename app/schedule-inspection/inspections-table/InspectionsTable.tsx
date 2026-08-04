@@ -3,6 +3,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { API } from "@/app/utils/api/api";
 import { useRouter } from "next/navigation";
+import { InspectionResultsModal } from "@/app/components/modal/job-request-modals/InspectionResultsModal";
+import { InspectionResultFormData } from "@/app/types/JobRequest";
+import { useToast } from "@/app/context/ToastContext";
+import { getErrorMessage } from "@/app/utils/errors";
 
 interface Personnel {
   id: number;
@@ -23,6 +27,10 @@ interface InspectionRequest {
   specific_work: string;
   field_work: string;
   status: string;
+  assessment_results?: string | null;
+  estimated_duration_value?: number | null;
+  estimated_duration_unit?: string | null;
+  status_of_materials?: string | null;
   unit?: InspectionUnit | null;
 }
 
@@ -69,7 +77,7 @@ const statusPill = (status: string | null) => {
     "Under Review": "bg-amber-50 text-amber-700 border-amber-200",
   };
   return (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide border ${classes[value] ?? "bg-slate-50 text-slate-600 border-slate-200"}`}>
+    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide whitespace-nowrap border ${classes[value] ?? "bg-slate-50 text-slate-600 border-slate-200"}`}>
       {value}
     </span>
   );
@@ -77,15 +85,34 @@ const statusPill = (status: string | null) => {
 
 const InspectionsTable = () => {
   const router = useRouter();
+  const { success, error } = useToast();
   const [inspections, setInspections] = useState<Inspection[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<(typeof STATUS_TABS)[number]>("All");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchInspections = async () => {
+  const [resultTarget, setResultTarget] = useState<Inspection | null>(null);
+  const [resultForm, setResultForm] = useState<InspectionResultFormData>({
+    assessment_results: '',
+    estimated_duration_value: 0,
+    estimated_duration_unit: 'Hours',
+    status_of_materials: null,
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const hasSetDefaultTab = React.useRef(false);
+
+  const fetchInspections = async (isInitial = false) => {
     try {
       const response = await API.get("/inspections");
-      setInspections(response.data.data ?? []);
+      const data: Inspection[] = response.data.data ?? [];
+      setInspections(data);
+      if (isInitial && !hasSetDefaultTab.current) {
+        hasSetDefaultTab.current = true;
+        const hasUnderReview = data.some(
+          (i) => (i.status ?? "Under Review") === "Under Review"
+        );
+        setActiveTab(hasUnderReview ? "Under Review" : "All");
+      }
     } catch (error) {
       console.error("Error fetching inspections:", error);
     } finally {
@@ -94,7 +121,7 @@ const InspectionsTable = () => {
   };
 
   useEffect(() => {
-    fetchInspections();
+    fetchInspections(true);
   }, []);
 
   const handlePrint = (insp: Inspection) => {
@@ -105,6 +132,56 @@ const InspectionsTable = () => {
       personnels: insp.personnels ?? [],
     }));
     router.push("/inspection");
+  };
+
+  const handleOpenResults = (insp: Inspection) => {
+    const jr = insp.job_request;
+    setResultTarget(insp);
+    setResultForm({
+      assessment_results: jr?.assessment_results ?? '',
+      estimated_duration_value: jr?.estimated_duration_value ?? 0,
+      estimated_duration_unit: (jr?.estimated_duration_unit as 'Hours' | 'Days') ?? 'Hours',
+      status_of_materials: (jr?.status_of_materials as 'Available' | 'Not Available' | null) ?? null,
+    });
+  };
+
+  const handleSubmitResults = async (action: 'job_order' | 'purchase' | 'requisition') => {
+    if (!resultTarget?.job_request) return;
+    setIsSubmitting(true);
+    try {
+      const materials = resultForm.status_of_materials;
+      const nextStatus = materials === 'Available' ? 'Approved' : 'Awaiting Materials';
+      await API.patch(`/job-requests/${resultTarget.job_request.id}`, {
+        assessment_results: resultForm.assessment_results,
+        estimated_duration_value: resultForm.estimated_duration_value,
+        estimated_duration_unit: resultForm.estimated_duration_unit,
+        status_of_materials: materials,
+        status: nextStatus,
+      });
+      await API.patch(`/inspections/${resultTarget.id}`, {
+        status: 'Completed',
+        recommedation: materials === 'Available' ? 'Approved' : 'Disapproved',
+      });
+      success('Inspection results submitted successfully.');
+      setResultTarget(null);
+      fetchInspections();
+      if (action === 'job_order') {
+        localStorage.setItem('selectedRequestId', String(resultTarget.job_request.id));
+        localStorage.setItem('job-order-origin', 'inspection');
+        router.push('/job-order');
+      } else if (action === 'purchase') {
+        localStorage.setItem('selectedRequestId', String(resultTarget.job_request.id));
+        router.push('/pr-ris/form?type=PR');
+      } else {
+        localStorage.setItem('selectedRequestId', String(resultTarget.job_request.id));
+        router.push('/pr-ris/form?type=RIS');
+      }
+    } catch (err) {
+      console.error('Failed to submit inspection results:', err);
+      error(getErrorMessage(err, 'Failed to submit inspection results. Please try again.'));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const filtered = useMemo(() => {
@@ -222,18 +299,29 @@ const InspectionsTable = () => {
                       </td>
                       <td className="px-4 py-3.5">{statusPill(insp.status)}</td>
                       <td className="px-4 py-3.5 text-right">
-                        <button
-                          type="button"
-                          onClick={() => handlePrint(insp)}
-                          title="Print inspection report"
-                          className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M6 9V2h12v7" />
-                            <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" />
-                            <rect x="6" y="14" width="12" height="8" />
-                          </svg>
-                        </button>
+                        <div className="flex items-center justify-end gap-2">
+                          {insp.status !== 'Completed' && insp.job_request && (
+                            <button
+                              type="button"
+                              onClick={() => handleOpenResults(insp)}
+                              className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-lg transition-all whitespace-nowrap"
+                            >
+                              Submit Results
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => handlePrint(insp)}
+                            title="Print inspection report"
+                            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M6 9V2h12v7" />
+                              <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" />
+                              <rect x="6" y="14" width="12" height="8" />
+                            </svg>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -243,6 +331,17 @@ const InspectionsTable = () => {
           </table>
         </div>
       </div>
+
+      <InspectionResultsModal
+        inspectionResultTarget={resultTarget?.job_request ?? null}
+        inspectionResultForm={resultForm}
+        isSubmitting={isSubmitting}
+        onClose={() => setResultTarget(null)}
+        onFormChange={(form) => setResultForm(form)}
+        onCreateJobOrder={() => handleSubmitResults('job_order')}
+        onCreatePurchaseRequest={() => handleSubmitResults('purchase')}
+        onCreateRequisitionSlip={() => handleSubmitResults('requisition')}
+      />
     </div>
   );
 };

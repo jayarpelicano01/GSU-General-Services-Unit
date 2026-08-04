@@ -53,7 +53,7 @@ interface JobOrder {
 const JobOrderTable = () => {
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState('All Orders');
-    const tabs = ['Assigned', 'All Orders', 'Pending', 'Completed', 'Cancelled'];
+    const tabs = ['All Orders', 'Assigned', 'Pending', 'Completed', 'Cancelled'];
     const [orders, setOrders] = useState<JobOrder[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortKey, setSortKey] = useState<'jo' | 'unit' | 'date' | 'status'>('jo');

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { API } from "@/app/utils/api/api";
 import ConfirmDialog from "@/app/components/confirm/Confirm";
 import { useToast } from "@/app/context/ToastContext";
@@ -72,6 +73,7 @@ const JobOrderForm = () => {
   const { success, error } = useToast();
   const [personnelList, setPersonnelList] = useState<Personnel[]>([]);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [origin, setOrigin] = useState<"job-request" | "inspection" | "pr-ris">("job-request");
 
   useEffect(() => {
 
@@ -100,6 +102,8 @@ const JobOrderForm = () => {
   useEffect(() => {
     const fetchRequest = async () => {
       const storedRequestId = localStorage.getItem("selectedRequestId");
+      const storedOrigin = localStorage.getItem("job-order-origin") as "job-request" | "inspection" | "pr-ris" | null;
+      if (storedOrigin) setOrigin(storedOrigin);
       console.log(storedRequestId);
 
       if (storedRequestId) {
@@ -166,6 +170,16 @@ const JobOrderForm = () => {
           } catch (error) {
             console.error(error);
           }
+
+          const prRisId = localStorage.getItem("selectedPrRisId");
+          if (prRisId) {
+            try {
+              await API.patch(`/purchase-requests/${prRisId}/receive`);
+              localStorage.removeItem("selectedPrRisId");
+            } catch (error) {
+              console.error("Failed to mark purchase request as received:", error);
+            }
+          }
           
           try {
             await Promise.all(JobOrderFormData.personnels.map(personnelId => 
@@ -224,6 +238,27 @@ const JobOrderForm = () => {
     <div className="min-h-screen bg-[#f8f9ff] py-12 px-4">
       <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         
+        {/* Breadcrumbs */}
+        <nav className="px-8 pt-6 pb-2 flex flex-wrap items-center gap-2 text-sm">
+          {origin === "inspection" ? (
+            <>
+              <Link href="/schedule-inspection" className="text-slate-400 hover:text-indigo-600 font-medium transition-colors">Inspections</Link>
+              <span className="text-slate-300">/</span>
+            </>
+          ) : origin === "pr-ris" ? (
+            <>
+              <Link href="/pr-ris" className="text-slate-400 hover:text-indigo-600 font-medium transition-colors">PR / RIS</Link>
+              <span className="text-slate-300">/</span>
+            </>
+          ) : (
+            <>
+              <Link href="/job-request-list" className="text-slate-400 hover:text-indigo-600 font-medium transition-colors">Job Requests</Link>
+              <span className="text-slate-300">/</span>
+            </>
+          )}
+          <span className="text-slate-700 font-semibold">Create Job Order</span>
+        </nav>
+
         {/* Header - UPDATED: Removed subtitle */}
         <div className="px-8 py-6 border-b border-slate-100 bg-white flex justify-between items-start">
           <div>

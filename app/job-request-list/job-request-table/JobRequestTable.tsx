@@ -137,6 +137,7 @@ const JobRequestTable = () => {
 
   const handleNavigateToJobOrderForm = (requestId: number) => {
     localStorage.setItem('selectedRequestId', requestId.toString());
+    localStorage.setItem('job-order-origin', 'job-request');
     router.push('/job-order');
   }
 
@@ -457,15 +458,7 @@ const JobRequestTable = () => {
                         >
                           View Details
                         </button>
-                      ) : req.status === 'Awaiting Materials' ? (
-                        <button
-                          type="button"
-                          onClick={() => handleNavigateToJobOrderForm(req.id)}
-                          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wider shadow-sm shadow-indigo-100 transition-all"
-                        >
-                          Create Job Order
-                        </button>
-                      ) : req.status === 'Pending' ? (
+                      ) : ['Pending', 'Under Inspection', 'Awaiting Materials'].includes(req.status) ? (
                         <button
                           type="button"
                           onClick={() => setSelectedRequest(req)}
@@ -520,6 +513,14 @@ const JobRequestTable = () => {
         onScheduleInspection={(req) => {
           setSelectedRequest(null);
           handleOpenInspectionModal(req);
+        }}
+        onSeeInspection={() => {
+          setSelectedRequest(null);
+          router.push('/schedule-inspection');
+        }}
+        onSeePrRis={() => {
+          setSelectedRequest(null);
+          router.push('/pr-ris');
         }}
       />
 

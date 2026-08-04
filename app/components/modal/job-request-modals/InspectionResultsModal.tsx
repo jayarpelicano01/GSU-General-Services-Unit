@@ -1,21 +1,30 @@
 "use client";
 
 import Modal from "@/app/components/modal/modal";
-import { JobRequest, InspectionResultFormData } from "@/app/types/JobRequest";
+import { InspectionResultFormData } from "@/app/types/JobRequest";
+
+export interface InspectionResultTarget {
+  id: number;
+  field_work: string;
+  unit?: {
+    unit_name: string;
+  } | null;
+}
 
 interface Props {
-  inspectionResultTarget: JobRequest | null;
+  inspectionResultTarget: InspectionResultTarget | null;
   inspectionResultForm: InspectionResultFormData;
   isSubmitting: boolean;
   onClose: () => void;
   onFormChange: (form: InspectionResultFormData) => void;
   onCreateJobOrder: () => void;
-  onRequestPurchase: () => void;
+  onCreatePurchaseRequest: () => void;
+  onCreateRequisitionSlip: () => void;
 }
 
 export const InspectionResultsModal = ({
   inspectionResultTarget, inspectionResultForm, isSubmitting,
-  onClose, onFormChange, onCreateJobOrder, onRequestPurchase,
+  onClose, onFormChange, onCreateJobOrder, onCreatePurchaseRequest, onCreateRequisitionSlip,
 }: Props) => (
   <Modal
     isOpen={Boolean(inspectionResultTarget)}
@@ -112,20 +121,39 @@ export const InspectionResultsModal = ({
           Create Job Order
         </button>
 
-        <button
-          onClick={onRequestPurchase}
-          disabled={
-            isSubmitting ||
-            !inspectionResultForm.assessment_results.trim() ||
-            inspectionResultForm.status_of_materials !== 'Not Available'
-          }
-          className="w-full px-6 py-3 text-xs font-bold uppercase tracking-widest text-amber-600 bg-amber-50 border border-amber-200 hover:bg-amber-100 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-        >
-          <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
-          Request Purchase
-        </button>
+        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center">
+          Materials not available — select document type
+        </p>
+        <div className="flex gap-3">
+          <button
+            onClick={onCreatePurchaseRequest}
+            disabled={
+              isSubmitting ||
+              !inspectionResultForm.assessment_results.trim() ||
+              inspectionResultForm.status_of_materials !== 'Not Available'
+            }
+            className="flex-1 px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-amber-700 bg-amber-50 border border-amber-200 hover:bg-amber-100 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+          >
+            <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            Purchase Request
+          </button>
+          <button
+            onClick={onCreateRequisitionSlip}
+            disabled={
+              isSubmitting ||
+              !inspectionResultForm.assessment_results.trim() ||
+              inspectionResultForm.status_of_materials !== 'Not Available'
+            }
+            className="flex-1 px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 whitespace-nowrap"
+          >
+            <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path d="M3 10h18M7 15h2m4 0h4M5 6h14a1 1 0 011 1v11a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1z" />
+            </svg>
+            Requisition & Issue Slip
+          </button>
+        </div>
       </div>
 
     </div>

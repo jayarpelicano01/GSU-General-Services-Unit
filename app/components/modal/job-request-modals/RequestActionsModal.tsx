@@ -9,12 +9,14 @@ interface Props {
   onViewDetails: (req: JobRequest) => void;
   onCreateJobOrder: (req: JobRequest) => void;
   onScheduleInspection: (req: JobRequest) => void;
+  onSeeInspection: (req: JobRequest) => void;
+  onSeePrRis: (req: JobRequest) => void;
   onDisapprove: (req: JobRequest) => void;
 }
 
 export const RequestActionsModal = ({
   selectedRequest, onClose, onViewDetails,
-  onCreateJobOrder, onScheduleInspection, onDisapprove,
+  onCreateJobOrder, onScheduleInspection, onSeeInspection, onSeePrRis, onDisapprove,
 }: Props) => (
   <Modal
     isOpen={Boolean(selectedRequest)}
@@ -116,6 +118,31 @@ export const RequestActionsModal = ({
           </>
         )}
 
+        {selectedRequest.status === 'Under Inspection' && (
+          <>
+            <div className="flex items-center my-3 px-2">
+              <div className="h-px bg-slate-100 flex-1" />
+              <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest px-4">Actions</span>
+              <div className="h-px bg-slate-100 flex-1" />
+            </div>
+            <button
+              className="group w-full text-left px-4 py-4 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-100 hover:border-blue-200 transition-all flex items-center gap-4 shadow-sm"
+              onClick={() => onSeeInspection(selectedRequest)}
+            >
+              <div className="p-2.5 bg-white rounded-lg text-blue-600 shadow-sm group-hover:scale-110 transition-transform">
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </div>
+              <div>
+                <span className="text-blue-900 font-extrabold text-sm block">See Inspection</span>
+                <span className="text-blue-600/70 text-[11px] font-medium block mt-0.5">View inspection schedule and results in the inspections tab</span>
+              </div>
+            </button>
+          </>
+        )}
+
         {selectedRequest.status === 'Awaiting Materials' && (
           <>
             <div className="flex items-center my-3 px-2">
@@ -124,17 +151,17 @@ export const RequestActionsModal = ({
               <div className="h-px bg-slate-100 flex-1" />
             </div>
             <button
-              className="group w-full text-left px-4 py-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 hover:border-emerald-200 transition-all flex items-center gap-4 shadow-sm"
-              onClick={() => onCreateJobOrder(selectedRequest)}
+              className="group w-full text-left px-4 py-4 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-100 hover:border-amber-200 transition-all flex items-center gap-4 shadow-sm"
+              onClick={() => onSeePrRis(selectedRequest)}
             >
-              <div className="p-2.5 bg-white rounded-lg text-emerald-600 shadow-sm group-hover:scale-110 transition-transform">
+              <div className="p-2.5 bg-white rounded-lg text-amber-600 shadow-sm group-hover:scale-110 transition-transform">
                 <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path d="M12 4v16m8-8H4" />
+                  <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
               <div>
-                <span className="text-emerald-900 font-extrabold text-sm block">Create Job Order</span>
-                <span className="text-emerald-600/70 text-[11px] font-medium block mt-0.5">Dispatch work order to personnel</span>
+                <span className="text-amber-900 font-extrabold text-sm block">See PR / RIS</span>
+                <span className="text-amber-600/70 text-[11px] font-medium block mt-0.5">View the purchase request or requisition document in the PR / RIS tab</span>
               </div>
             </button>
           </>
