@@ -34,6 +34,7 @@ export interface Personnel {
   last_name: string;
   suffix: string | null;
   field: string;
+  status?: "Active" | "Inactive";
 }
 
 export interface InspectionFormData {
