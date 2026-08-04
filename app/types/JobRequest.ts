@@ -46,4 +46,5 @@ export interface InspectionResultFormData {
   estimated_duration_value: number;
   estimated_duration_unit: 'Hours' | 'Days';
   status_of_materials: 'Available' | 'Not Available' | null;
+  recommendation: string;
 }

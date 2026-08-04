@@ -21,6 +21,7 @@ interface JobRequest {
   };
   field_work: string;
   specific_work: string;
+  assessment_results: string;
   estimated_duration_value: number;
   estimated_duration_unit: string;
   status_of_materials: string;
@@ -40,6 +41,7 @@ interface InspectionSchedule {
     request: JobRequest;
     scheduledDate: Date;
     personnels: Personnel[];
+    recommendation?: string;
 }
 
 const InspectionReport = () => {
@@ -132,7 +134,9 @@ const InspectionReport = () => {
                 <div className="flex items-end gap-2">
                     <span className="font-bold shrink-0 w-52.5">REMARKS</span>
                     <span className="shrink-0">:</span>
-                    <span className="flex-1 border-b border-black block" style={{ minHeight: '14px' }} />
+                    <span className="flex-1 border-b border-black block text-[13px]" style={{ minHeight: '14px' }}>
+                        {schedule?.request?.assessment_results || ''}
+                    </span>
                 </div>
                 <div className="mt-3 space-y-4.5">
                     {[...Array(3)].map((_, i) => (
@@ -146,7 +150,9 @@ const InspectionReport = () => {
                 <div className="flex items-end gap-2">
                     <span className="font-bold shrink-0 w-52.5">RECOMMENDATION / SUGGESTION</span>
                     <span className="shrink-0">:</span>
-                    <span className="flex-1 border-b border-black block" style={{ minHeight: '14px' }} />
+                    <span className="flex-1 border-b border-black block text-[13px]" style={{ minHeight: '14px' }}>
+                        {schedule?.recommendation || ''}
+                    </span>
                 </div>
                 <div className="mt-3 space-y-4.5">
                     {[...Array(3)].map((_, i) => (

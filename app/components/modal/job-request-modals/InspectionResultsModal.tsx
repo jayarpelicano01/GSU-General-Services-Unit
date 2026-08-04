@@ -136,6 +136,19 @@ export const InspectionResultsModal = ({
           </div>
         </div>
 
+        <div>
+          <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-[0.15em] mb-2">
+            Recommendation
+          </label>
+          <textarea
+            rows={3}
+            value={inspectionResultForm.recommendation}
+            onChange={(e) => onFormChange({ ...inspectionResultForm, recommendation: e.target.value })}
+            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all resize-none"
+            placeholder="Any recommendations or suggestions from the inspection..."
+          />
+        </div>
+
         {showJobOrder && inspectionResultTarget && (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-5">
             <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide flex items-center gap-2 border-b border-slate-200 pb-3">

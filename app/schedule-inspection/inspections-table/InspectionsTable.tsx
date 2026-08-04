@@ -33,6 +33,7 @@ interface Inspection {
   inspection_date: string | Date;
   remarks: string | null;
   recommedation: string | null;
+  recommendation: string | null;
   status: string;
   job_request?: InspectionRequest | null;
   personnels?: Personnel[];
@@ -91,6 +92,7 @@ const InspectionsTable = () => {
     estimated_duration_value: 0,
     estimated_duration_unit: 'Hours',
     status_of_materials: null,
+    recommendation: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [personnelList, setPersonnelList] = useState<Personnel[]>([]);
@@ -135,6 +137,7 @@ const InspectionsTable = () => {
       request: insp.job_request,
       scheduledDate: toDateInput(insp.inspection_date),
       personnels: insp.personnels ?? [],
+      recommendation: insp.recommendation ?? '',
     }));
     router.push("/inspection");
   };
@@ -147,6 +150,7 @@ const InspectionsTable = () => {
       estimated_duration_value: jr?.estimated_duration_value ?? 0,
       estimated_duration_unit: (jr?.estimated_duration_unit as 'Hours' | 'Days') ?? 'Hours',
       status_of_materials: (jr?.status_of_materials as 'Available' | 'Not Available' | null) ?? null,
+      recommendation: insp.recommendation ?? '',
     });
   };
 
@@ -165,6 +169,7 @@ const InspectionsTable = () => {
       await API.patch(`/inspections/${resultTarget.id}`, {
         status: 'Completed',
         recommedation: 'Disapproved',
+        recommendation: resultForm.recommendation,
       });
       success('Inspection results submitted successfully.');
       setResultTarget(null);
@@ -194,6 +199,7 @@ const InspectionsTable = () => {
       await API.patch(`/inspections/${resultTarget.id}`, {
         status: 'Completed',
         recommedation: 'Approved',
+        recommendation: resultForm.recommendation,
       });
       await createJobOrder({
         request: resultTarget.job_request,
