@@ -107,6 +107,7 @@ export const CreateJobOrderModal = ({ open, request, prRisId, onClose }: Props) 
         message="Finalize and Print the Order or save to draft first?"
         confirmLabel="Yes, Process"
         cancelLabel="Save as Draft"
+        isLoading={isSubmitting}
         onConfirm={() => submitData("Assigned")}
         onCancel={() => submitData("Pending")}
       />

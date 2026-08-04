@@ -183,6 +183,7 @@ export const ScheduleInspectionModal = ({
         }?`}
         confirmLabel="Yes, Schedule"
         cancelLabel="Go Back"
+        isLoading={isSubmitting}
         onConfirm={onConfirm}
         onCancel={onConfirmClose}
       />

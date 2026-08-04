@@ -257,6 +257,7 @@ export const InspectionResultsModal = ({
         message="Finalize and Print the Order or save to draft first?"
         confirmLabel="Yes, Process"
         cancelLabel="Save as Draft"
+        isLoading={isSubmitting}
         onConfirm={() => {
           setShowConfirm(false);
           onSubmitInspectionWithJobOrder(jobOrderForm, "Assigned");

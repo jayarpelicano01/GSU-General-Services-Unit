@@ -72,6 +72,7 @@ const JobOrderForm = () => {
   const { success, error } = useToast();
   const [personnelList, setPersonnelList] = useState<Personnel[]>([]);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [origin, setOrigin] = useState<"job-request" | "inspection" | "pr-ris">("job-request");
 
   useEffect(() => {
@@ -149,6 +150,8 @@ const JobOrderForm = () => {
  }, [JobOrderFormData]);
 
   const submitData = async (status: string) => {  
+    setIsSubmitting(true);
+    try {
     const payload = {
         request_id: requestData?.id,
         specific_work: JobOrderFormData.specificWorkOrder,
@@ -156,7 +159,6 @@ const JobOrderForm = () => {
         status: status
     }
 
-    try {
         const response = await API.post('/job-orders', {...payload});
         
         if (response.data.status === 'success') {
@@ -214,6 +216,8 @@ const JobOrderForm = () => {
     } catch (err) {
       console.error('Error creating job order:', err);
       error(getErrorMessage(err, 'Failed to create job order. Please try again.'));
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -445,6 +449,7 @@ const JobOrderForm = () => {
         message="Finalize and Print the Order or save to draft first?"
         confirmLabel="Yes, Process"
         cancelLabel="Save as Draft"
+        isLoading={isSubmitting}
         onConfirm={() => {
           setShowConfirm(false);
           submitData("Assigned");

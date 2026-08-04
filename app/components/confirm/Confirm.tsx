@@ -9,6 +9,7 @@ interface ConfirmDialogProps {
   confirmLabel?: string;
   cancelLabel?: string;
   type?: "danger" | "primary";
+  isLoading?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
   onClose?: () => void;
@@ -21,6 +22,7 @@ export default function ConfirmDialog({
   confirmLabel = "Confirm",
   cancelLabel = "Cancel",
   type = "primary",
+  isLoading = false,
   onConfirm,
   onCancel,
   onClose
@@ -45,8 +47,9 @@ export default function ConfirmDialog({
       >
         {/* X Button */}
         <button
+            disabled={isLoading}
             onClick={onClose}
-            className="absolute top-4 right-4 p-1.5 rounded-xl text-slate-300 hover:text-slate-500 hover:bg-slate-100 transition-all"
+            className="absolute top-4 right-4 p-1.5 rounded-xl text-slate-300 hover:text-slate-500 hover:bg-slate-100 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
         >
             <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path d="M6 18L18 6M6 6l12 12" />
@@ -81,18 +84,29 @@ export default function ConfirmDialog({
         <div className="flex gap-3 mt-8">
           <button
             onClick={onCancel}
-            className="flex-1 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-xl transition-all"
+            disabled={isLoading}
+            className="flex-1 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed"
           >
             {cancelLabel}
           </button>
           <button
             onClick={onConfirm}
+            disabled={isLoading}
             className={`
               flex-1 px-4 py-3 text-xs font-bold uppercase tracking-widest text-white rounded-xl shadow-lg transition-all active:scale-95
+              disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
               ${isDanger ? 'bg-rose-500 hover:bg-rose-600 shadow-rose-100' : 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-100'}
             `}
           >
-            {confirmLabel}
+            {isLoading ? (
+              <span className="inline-flex items-center gap-2">
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Processing...
+              </span>
+            ) : confirmLabel}
           </button>
         </div>
       </div>

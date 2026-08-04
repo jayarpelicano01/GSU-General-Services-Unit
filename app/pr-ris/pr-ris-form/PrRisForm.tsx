@@ -489,6 +489,7 @@ const PrRisForm = () => {
           : "Create this document?"}
         confirmLabel={`Yes, Create ${type}`}
         cancelLabel="Go Back"
+        isLoading={isSubmitting}
         onConfirm={handleSubmit}
         onCancel={() => setShowConfirm(false)}
       />
