@@ -137,7 +137,8 @@ const JobOrderTable = () => {
     // Update your state to use the order's existing data as defaults
     const [formData, setFormData] = useState({
         date_started: completeOrder?.date_started || '', 
-        date_accomplished: today
+        date_accomplished: today,
+        remarks: ''
     });
 
     const handleOpenCompleteModal = (order: JobOrder) => {
@@ -155,7 +156,8 @@ const JobOrderTable = () => {
         
         setFormData({
             date_started: startDateValue,
-            date_accomplished: todayStr
+            date_accomplished: todayStr,
+            remarks: order.remarks || ''
         });
     };
 
@@ -641,6 +643,19 @@ const JobOrderTable = () => {
                         onChange={(e) => setFormData({...formData, date_accomplished: e.target.value})}
                     />
                 </div>
+            </div>
+
+            <div>
+                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-[0.15em] mb-2">
+                    Remarks
+                </label>
+                <textarea 
+                    rows={4}
+                    placeholder="Any additional notes or constraints for this completed order..."
+                    value={formData.remarks}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all resize-none"
+                    onChange={(e) => setFormData({...formData, remarks: e.target.value})}
+                />
             </div>
 
             <div className="flex items-center gap-3 pt-6 border-t border-slate-100">

@@ -4,17 +4,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import { API } from "@/app/utils/api/api";
 import { useRouter } from "next/navigation";
 import { InspectionResultsModal } from "@/app/components/modal/job-request-modals/InspectionResultsModal";
-import { InspectionResultFormData } from "@/app/types/JobRequest";
+import { InspectionResultFormData, Personnel } from "@/app/types/JobRequest";
+import { JobOrderFormData } from "@/app/types/JobOrder";
+import { createJobOrder } from "@/app/utils/jobOrder";
 import { useToast } from "@/app/context/ToastContext";
 import { getErrorMessage } from "@/app/utils/errors";
-
-interface Personnel {
-  id: number;
-  first_name: string;
-  middle_name: string | null;
-  last_name: string;
-  suffix: string | null;
-}
 
 interface InspectionUnit {
   unit_name: string;
@@ -99,7 +93,17 @@ const InspectionsTable = () => {
     status_of_materials: null,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [personnelList, setPersonnelList] = useState<Personnel[]>([]);
   const hasSetDefaultTab = React.useRef(false);
+
+  const fetchPersonnel = async () => {
+    try {
+      const response = await API.get("/personnels");
+      setPersonnelList(response.data.data);
+    } catch (err) {
+      console.error("Error fetching personnel:", err);
+    }
+  };
 
   const fetchInspections = async (isInitial = false) => {
     try {
@@ -122,6 +126,7 @@ const InspectionsTable = () => {
 
   useEffect(() => {
     fetchInspections(true);
+    fetchPersonnel();
   }, []);
 
   const handlePrint = (insp: Inspection) => {
@@ -145,40 +150,70 @@ const InspectionsTable = () => {
     });
   };
 
-  const handleSubmitResults = async (action: 'job_order' | 'purchase' | 'requisition') => {
+  const handleSubmitResults = async (action: 'purchase' | 'requisition') => {
     if (!resultTarget?.job_request) return;
     setIsSubmitting(true);
     try {
       const materials = resultForm.status_of_materials;
-      const nextStatus = materials === 'Available' ? 'Approved' : 'Awaiting Materials';
       await API.patch(`/job-requests/${resultTarget.job_request.id}`, {
         assessment_results: resultForm.assessment_results,
         estimated_duration_value: resultForm.estimated_duration_value,
         estimated_duration_unit: resultForm.estimated_duration_unit,
         status_of_materials: materials,
-        status: nextStatus,
+        status: 'Awaiting Materials',
       });
       await API.patch(`/inspections/${resultTarget.id}`, {
         status: 'Completed',
-        recommedation: materials === 'Available' ? 'Approved' : 'Disapproved',
+        recommedation: 'Disapproved',
       });
       success('Inspection results submitted successfully.');
       setResultTarget(null);
       fetchInspections();
-      if (action === 'job_order') {
-        localStorage.setItem('selectedRequestId', String(resultTarget.job_request.id));
-        localStorage.setItem('job-order-origin', 'inspection');
-        router.push('/job-order');
-      } else if (action === 'purchase') {
-        localStorage.setItem('selectedRequestId', String(resultTarget.job_request.id));
-        router.push('/pr-ris/form?type=PR');
-      } else {
-        localStorage.setItem('selectedRequestId', String(resultTarget.job_request.id));
-        router.push('/pr-ris/form?type=RIS');
-      }
+      localStorage.setItem('selectedRequestId', String(resultTarget.job_request.id));
+      router.push(action === 'purchase' ? '/pr-ris/form?type=PR' : '/pr-ris/form?type=RIS');
     } catch (err) {
       console.error('Failed to submit inspection results:', err);
       error(getErrorMessage(err, 'Failed to submit inspection results. Please try again.'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSubmitInspectionWithJobOrder = async (jobOrderForm: JobOrderFormData, status: string) => {
+    if (!resultTarget?.job_request) return;
+    setIsSubmitting(true);
+    try {
+      const materials = resultForm.status_of_materials;
+      await API.patch(`/job-requests/${resultTarget.job_request.id}`, {
+        assessment_results: resultForm.assessment_results,
+        estimated_duration_value: resultForm.estimated_duration_value,
+        estimated_duration_unit: resultForm.estimated_duration_unit,
+        status_of_materials: materials,
+        status: 'Approved',
+      });
+      await API.patch(`/inspections/${resultTarget.id}`, {
+        status: 'Completed',
+        recommedation: 'Approved',
+      });
+      await createJobOrder({
+        request: resultTarget.job_request,
+        form: jobOrderForm,
+        personnelList,
+        status,
+      });
+      success(
+        status === "Assigned"
+          ? "Inspection results submitted and job order created."
+          : "Inspection results submitted and job order saved as draft."
+      );
+      setResultTarget(null);
+      fetchInspections();
+      setTimeout(() => {
+        router.push(status === "Assigned" ? "/job-order/print-job-order" : "/job-order-list");
+      }, 1200);
+    } catch (err) {
+      console.error('Failed to submit inspection results and create job order:', err);
+      error(getErrorMessage(err, 'Failed to submit inspection results and create job order. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -335,12 +370,13 @@ const InspectionsTable = () => {
       <InspectionResultsModal
         inspectionResultTarget={resultTarget?.job_request ?? null}
         inspectionResultForm={resultForm}
+        personnelList={personnelList}
         isSubmitting={isSubmitting}
         onClose={() => setResultTarget(null)}
         onFormChange={(form) => setResultForm(form)}
-        onCreateJobOrder={() => handleSubmitResults('job_order')}
         onCreatePurchaseRequest={() => handleSubmitResults('purchase')}
         onCreateRequisitionSlip={() => handleSubmitResults('requisition')}
+        onSubmitInspectionWithJobOrder={handleSubmitInspectionWithJobOrder}
       />
     </div>
   );

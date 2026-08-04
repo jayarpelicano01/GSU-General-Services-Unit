@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { API } from "@/app/utils/api/api";
 import { useRouter } from "next/navigation";
+import { CreateJobOrderModal } from "@/app/components/modal/job-order-modals/CreateJobOrderModal";
 
 interface PrRisUnit {
   unit_name: string;
@@ -76,6 +77,7 @@ const PrRisTable = () => {
   const [activeTab, setActiveTab] = useState<(typeof STATUS_TABS)[number]>("All");
   const [searchQuery, setSearchQuery] = useState("");
   const hasSetDefaultTab = React.useRef(false);
+  const [createJobOrderDoc, setCreateJobOrderDoc] = useState<PrRisDocument | null>(null);
 
   const fetchDocuments = async (isInitial = false) => {
     try {
@@ -106,10 +108,7 @@ const PrRisTable = () => {
 
   const handleCreateJobOrder = (doc: PrRisDocument) => {
     if (!doc.job_request) return;
-    localStorage.setItem("selectedRequestId", String(doc.job_request.id));
-    localStorage.setItem("selectedPrRisId", String(doc.id));
-    localStorage.setItem("job-order-origin", "pr-ris");
-    router.push("/job-order");
+    setCreateJobOrderDoc(doc);
   };
 
   const filtered = useMemo(() => {
@@ -257,6 +256,13 @@ const PrRisTable = () => {
           </table>
         </div>
       </div>
+
+      <CreateJobOrderModal
+        open={Boolean(createJobOrderDoc)}
+        request={createJobOrderDoc?.job_request ?? null}
+        prRisId={createJobOrderDoc?.id ? String(createJobOrderDoc.id) : null}
+        onClose={() => setCreateJobOrderDoc(null)}
+      />
     </div>
   );
 };

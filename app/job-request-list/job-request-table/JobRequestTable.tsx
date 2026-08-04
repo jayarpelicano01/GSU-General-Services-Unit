@@ -9,6 +9,7 @@ import PageSkeleton from '@/app/components/loading/page-skeleton/PageSkeleton';
 import { DisapproveModal } from '@/app/components/modal/job-request-modals/DisapproveModal';
 import { HeadRejectModal } from '@/app/components/modal/job-request-modals/HeadRejectModal';
 import { ScheduleInspectionModal } from '@/app/components/modal/job-request-modals/ScheduleInspectionModal';
+import { CreateJobOrderModal } from '@/app/components/modal/job-order-modals/CreateJobOrderModal';
 import { Personnel, InspectionFormData } from '@/app/types/JobRequest';
 import { useAuth } from '@/app/context/AuthContext';
 import { useToast } from '@/app/context/ToastContext';
@@ -75,6 +76,7 @@ const JobRequestTable = () => {
   const [inspectionForm, setInspectionForm] = useState<InspectionFormData>({ scheduledDate: '', personnels: [] });
   const [showInspectionConfirm, setShowInspectionConfirm] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
+  const [createJobOrderRequest, setCreateJobOrderRequest] = useState<JobRequest | null>(null);
 
   useEffect(() => {
 
@@ -135,10 +137,9 @@ const JobRequestTable = () => {
     }
   };
 
-  const handleNavigateToJobOrderForm = (requestId: number) => {
-    localStorage.setItem('selectedRequestId', requestId.toString());
-    localStorage.setItem('job-order-origin', 'job-request');
-    router.push('/job-order');
+  const handleOpenCreateJobOrder = (req: JobRequest) => {
+    setSelectedRequest(null);
+    setCreateJobOrderRequest(req);
   }
 
   const handleApproveRequest = async (req: JobRequest) => {
@@ -506,10 +507,7 @@ const JobRequestTable = () => {
           setSelectedRequest(null);
         }}
         onDisapprove={(req) => handleDisapproveRequest(req)}
-        onCreateJobOrder={(req) => {
-          setSelectedRequest(null);
-          handleNavigateToJobOrderForm(req.id);
-        }}
+        onCreateJobOrder={(req) => handleOpenCreateJobOrder(req)}
         onScheduleInspection={(req) => {
           setSelectedRequest(null);
           handleOpenInspectionModal(req);
@@ -522,6 +520,12 @@ const JobRequestTable = () => {
           setSelectedRequest(null);
           router.push('/pr-ris');
         }}
+      />
+
+      <CreateJobOrderModal
+        open={Boolean(createJobOrderRequest)}
+        request={createJobOrderRequest}
+        onClose={() => setCreateJobOrderRequest(null)}
       />
 
      <RequestDetailsModal

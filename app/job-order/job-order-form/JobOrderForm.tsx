@@ -55,7 +55,6 @@ interface JobRequestData {
 interface JobOrderData {
   jobOrderNo: number | null;
   specificWorkOrder: string; 
-  remarks: string;
   personnels: string[];
 }
 
@@ -96,7 +95,6 @@ const JobOrderForm = () => {
     jobOrderNo: null,
     specificWorkOrder: requestData?.specific_work || "",
     personnels: [],
-    remarks: "",
   });
   
   useEffect(() => {
@@ -154,7 +152,6 @@ const JobOrderForm = () => {
     const payload = {
         request_id: requestData?.id,
         specific_work: JobOrderFormData.specificWorkOrder,
-        remarks: JobOrderFormData.remarks,
         jo_number: JobOrderFormData.jobOrderNo,
         status: status
     }
@@ -268,44 +265,7 @@ const JobOrderForm = () => {
 
         <form className="p-8 space-y-8" onSubmit={handleSubmit}>
           
-          {/* SECTION 1: REQUEST REFERENCE */}
-          <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 space-y-4">
-            <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide flex items-center gap-2 mb-4 border-b border-slate-200 pb-3">
-                <span className="w-2 h-2 rounded-full bg-slate-400"></span>
-                Request Reference
-            </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Requesting Unit</label>
-                    <div className="text-sm font-medium text-slate-700">{requestData.unit.unit_name || ''} ({requestData.unit.unit_acronym})</div>
-                </div>
-                <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Field of Work</label>
-                    <div className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold inline-block border border-indigo-100">
-                        {requestData.field_work || "General"}
-                    </div>
-                </div>
-                <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Location</label>
-                    <div className="text-sm font-medium text-slate-700">{requestData.unit.location.location_name}</div>
-                </div>
-                <div className="md:col-span-2">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Requested Work Description</label>
-                    <div className="text-sm text-slate-600 italic bg-white p-3 rounded border border-slate-200">
-                        {requestData.specific_work}
-                    </div>
-                </div>
-                <div className="md:col-span-2">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Assessment Results</label>
-                    <div className="text-sm text-slate-600 italic bg-white p-3 rounded border border-slate-200">
-                        {requestData.assessment_results || "None Specified"}
-                    </div>
-                </div>
-            </div>
-          </div>
-
-          {/* SECTION 2: JOB EXECUTION DETAILS */}
+          {/* JOB EXECUTION DETAILS */}
           <div className="space-y-6">
             {/* Order Number */}
             <div>
@@ -445,21 +405,6 @@ const JobOrderForm = () => {
                         className="w-full border border-slate-200 rounded-lg px-4 py-3 text-slate-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
                         placeholder="Detailed instructions for the personnel..."
                         required
-                    />
-                </div>
-
-                <div>
-                    <label htmlFor="remarks" className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-                        Remarks
-                    </label>
-                    <textarea
-                        id="remarks"
-                        name="remarks"
-                        value={JobOrderFormData.remarks}
-                        onChange={handleInputChange}
-                        rows={3}
-                        className="w-full border border-slate-200 rounded-lg px-4 py-3 text-slate-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
-                        placeholder="Any additional notes or constraints..."
                     />
                 </div>
             </div>
