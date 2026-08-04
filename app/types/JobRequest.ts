@@ -1,6 +1,7 @@
 export interface JobRequest {
   id: number;
   unit: {
+    id: number;
     unit_name: string;
     unit_acronym: string;
     head_id: number;
@@ -22,6 +23,8 @@ export interface JobRequest {
   status_of_materials: string;
   status: string;
   reason_for_disapproval: string | null;
+  head_approved?: boolean;
+  head_approved_at?: string | null;
 }
 
 export interface Personnel {

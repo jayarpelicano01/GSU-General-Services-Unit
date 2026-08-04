@@ -7,16 +7,14 @@ interface Props {
   selectedRequest: JobRequest | null;
   onClose: () => void;
   onViewDetails: (req: JobRequest) => void;
-  onScheduleInspection: (req: JobRequest) => void;
-  onSubmitResults: (req: JobRequest) => void;
   onCreateJobOrder: (req: JobRequest) => void;
+  onScheduleInspection: (req: JobRequest) => void;
   onDisapprove: (req: JobRequest) => void;
 }
 
 export const RequestActionsModal = ({
   selectedRequest, onClose, onViewDetails,
-  onScheduleInspection, onSubmitResults, onCreateJobOrder,
-  onDisapprove,
+  onCreateJobOrder, onScheduleInspection, onDisapprove,
 }: Props) => (
   <Modal
     isOpen={Boolean(selectedRequest)}
@@ -36,6 +34,7 @@ export const RequestActionsModal = ({
             <p className="text-[11px] text-slate-400 mt-0.5">{selectedRequest.field_work}</p>
           </div>
           <span className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold tracking-tight inline-block shrink-0 ${
+            selectedRequest.status === 'For Approval'       ? 'bg-violet-100 text-violet-600 border border-violet-200' :
             selectedRequest.status === 'Approved'           ? 'bg-emerald-100 text-emerald-600' :
             selectedRequest.status === 'Pending'            ? 'bg-amber-100 text-amber-600 border border-amber-200' :
             selectedRequest.status === 'Under Inspection'   ? 'bg-blue-100 text-blue-600' :
@@ -47,6 +46,18 @@ export const RequestActionsModal = ({
             {selectedRequest.status.toUpperCase()}
           </span>
         </div>
+
+        {/* Head approval status */}
+        {selectedRequest.status === 'Pending' && selectedRequest.head_approved && (
+          <div className="px-4 py-2.5 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center gap-2">
+            <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" className="text-emerald-600 shrink-0">
+              <path d="M5 13l4 4L19 7" />
+            </svg>
+            <p className="text-[12px] font-semibold text-emerald-700">
+              Approved by Unit Head{selectedRequest.head_approved_at ? ` on ${new Date(selectedRequest.head_approved_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}` : ''}
+            </p>
+          </div>
+        )}
 
         <button
           className="group w-full text-left px-4 py-4 rounded-xl hover:bg-slate-50 border border-slate-100 transition-all flex items-center justify-between"
@@ -74,41 +85,32 @@ export const RequestActionsModal = ({
               <div className="h-px bg-slate-100 flex-1" />
             </div>
             <button
-              className="group w-full text-left px-4 py-4 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 hover:border-indigo-200 transition-all flex items-center gap-4 shadow-sm"
+              className="group w-full text-left px-4 py-4 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-100 hover:border-blue-200 transition-all flex items-center gap-4 shadow-sm"
               onClick={() => onScheduleInspection(selectedRequest)}
             >
-              <div className="p-2.5 bg-white rounded-lg text-indigo-600 shadow-sm group-hover:scale-110 transition-transform">
+              <div className="p-2.5 bg-white rounded-lg text-blue-600 shadow-sm group-hover:scale-110 transition-transform">
                 <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <path d="M16 2v4M8 2v4M3 10h18" />
                 </svg>
               </div>
               <div>
-                <span className="text-indigo-900 font-extrabold text-sm block">Schedule Inspection</span>
-                <span className="text-indigo-600/70 text-[11px] font-medium block mt-0.5">Assign personnel and set inspection date</span>
+                <span className="text-blue-900 font-extrabold text-sm block">Schedule Inspection</span>
+                <span className="text-blue-600/70 text-[11px] font-medium block mt-0.5">Assign personnel to evaluate the request on site</span>
               </div>
             </button>
-          </>
-        )}
-
-        {selectedRequest.status === 'Under Inspection' && (
-          <>
-            <div className="flex items-center my-3 px-2">
-              <div className="h-px bg-slate-100 flex-1" />
-              <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest px-4">Actions</span>
-              <div className="h-px bg-slate-100 flex-1" />
-            </div>
             <button
-              className="group w-full text-left px-4 py-4 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-100 hover:border-amber-200 transition-all flex items-center gap-4 shadow-sm"
-              onClick={() => onSubmitResults(selectedRequest)}
+              className="group w-full text-left px-4 py-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 hover:border-emerald-200 transition-all flex items-center gap-4 shadow-sm"
+              onClick={() => onCreateJobOrder(selectedRequest)}
             >
-              <div className="p-2.5 bg-white rounded-lg text-amber-600 shadow-sm group-hover:scale-110 transition-transform">
+              <div className="p-2.5 bg-white rounded-lg text-emerald-600 shadow-sm group-hover:scale-110 transition-transform">
                 <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  <path d="M12 4v16m8-8H4" />
                 </svg>
               </div>
               <div>
-                <span className="text-amber-900 font-extrabold text-sm block">Submit Inspection Results</span>
-                <span className="text-amber-600/70 text-[11px] font-medium block mt-0.5">Fill in assessment and material status</span>
+                <span className="text-emerald-900 font-extrabold text-sm block">Create Job Order</span>
+                <span className="text-emerald-600/70 text-[11px] font-medium block mt-0.5">Dispatch work order to personnel</span>
               </div>
             </button>
           </>

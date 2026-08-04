@@ -5,10 +5,11 @@ import { useRouter } from 'next/navigation';
 import { API } from '@/app/utils/api/api';
 import { RequestActionsModal } from '@/app/components/modal/job-request-modals/RequestActionsModal';
 import { RequestDetailsModal } from '@/app/components/modal/job-request-modals/RequestDetailsModal';
-import { ScheduleInspectionModal } from '@/app/components/modal/job-request-modals/ScheduleInspectionModal';
-import { InspectionResultsModal } from '@/app/components/modal/job-request-modals/InspectionResultsModal';
 import PageSkeleton from '@/app/components/loading/page-skeleton/PageSkeleton';
 import { DisapproveModal } from '@/app/components/modal/job-request-modals/DisapproveModal';
+import { HeadRejectModal } from '@/app/components/modal/job-request-modals/HeadRejectModal';
+import { ScheduleInspectionModal } from '@/app/components/modal/job-request-modals/ScheduleInspectionModal';
+import { Personnel, InspectionFormData } from '@/app/types/JobRequest';
 import { useAuth } from '@/app/context/AuthContext';
 import { useToast } from '@/app/context/ToastContext';
 import { getErrorMessage } from '@/app/utils/errors';
@@ -17,6 +18,7 @@ interface JobRequest {
   id: number;
   request_date?: string;
   unit: {
+    id: number;
     unit_name: string;
     unit_acronym: string;
     head_id: number;
@@ -38,20 +40,8 @@ interface JobRequest {
   status_of_materials: string;
   status: string;
   reason_for_disapproval: string | null;
-}
-
-interface Personnel {
-  id: number;
-  first_name: string;
-  middle_name: string | null;
-  last_name: string;
-  suffix: string | null;
-  field: string;
-}
-
-interface InspectionFormData {
-  scheduledDate: string;
-  personnels: string[];
+  head_approved?: boolean;
+  head_approved_at?: string | null;
 }
 
 const JobRequestTable = () => {
@@ -59,9 +49,12 @@ const JobRequestTable = () => {
   const { success, error } = useToast();
   const isGsuStaff = user?.role === "GSU_STAFF";
   const isUnitUser = user?.role === "UNIT_STAFF" || user?.role === "UNIT_HEAD";
+  const isUnitHead = user?.role === "UNIT_HEAD";
   const canAccessReport = isGsuStaff;
   const [activeTab, setActiveTab] = useState('All Requests');
-  const tabs = ['All Requests', 'Pending', 'Under Inspection', 'Awaiting Materials', 'Approved', 'Disapproved', 'Cancelled'];
+  const tabs = isUnitUser
+    ? ['All Requests', 'For Approval', 'Pending', 'Under Inspection', 'Awaiting Materials', 'Approved', 'Disapproved', 'Cancelled']
+    : ['All Requests', 'Pending', 'Under Inspection', 'Awaiting Materials', 'Approved', 'Disapproved', 'Cancelled'];
   const [searchQuery, setSearchQuery] = useState('');
   const [sortKey, setSortKey] = useState<'id' | 'unit' | 'date' | 'status'>('id');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
@@ -69,19 +62,19 @@ const JobRequestTable = () => {
   const [requests, setRequests] = useState<JobRequest[]>([]);
   const [selectedRequest, setSelectedRequest] = useState<JobRequest | null>(null);
   const [viewingRequest, setViewingRequest] = useState<JobRequest | null>(null);
-  const [showInspectionConfirm, setShowInspectionConfirm] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   const [disapproveTarget, setDisapproveTarget] = useState<JobRequest | null>(null);
   const [disapproveReason, setDisapproveReason] = useState('');
 
-  const [inspectionTarget, setInspectionTarget] = useState<JobRequest | null>(null);
+  const [rejectTarget, setRejectTarget] = useState<JobRequest | null>(null);
+  const [rejectReason, setRejectReason] = useState('');
+
   const [personnelList, setPersonnelList] = useState<Personnel[]>([]);
-  const [inspectionForm, setInspectionForm] = useState<InspectionFormData>({
-    scheduledDate: '',
-    personnels: [],
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [inspectionTarget, setInspectionTarget] = useState<JobRequest | null>(null);
+  const [inspectionForm, setInspectionForm] = useState<InspectionFormData>({ scheduledDate: '', personnels: [] });
+  const [showInspectionConfirm, setShowInspectionConfirm] = useState(false);
+  const [isScheduling, setIsScheduling] = useState(false);
 
   useEffect(() => {
 
@@ -98,16 +91,6 @@ const JobRequestTable = () => {
       }
     };
 
-    fetchRequests();
-    
-  }, []); 
-
-  if (viewingRequest) {
-    console.log(viewingRequest);
-    
-  }
-
-    useEffect(() => {
     const fetchPersonnel = async () => {
       try {
         const response = await API.get('/personnels');
@@ -116,8 +99,16 @@ const JobRequestTable = () => {
         console.error('Error fetching personnel:', error);
       }
     };
+
+    fetchRequests();
     fetchPersonnel();
-  }, []);
+    
+  }, []); 
+
+  if (viewingRequest) {
+    console.log(viewingRequest);
+    
+  }
   
   const handleDisapproveRequest = (req: JobRequest) => {
     setDisapproveTarget(req);
@@ -149,92 +140,68 @@ const JobRequestTable = () => {
     router.push('/job-order');
   }
 
-  const [inspectionResultTarget, setInspectionResultTarget] = useState<JobRequest | null>(null);
-  const [inspectionResultForm, setInspectionResultForm] = useState({
-    assessment_results: '',
-    estimated_duration_value: 0,
-    estimated_duration_unit: 'Hours' as 'Hours' | 'Days',
-    status_of_materials: null as 'Available' | 'Not Available' | null,
-  });
-
-  const handleSubmitInspectionResult = async () => {
-    if (!inspectionResultTarget) return;
+  const handleApproveRequest = async (req: JobRequest) => {
     try {
-      const isAvailable = inspectionResultForm.status_of_materials === 'Available';
-      await API.patch(`/job-requests/${inspectionResultTarget.id}`, {
-        assessment_results: inspectionResultForm.assessment_results,
-        estimated_duration_value: inspectionResultForm.estimated_duration_value,
-        estimated_duration_unit: inspectionResultForm.estimated_duration_unit,
-        status_of_materials: inspectionResultForm.status_of_materials,
-        status: isAvailable ? 'Approved' : 'Awaiting Materials',
+      await API.patch(`/job-requests/${req.id}/head-approval`, {
+        approved: true,
       });
-
-      const scheduledRef = localStorage.getItem('inspection-schedule');
-      const inspectionId = scheduledRef ? JSON.parse(scheduledRef)?.id : null;
-      if (inspectionId) {
-        await API.patch(`/inspections/${inspectionId}`, {
-          recommedation: isAvailable ? 'Approved' : 'Disapproved',
-          status: 'Completed',
-        });
-      }
       setRequests(prev =>
-        prev.map(r => r.id === inspectionResultTarget.id ? {
-          ...r,
-          status: inspectionResultForm.status_of_materials === 'Available' ? 'Approved' : 'Awaiting Materials',
-          status_of_materials: inspectionResultForm.status_of_materials ?? r.status_of_materials,
-        } : r)
+        prev.map(r => r.id === req.id ? { ...r, head_approved: true, head_approved_at: new Date().toISOString(), status: 'Pending' } : r)
       );
-      setInspectionResultTarget(null);
-      success('Inspection results submitted successfully.');
+      success('Request approved successfully.');
     } catch (err) {
-      console.error('Failed to submit inspection results:', err);
-      error(getErrorMessage(err, 'Failed to submit inspection results. Please try again.'));
+      console.error('Failed to approve request:', err);
+      error(getErrorMessage(err, 'Failed to approve request. Please try again.'));
     }
   };
 
-  const handleSubmitInspection = async () => {
-    if (!inspectionTarget) return;
-    setIsSubmitting(true);
+  const handleSubmitRejection = async () => {
+    if (!rejectTarget) return;
     try {
-      await API.patch(`/job-requests/${inspectionTarget.id}/status`, {
-        status: 'Under Inspection',
+      await API.patch(`/job-requests/${rejectTarget.id}/head-approval`, {
+        approved: false,
+        reason_for_disapproval: rejectReason,
       });
-
-      const inspectionRes = await API.post('/inspections', {
-        job_request_id: inspectionTarget.id,
-        inspection_date: inspectionForm.scheduledDate,
-        personnel_ids: inspectionForm.personnels.map((id) => Number(id)),
-      });
-      const inspectionId = inspectionRes.data.data?.id ?? null;
-
       setRequests(prev =>
-        prev.map(r => r.id === inspectionTarget.id ? { ...r, status: 'Under Inspection' } : r)
+        prev.map(r => r.id === rejectTarget.id ? { ...r, head_approved: false, reason_for_disapproval: rejectReason, status: 'Disapproved' } : r)
       );
-      // setInspectionTarget(null);
-      localStorage.setItem('inspection-schedule', JSON.stringify({
-        id: inspectionId,
-        request: inspectionTarget,
-        scheduledDate: inspectionForm.scheduledDate,
-        personnels: inspectionForm.personnels.map(id =>
-          personnelList.find(p => String(p.id) === id)
-      ),
-      }));
-      success('Inspection scheduled successfully.');
-      router.push('/inspection');
+      setRejectTarget(null);
+      setRejectReason('');
+      success('Request rejected successfully.');
     } catch (err) {
-      console.error('Failed to schedule inspection:', err);
-      error(getErrorMessage(err, 'Failed to schedule inspection. Please try again.'));
-    } finally {
-      setIsSubmitting(false);
+      console.error('Failed to reject request:', err);
+      error(getErrorMessage(err, 'Failed to reject request. Please try again.'));
     }
   };
 
   const handleOpenInspectionModal = (req: JobRequest) => {
     setInspectionTarget(req);
-    setInspectionForm({
-      scheduledDate: new Date().toISOString().split('T')[0],
-      personnels: [],
-    });
+    setInspectionForm({ scheduledDate: '', personnels: [] });
+    setSelectedRequest(null);
+  };
+
+  const handleSubmitInspection = async () => {
+    if (!inspectionTarget) return;
+    setIsScheduling(true);
+    try {
+      await API.patch(`/job-requests/${inspectionTarget.id}/status`, { status: 'Under Inspection' });
+      await API.post('/inspections', {
+        job_request_id: inspectionTarget.id,
+        inspection_date: inspectionForm.scheduledDate,
+        personnel_ids: inspectionForm.personnels.map(Number),
+      });
+      setRequests(prev =>
+        prev.map(r => r.id === inspectionTarget.id ? { ...r, status: 'Under Inspection' } : r)
+      );
+      setInspectionTarget(null);
+      setShowInspectionConfirm(false);
+      success('Inspection scheduled successfully.');
+    } catch (err) {
+      console.error('Failed to schedule inspection:', err);
+      error(getErrorMessage(err, 'Failed to schedule inspection. Please try again.'));
+    } finally {
+      setIsScheduling(false);
+    }
   };
 
   const filteredRequests = requests.filter(req => {
@@ -285,11 +252,14 @@ const JobRequestTable = () => {
     sortKey === key ? (sortDir === 'asc' ? '↑' : '↓') : '↕';
 
   useEffect(() => {
+    const hasForApproval = requests.some(r => r.status === 'For Approval');
     const hasPending = requests.some(r => r.status === 'Pending');
     const hasUnderInspection = requests.some(r => r.status === 'Under Inspection');
     const hasAwaitingMaterials = requests.some(r => r.status === 'Awaiting Materials');
 
-    if (hasPending) {
+    if (hasForApproval) {
+      setActiveTab('For Approval');
+    } else if (hasPending) {
       setActiveTab('Pending');
     } else if (hasUnderInspection) {
       setActiveTab('Under Inspection');
@@ -435,6 +405,7 @@ const JobRequestTable = () => {
                   {/* Status */}
                   <td className="px-4 py-6 text-center">
                     <span className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold tracking-tight inline-block min-w-20 ${
+                      req.status === 'For Approval'        ? 'bg-violet-100 text-violet-600 border border-violet-200' :
                       req.status === 'Approved'           ? 'bg-emerald-100 text-emerald-600' :
                       req.status === 'Pending'            ? 'bg-amber-100 text-amber-600 border border-amber-200' :
                       req.status === 'Under Inspection'   ? 'bg-blue-100 text-blue-600' :
@@ -452,11 +423,30 @@ const JobRequestTable = () => {
                     {req.request_date ? new Date(req.request_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '—'}
                   </td>
 
-                  {/* Action */}
                   {/* Action Cell */}
                   <td className="px-4 py-6 text-right">
                     <div className="flex justify-end items-center">
-                      {isUnitUser ? (
+                      {isUnitHead && req.status === 'For Approval' && req.unit?.id === user?.unit_id ? (
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleApproveRequest(req)}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wider shadow-sm shadow-emerald-100 transition-all"
+                          >
+                            Approve
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setRejectTarget(req);
+                              setRejectReason('');
+                            }}
+                            className="bg-rose-500 hover:bg-rose-600 text-white px-3 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wider shadow-sm shadow-rose-100 transition-all"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      ) : isUnitUser ? (
                         <button
                           type="button"
                           onClick={() => {
@@ -475,7 +465,7 @@ const JobRequestTable = () => {
                         >
                           Create Job Order
                         </button>
-                      ) : req.status === 'Pending' || req.status === 'Under Inspection' ? (
+                      ) : req.status === 'Pending' ? (
                         <button
                           type="button"
                           onClick={() => setSelectedRequest(req)}
@@ -522,24 +512,14 @@ const JobRequestTable = () => {
           setViewingRequest(req);
           setSelectedRequest(null);
         }}
-        onScheduleInspection={(req) => {
-          setSelectedRequest(null);
-          handleOpenInspectionModal(req);
-        }}
         onDisapprove={(req) => handleDisapproveRequest(req)}
-        onSubmitResults={(req) => {
-          setSelectedRequest(null);
-          setInspectionResultTarget(req);
-          setInspectionResultForm({
-            assessment_results: '',
-            estimated_duration_value: 0,
-            estimated_duration_unit: 'Hours',
-            status_of_materials: null,
-          });
-        }}
         onCreateJobOrder={(req) => {
           setSelectedRequest(null);
           handleNavigateToJobOrderForm(req.id);
+        }}
+        onScheduleInspection={(req) => {
+          setSelectedRequest(null);
+          handleOpenInspectionModal(req);
         }}
       />
 
@@ -548,44 +528,33 @@ const JobRequestTable = () => {
         onClose={() => setViewingRequest(null)}
       />
 
-      <ScheduleInspectionModal
-        inspectionTarget={inspectionTarget}
-        inspectionForm={inspectionForm}
-        personnelList={personnelList}
-        isSubmitting={isSubmitting}
-        showConfirm={showInspectionConfirm}
-        onClose={() => setInspectionTarget(null)}
-        onFormChange={(form) => setInspectionForm(form)}
-        onConfirmOpen={() => setShowInspectionConfirm(true)}
-        onConfirm={() => {
-          setShowInspectionConfirm(false);
-          handleSubmitInspection();
-        }}
-        onConfirmClose={() => setShowInspectionConfirm(false)}
-      />
-
-      <InspectionResultsModal
-        inspectionResultTarget={inspectionResultTarget}
-        inspectionResultForm={inspectionResultForm}
-        isSubmitting={isSubmitting}
-        onClose={() => setInspectionResultTarget(null)}
-        onFormChange={(form) => setInspectionResultForm(form)}
-        onCreateJobOrder={() => {
-          handleSubmitInspectionResult();
-          handleNavigateToJobOrderForm(inspectionResultTarget!.id);
-        }}
-        onRequestPurchase={() => {
-          handleSubmitInspectionResult();
-          // TODO: router.push('/purchase-request')
-        }}
-      />
-
       <DisapproveModal
         disapproveTarget={disapproveTarget}
         disapproveReason={disapproveReason}
         onReasonChange={(reason) => setDisapproveReason(reason)}
         onClose={() => setDisapproveTarget(null)}
         onConfirm={handleSubmitDisapproval}
+      />
+
+      <HeadRejectModal
+        rejectTarget={rejectTarget}
+        rejectReason={rejectReason}
+        onReasonChange={(reason) => setRejectReason(reason)}
+        onClose={() => setRejectTarget(null)}
+        onConfirm={handleSubmitRejection}
+      />
+
+      <ScheduleInspectionModal
+        inspectionTarget={inspectionTarget}
+        inspectionForm={inspectionForm}
+        personnelList={personnelList}
+        isSubmitting={isScheduling}
+        showConfirm={showInspectionConfirm}
+        onClose={() => setInspectionTarget(null)}
+        onFormChange={(form) => setInspectionForm(form)}
+        onConfirmOpen={() => setShowInspectionConfirm(true)}
+        onConfirm={handleSubmitInspection}
+        onConfirmClose={() => setShowInspectionConfirm(false)}
       />
 
       {/* Floating Report Button */}

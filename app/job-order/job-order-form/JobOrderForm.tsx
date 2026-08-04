@@ -45,6 +45,10 @@ interface JobRequestData {
   estimated_duration_unit: string;
   status_of_materials: string;
   status: string;
+  job_order?: {
+    id: number;
+    jo_number: number | null;
+  } | null;
 }
 
 interface JobOrderData {
@@ -103,7 +107,7 @@ const JobOrderForm = () => {
           const response = await API.get(`/job-requests/${storedRequestId}`);
           const data = response.data.data;
 
-          if (data.status === 'Approved') {
+          if (data.job_order) {
             router.push("/job-request-list")
           }
 
