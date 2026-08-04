@@ -32,7 +32,7 @@ const navigation: { name: string; href: string; icon: React.ComponentType<{ clas
   { name: "Job Orders", href: "/job-order-list", icon: ClipboardList, roles: ["GSU_STAFF", "UNIT_HEAD", "UNIT_STAFF"] },
   { name: "Inspections", href: "/schedule-inspection", icon: Calendar, roles: ["GSU_STAFF"] },
   { name: "Personnel", href: "/personnel", icon: Users, roles: ["GSU_STAFF"] },
-  { name: "Waiting for Materials", href: "/waiting-materials", icon: Clock, roles: ["GSU_STAFF"] },
+  { name: "PR / RIS", href: "/pr-ris", icon: Clock, roles: ["GSU_STAFF"] },
   { name: "Accomplishment Report", href: "/accomplishment-report", icon: FileCheck, roles: ["GSU_STAFF", "UNIT_HEAD"] },
 ]
 
