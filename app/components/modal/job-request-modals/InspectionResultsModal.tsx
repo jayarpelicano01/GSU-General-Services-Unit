@@ -25,7 +25,7 @@ interface Props {
   onFormChange: (form: InspectionResultFormData) => void;
   onCreatePurchaseRequest: () => void;
   onCreateRequisitionSlip: () => void;
-  onSubmitInspectionWithJobOrder: (form: JobOrderFormData, status: string) => void;
+  onSubmitInspectionWithJobOrder: (form: JobOrderFormData) => void;
 }
 
 export const InspectionResultsModal = ({
@@ -254,18 +254,15 @@ export const InspectionResultsModal = ({
         isOpen={showConfirm}
         onClose={() => setShowConfirm(false)}
         title="Process Job Order?"
-        message="Finalize and Print the Order or save to draft first?"
+        message="Finalize the order and assign the selected personnel?"
         confirmLabel="Yes, Process"
-        cancelLabel="Save as Draft"
+        cancelLabel="Cancel"
         isLoading={isSubmitting}
         onConfirm={() => {
           setShowConfirm(false);
-          onSubmitInspectionWithJobOrder(jobOrderForm, "Assigned");
+          onSubmitInspectionWithJobOrder(jobOrderForm);
         }}
-        onCancel={() => {
-          setShowConfirm(false);
-          onSubmitInspectionWithJobOrder(jobOrderForm, "Pending");
-        }}
+        onCancel={() => setShowConfirm(false)}
       />
     </Modal>
   );

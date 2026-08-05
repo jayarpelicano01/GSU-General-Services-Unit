@@ -51,7 +51,6 @@ export const JobOrderDetailsModal = ({ viewingOrder, onClose }: Props) => (
           <span className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold tracking-tight inline-block ${
             viewingOrder.status === 'Completed'  ? 'bg-emerald-100 text-emerald-600' :
             viewingOrder.status === 'Assigned'   ? 'bg-blue-100 text-blue-600' :
-            viewingOrder.status === 'Pending'    ? 'bg-amber-100 text-amber-600 border border-amber-200' :
             viewingOrder.status === 'Cancelled'  ? 'bg-rose-100 text-rose-600' :
             'bg-slate-100 text-slate-500'
           }`}>

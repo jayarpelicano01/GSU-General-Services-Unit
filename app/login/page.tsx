@@ -166,7 +166,7 @@ const LoginPageInner = () => {
                 </p>
                 <div className="mt-3 space-y-1 text-[11px] font-mono bg-slate-50 border border-slate-100 rounded-xl p-4 text-left text-slate-600">
                   <div><span className="text-indigo-600">GSU Staff:</span> gsu.staff@uep.edu.ph / TestPass123</div>
-                  <div><span className="text-indigo-600">Unit Head:</span> unit.head@uep.edu.ph / TestPass123</div>
+                  <div><span className="text-indigo-600">Unit Head:</span> cs.head@uep.edu.ph / TestPass123</div>
                   <div><span className="text-indigo-600">Unit Staff:</span> unit.staff@uep.edu.ph / TestPass123</div>
                 </div>
               </div>

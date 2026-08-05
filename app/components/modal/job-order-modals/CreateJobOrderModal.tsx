@@ -52,15 +52,15 @@ export const CreateJobOrderModal = ({ open, request, prRisId, onClose }: Props) 
 
   if (!request) return null;
 
-  const submitData = async (status: string) => {
+  const submitData = async () => {
     setIsSubmitting(true);
     try {
-      await createJobOrder({ request, form, personnelList, status, prRisId });
+      await createJobOrder({ request, form, personnelList, prRisId });
       setShowConfirm(false);
       onClose();
-      success(status === "Assigned" ? "Job Order created and personnel assigned." : "Job Order created successfully.");
+      success("Job Order created and personnel assigned.");
       setTimeout(() => {
-        router.push(status === "Assigned" ? "/job-order/print-job-order" : "/job-order-list");
+        router.push("/job-order/print-job-order");
       }, 1200);
     } catch (err) {
       console.error("Error creating job order:", err);
@@ -104,12 +104,12 @@ export const CreateJobOrderModal = ({ open, request, prRisId, onClose }: Props) 
         isOpen={showConfirm}
         onClose={() => setShowConfirm(false)}
         title="Process Job Order?"
-        message="Finalize and Print the Order or save to draft first?"
+        message="Finalize the order and assign the selected personnel?"
         confirmLabel="Yes, Process"
-        cancelLabel="Save as Draft"
+        cancelLabel="Cancel"
         isLoading={isSubmitting}
-        onConfirm={() => submitData("Assigned")}
-        onCancel={() => submitData("Pending")}
+        onConfirm={() => submitData()}
+        onCancel={() => setShowConfirm(false)}
       />
     </>
   );

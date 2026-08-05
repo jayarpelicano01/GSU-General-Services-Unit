@@ -149,14 +149,14 @@ const JobOrderForm = () => {
     console.log(JobOrderFormData);
  }, [JobOrderFormData]);
 
-  const submitData = async (status: string) => {  
+  const submitData = async () => {  
     setIsSubmitting(true);
     try {
     const payload = {
         request_id: requestData?.id,
         specific_work: JobOrderFormData.specificWorkOrder,
         jo_number: JobOrderFormData.jobOrderNo,
-        status: status
+        status: "Assigned"
     }
 
         const response = await API.post('/job-orders', {...payload});
@@ -202,17 +202,11 @@ const JobOrderForm = () => {
 
         localStorage.setItem("job-request", JSON.stringify(updatedRequestData))
         localStorage.setItem("job-order", JSON.stringify(updatedOrderDate))
-        success(status === "Assigned" ? "Job Order created and personnel assigned." : "Job Order created successfully.");
+        success("Job Order created and personnel assigned.");
 
-        if (status === "Assigned") {
-          setTimeout(() => {
-            router.push(`/job-order/print-job-order`);
-          }, 1500);
-        } else {
-          setTimeout(() => {
-            router.push(`/job-order-list`);
-          }, 1500);
-        }
+        setTimeout(() => {
+          router.push(`/job-order/print-job-order`);
+        }, 1500);
     } catch (err) {
       console.error('Error creating job order:', err);
       error(getErrorMessage(err, 'Failed to create job order. Please try again.'));
@@ -446,18 +440,15 @@ const JobOrderForm = () => {
         isOpen={showConfirm}
         onClose={() => setShowConfirm(false)}
         title="Process Job Order?"
-        message="Finalize and Print the Order or save to draft first?"
+        message="Finalize the order and assign the selected personnel?"
         confirmLabel="Yes, Process"
-        cancelLabel="Save as Draft"
+        cancelLabel="Cancel"
         isLoading={isSubmitting}
         onConfirm={() => {
           setShowConfirm(false);
-          submitData("Assigned");
+          submitData();
         }}
-        onCancel={() => {
-          setShowConfirm(false);
-          submitData("Pending")
-        }}
+        onCancel={() => setShowConfirm(false)}
       />
     </div>
   );

@@ -15,7 +15,6 @@ import {
   CheckCircle2,
   SearchCheck,
   Package,
-  Wrench,
   Timer,
   ArrowUpRight,
   ArrowDownRight,
@@ -353,7 +352,6 @@ function DashboardContent() {
     return {
       pendingInspections: requests.filter((r) => r.status === "Under Inspection").length,
       awaitingMaterials: requests.filter((r) => r.status === "Awaiting Materials").length,
-      ordersToAssign: orders.filter((o) => o.status === "Pending").length,
       completedThisMonth,
       inProgress: orders.filter((o) => o.status === "Assigned" || o.status === "Ongoing").length,
       myPendingRequests: requests.filter((r) => r.status === "Pending").length,
@@ -361,7 +359,6 @@ function DashboardContent() {
       trends: {
         pendingInspections: computeDelta(countReq("Under Inspection", true), countReq("Under Inspection", false)),
         awaitingMaterials: computeDelta(countReq("Awaiting Materials", true), countReq("Awaiting Materials", false)),
-        ordersToAssign: computeDelta(countOrderByStatus(["Pending"], true), countOrderByStatus(["Pending"], false)),
         completedThisMonth: computeDelta(completedThisMonth, completedPrevMonth),
         inProgress: computeDelta(countOrderByStatus(["Assigned", "Ongoing"], true), countOrderByStatus(["Assigned", "Ongoing"], false)),
         myPendingRequests: computeDelta(countReq("Pending", true), countReq("Pending", false)),
@@ -451,14 +448,6 @@ function DashboardContent() {
       bgColor: "bg-blue-50",
       textColor: "text-blue-600",
       ...stats.trends.awaitingMaterials,
-    },
-    {
-      name: "Job Orders to Assign",
-      value: stats.ordersToAssign,
-      icon: Wrench,
-      bgColor: "bg-amber-50",
-      textColor: "text-amber-600",
-      ...stats.trends.ordersToAssign,
     },
     {
       name: "Completed This Month",

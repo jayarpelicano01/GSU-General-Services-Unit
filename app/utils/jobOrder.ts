@@ -6,7 +6,6 @@ interface CreateJobOrderParams {
   request: JobOrderModalRequest;
   form: JobOrderFormData;
   personnelList: Personnel[];
-  status: string;
   prRisId?: string | null;
 }
 
@@ -14,14 +13,13 @@ export const createJobOrder = async ({
   request,
   form,
   personnelList,
-  status,
   prRisId,
 }: CreateJobOrderParams) => {
   const response = await API.post("/job-orders", {
     request_id: request.id,
     specific_work: form.specificWorkOrder,
     jo_number: form.jobOrderNo,
-    status,
+    status: "Assigned",
   });
 
   if (response.data.status !== "success") {

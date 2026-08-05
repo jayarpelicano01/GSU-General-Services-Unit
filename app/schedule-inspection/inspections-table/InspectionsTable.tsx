@@ -184,7 +184,7 @@ const InspectionsTable = () => {
     }
   };
 
-  const handleSubmitInspectionWithJobOrder = async (jobOrderForm: JobOrderFormData, status: string) => {
+  const handleSubmitInspectionWithJobOrder = async (jobOrderForm: JobOrderFormData) => {
     if (!resultTarget?.job_request) return;
     setIsSubmitting(true);
     try {
@@ -205,17 +205,12 @@ const InspectionsTable = () => {
         request: resultTarget.job_request,
         form: jobOrderForm,
         personnelList,
-        status,
       });
-      success(
-        status === "Assigned"
-          ? "Inspection results submitted and job order created."
-          : "Inspection results submitted and job order saved as draft."
-      );
+      success("Inspection results submitted and job order created.");
       setResultTarget(null);
       fetchInspections();
       setTimeout(() => {
-        router.push(status === "Assigned" ? "/job-order/print-job-order" : "/job-order-list");
+        router.push("/job-order/print-job-order");
       }, 1200);
     } catch (err) {
       console.error('Failed to submit inspection results and create job order:', err);
