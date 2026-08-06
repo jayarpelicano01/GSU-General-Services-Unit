@@ -41,7 +41,7 @@ export default function ConfirmDialog({
       {/* Dialog Box */}
       <div 
         className={`
-          relative w-full max-w-sm bg-white rounded-3xl shadow-2xl border border-slate-100 
+          relative w-full max-w-sm bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 
           p-6 overflow-hidden custom-confirm-bounce
         `}
       >
@@ -49,7 +49,7 @@ export default function ConfirmDialog({
         <button
             disabled={isLoading}
             onClick={onClose}
-            className="absolute top-4 right-4 p-1.5 rounded-xl text-slate-300 hover:text-slate-500 hover:bg-slate-100 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            className="absolute top-4 right-4 p-1.5 rounded-xl text-slate-300 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
         >
             <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path d="M6 18L18 6M6 6l12 12" />
@@ -59,7 +59,7 @@ export default function ConfirmDialog({
           {/* Icon Section */}
           <div className={`
             w-14 h-14 rounded-2xl flex items-center justify-center mb-4
-            ${isDanger ? 'bg-rose-50 text-rose-500' : 'bg-indigo-50 text-indigo-600'}
+            ${isDanger ? 'bg-rose-50 dark:bg-rose-500/15 text-rose-500 dark:text-rose-400' : 'bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400'}
           `}>
             {isDanger ? (
               <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -72,10 +72,10 @@ export default function ConfirmDialog({
             )}
           </div>
 
-          <h3 className="text-lg font-bold text-slate-800 tracking-tight">
+          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 tracking-tight">
             {title}
           </h3>
-          <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
             {message}
           </p>
         </div>
@@ -85,7 +85,7 @@ export default function ConfirmDialog({
           <button
             onClick={onCancel}
             disabled={isLoading}
-            className="flex-1 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            className="flex-1 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed"
           >
             {cancelLabel}
           </button>
@@ -95,7 +95,7 @@ export default function ConfirmDialog({
             className={`
               flex-1 px-4 py-3 text-xs font-bold uppercase tracking-widest text-white rounded-xl shadow-lg transition-all active:scale-95
               disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
-              ${isDanger ? 'bg-rose-500 hover:bg-rose-600 shadow-rose-100' : 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-100'}
+              ${isDanger ? 'bg-rose-500 hover:bg-rose-600 shadow-rose-100 dark:shadow-none' : 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-100 dark:shadow-none'}
             `}
           >
             {isLoading ? (

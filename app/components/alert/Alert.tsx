@@ -22,8 +22,8 @@ export default function Alert({ type, message, onClose, autoClose = 1500 }: Aler
 
   const styles = {
     success: {
-      bg: "bg-indigo-50/95 border-indigo-200 shadow-indigo-100",
-      text: "text-indigo-900",
+      bg: "bg-indigo-50/95 dark:bg-indigo-500/15 border-indigo-200 dark:border-indigo-500/30 shadow-indigo-100 dark:shadow-none",
+      text: "text-indigo-900 dark:text-indigo-100",
       accent: "bg-indigo-500",
       icon: (
         <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
@@ -32,8 +32,8 @@ export default function Alert({ type, message, onClose, autoClose = 1500 }: Aler
       ),
     },
     error: {
-      bg: "bg-rose-50/95 border-rose-200 shadow-rose-100",
-      text: "text-rose-900",
+      bg: "bg-rose-50/95 dark:bg-rose-500/15 border-rose-200 dark:border-rose-500/30 shadow-rose-100 dark:shadow-none",
+      text: "text-rose-900 dark:text-rose-100",
       accent: "bg-rose-500",
       icon: (
         <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -41,8 +41,8 @@ export default function Alert({ type, message, onClose, autoClose = 1500 }: Aler
         </svg>
       ),
     },
-    info: { bg: "bg-blue-50/90 border-blue-200 shadow-blue-100", text: "text-blue-900", accent: "bg-blue-500", icon: (<svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>) },
-    warning: { bg: "bg-amber-50/90 border-amber-200 shadow-amber-100", text: "text-amber-900", accent: "bg-amber-500", icon: (<svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>) },
+    info: { bg: "bg-blue-50/90 dark:bg-blue-500/15 border-blue-200 dark:border-blue-500/30 shadow-blue-100 dark:shadow-none", text: "text-blue-900 dark:text-blue-100", accent: "bg-blue-500", icon: (<svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>) },
+    warning: { bg: "bg-amber-50/90 dark:bg-amber-500/15 border-amber-200 dark:border-amber-500/30 shadow-amber-100 dark:shadow-none", text: "text-amber-900 dark:text-amber-100", accent: "bg-amber-500", icon: (<svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>) },
   };
 
   const s = styles[type];
@@ -55,7 +55,7 @@ export default function Alert({ type, message, onClose, autoClose = 1500 }: Aler
         ${s.bg} ${s.text}
       `}
     >
-      <div className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-white shadow-sm ${s.accent} text-white`}>
+      <div className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-white dark:bg-slate-900 shadow-sm ${s.accent} text-white`}>
         {s.icon}
       </div>
 

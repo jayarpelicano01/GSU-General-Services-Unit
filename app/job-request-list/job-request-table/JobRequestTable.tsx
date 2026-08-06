@@ -283,24 +283,24 @@ const JobRequestTable = () => {
   if (isLoading) { return < PageSkeleton />; }
 
   return (
-    <div className="min-h-screen bg-[#f8f9ff] p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-[#f8f9ff] p-4 sm:p-6 lg:p-8 dark:bg-slate-950">
       {/* Table Container */}
-      <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden dark:bg-slate-900 dark:border-slate-800">
 
         <div className="px-4 sm:px-8 pt-6 pb-3 flex items-start sm:items-center justify-between gap-3">
           <div className="min-w-0">
-            <h2 className="text-lg font-extrabold tracking-tight text-slate-800">Job Requests</h2>
-            <p className="text-slate-400 text-[12px] font-medium mt-0.5">Manage and monitor all incoming job requests</p>
+            <h2 className="text-lg font-extrabold tracking-tight text-slate-800 dark:text-slate-100">Job Requests</h2>
+            <p className="text-slate-400 text-[12px] font-medium mt-0.5 dark:text-slate-500">Manage and monitor all incoming job requests</p>
           </div>
-          <span className="bg-indigo-50 text-indigo-500 text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-indigo-100 whitespace-nowrap shrink-0">
+          <span className="bg-indigo-50 text-indigo-500 text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-indigo-100 whitespace-nowrap shrink-0 dark:bg-indigo-500/15 dark:text-indigo-300 dark:border-indigo-500/30">
             {filteredRequests.length} {activeTab === 'All Requests' ? 'Total' : activeTab}
           </span>
         </div>
 
         {/* Search bar */}
-        <div className="px-4 sm:px-8 py-3 border-b border-slate-100">
+        <div className="px-4 sm:px-8 py-3 border-b border-slate-100 dark:border-slate-800">
           <div className="relative max-w-md">
-            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="8" />
               <path d="M21 21l-4.35-4.35" />
             </svg>
@@ -309,13 +309,13 @@ const JobRequestTable = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by ID, unit, field of work, description, status, or date..."
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 dark:placeholder:text-slate-500"
             />
           </div>
         </div>
 
         {/* Navigation Tabs (From Screenshot) */}
-        <div className="flex items-center border-b border-slate-100 px-4 sm:px-8 py-2 gap-5 sm:gap-8 overflow-x-auto">
+        <div className="flex items-center border-b border-slate-100 px-4 sm:px-8 py-2 gap-5 sm:gap-8 overflow-x-auto dark:border-slate-800">
           {tabs.map((tab) => {
             const count = tab === 'All Requests'
               ? requests.length
@@ -326,8 +326,8 @@ const JobRequestTable = () => {
                 key={tab}
                 className={`py-4 text-sm font-medium flex items-center gap-2 whitespace-nowrap ${
                   activeTab === tab
-                    ? 'text-indigo-600 border-b-2 border-indigo-600'
-                    : 'text-slate-400 hover:text-slate-600'
+                    ? 'text-indigo-600 border-b-2 border-indigo-600 dark:text-indigo-400'
+                    : 'text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300'
                 }`}
                 onClick={() => setActiveTab(tab)}
               >
@@ -335,8 +335,8 @@ const JobRequestTable = () => {
                 {count > 0 && (
                   <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
                     activeTab === tab
-                      ? 'bg-indigo-100 text-indigo-600'
-                      : 'bg-slate-100 text-slate-400'
+                      ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300'
+                      : 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500'
                   }`}>
                     {count}
                   </span>
@@ -350,64 +350,64 @@ const JobRequestTable = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="text-slate-400 text-[11px] font-bold uppercase tracking-widest border-b border-slate-100">
+              <tr className="text-slate-400 text-[11px] font-bold uppercase tracking-widest border-b border-slate-100 dark:text-slate-500 dark:border-slate-800">
                 <th className="px-4 sm:px-8 py-5">
-                  <button onClick={() => toggleSort('id')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors">
+                  <button onClick={() => toggleSort('id')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors dark:hover:text-indigo-400">
                     ID <span className="text-[9px]">{sortIndicator('id')}</span>
                   </button>
                 </th>
                 <th className="px-4 py-5">
-                  <button onClick={() => toggleSort('unit')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors">
+                  <button onClick={() => toggleSort('unit')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors dark:hover:text-indigo-400">
                     Requesting Unit <span className="text-[9px]">{sortIndicator('unit')}</span>
                   </button>
                 </th>
                 <th className="px-4 py-5">Field of Work</th>
                 <th className="px-4 py-5">Work Description</th>
                 <th className="px-4 py-5 text-center">
-                  <button onClick={() => toggleSort('status')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors">
+                  <button onClick={() => toggleSort('status')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors dark:hover:text-indigo-400">
                     Status <span className="text-[9px]">{sortIndicator('status')}</span>
                   </button>
                 </th>
                 <th className="px-4 sm:px-8 py-5 text-right">
-                  <button onClick={() => toggleSort('date')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors">
+                  <button onClick={() => toggleSort('date')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors dark:hover:text-indigo-400">
                     Date <span className="text-[9px]">{sortIndicator('date')}</span>
                   </button>
                 </th>
                 <th className="px-4 py-5 text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {pagedRequests.map((req) => (
-                <tr key={req.id} className="hover:bg-slate-50/50 transition-colors group">
+                <tr key={req.id} className="hover:bg-slate-50/50 transition-colors group dark:hover:bg-slate-800/50">
                   
                   {/* ID */}
-                  <td className="px-4 sm:px-8 py-6 text-slate-400 text-sm font-medium tabular-nums whitespace-nowrap">
+                  <td className="px-4 sm:px-8 py-6 text-slate-400 text-sm font-medium tabular-nums whitespace-nowrap dark:text-slate-500">
                     #{req.id}
                   </td>
 
                   {/* Requesting Unit */}
                   <td className="px-4 py-6">
-                    <div className="text-slate-700 font-bold text-sm leading-tight">
+                    <div className="text-slate-700 font-bold text-sm leading-tight dark:text-slate-200">
                       {req.unit?.unit_name}
                     </div>
-                    <div className="text-slate-400 text-[11px] mt-0.5 font-medium">
+                    <div className="text-slate-400 text-[11px] mt-0.5 font-medium dark:text-slate-500">
                       {req.unit?.unit_acronym} • {req.unit?.location?.location_name}
                     </div>
                   </td>
 
                   {/* Field of Work */}
                   <td className="px-4 py-6">
-                    <span className="text-slate-600 text-[13px] font-semibold bg-slate-100 px-2.5 py-1 rounded">
+                    <span className="text-slate-600 text-[13px] font-semibold bg-slate-100 px-2.5 py-1 rounded dark:text-slate-300 dark:bg-slate-800">
                       {req.field_work}
                     </span>
                   </td>
                   
                   {/* Work Description */}
                   <td className="px-4 py-6 max-w-50">
-                    <div className="font-bold text-slate-700 truncate text-sm" title={req.specific_work}>
+                    <div className="font-bold text-slate-700 truncate text-sm dark:text-slate-200" title={req.specific_work}>
                       {req.specific_work}
                     </div>
-                    <div className="text-indigo-500 text-[10px] font-bold uppercase mt-1">
+                    <div className="text-indigo-500 text-[10px] font-bold uppercase mt-1 dark:text-indigo-400">
                       Est: {req.estimated_duration_value} {req.estimated_duration_unit}
                     </div>
                   </td>
@@ -415,21 +415,21 @@ const JobRequestTable = () => {
                   {/* Status */}
                   <td className="px-4 py-6 text-center">
                     <span className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold tracking-tight inline-block min-w-20 ${
-                      req.status === 'For Approval'        ? 'bg-violet-100 text-violet-600 border border-violet-200' :
-                      req.status === 'Approved'           ? 'bg-emerald-100 text-emerald-600' :
-                      req.status === 'Pending'            ? 'bg-amber-100 text-amber-600 border border-amber-200' :
-                      req.status === 'Under Inspection'   ? 'bg-blue-100 text-blue-600' :
-                      req.status === 'Awaiting Materials' ? 'bg-orange-100 text-orange-600' :
-                      req.status === 'Disapproved'        ? 'bg-rose-100 text-rose-600' :
-                      req.status === 'Cancelled'          ? 'bg-slate-100 text-slate-500' :
-                      'bg-slate-100 text-slate-500'
+                      req.status === 'For Approval'        ? 'bg-violet-100 text-violet-600 border border-violet-200 dark:bg-violet-500/20 dark:text-violet-300 dark:border-violet-500/30' :
+                      req.status === 'Approved'           ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300' :
+                      req.status === 'Pending'            ? 'bg-amber-100 text-amber-600 border border-amber-200 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30' :
+                      req.status === 'Under Inspection'   ? 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-300' :
+                      req.status === 'Awaiting Materials' ? 'bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-300' :
+                      req.status === 'Disapproved'        ? 'bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-300' :
+                      req.status === 'Cancelled'          ? 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400' :
+                      'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
                     }`}>
                       {req.status?.toUpperCase() || 'UNKNOWN'}
                     </span>
                   </td>
 
                   {/* Date */}
-                  <td className="px-4 sm:px-8 py-6 text-slate-500 text-sm tabular-nums whitespace-nowrap">
+                  <td className="px-4 sm:px-8 py-6 text-slate-500 text-sm tabular-nums whitespace-nowrap dark:text-slate-400">
                     {req.request_date ? new Date(req.request_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '—'}
                   </td>
 
@@ -467,7 +467,7 @@ const JobRequestTable = () => {
                             setViewingRequest(req);
                             setSelectedRequest(null);
                           }}
-                          className="text-indigo-600 hover:text-indigo-800 transition-colors font-bold text-[11px] uppercase tracking-wider underline underline-offset-4"
+                          className="text-indigo-600 hover:text-indigo-800 transition-colors font-bold text-[11px] uppercase tracking-wider underline underline-offset-4 dark:text-indigo-400 dark:hover:text-indigo-300"
                         >
                           View Details
                         </button>
@@ -475,7 +475,7 @@ const JobRequestTable = () => {
                         <button
                           type="button"
                           onClick={() => setSelectedRequest(req)}
-                          className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all"
+                          className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all dark:text-slate-500 dark:hover:text-indigo-400 dark:hover:bg-indigo-500/10"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <circle cx="12" cy="12" r="1" /><circle cx="12" cy="5" r="1" /><circle cx="12" cy="19" r="1" />
@@ -488,7 +488,7 @@ const JobRequestTable = () => {
                             setViewingRequest(req);
                             setSelectedRequest(null);
                           }}
-                          className="text-indigo-600 hover:text-indigo-800 transition-colors font-bold text-[11px] uppercase tracking-wider underline underline-offset-4"
+                          className="text-indigo-600 hover:text-indigo-800 transition-colors font-bold text-[11px] uppercase tracking-wider underline underline-offset-4 dark:text-indigo-400 dark:hover:text-indigo-300"
                         >
                           View Details
                         </button>
@@ -501,11 +501,11 @@ const JobRequestTable = () => {
                 <tr>
                   <td colSpan={7} className="px-8 py-16 text-center">
                     <div className="flex flex-col items-center gap-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                       </svg>
-                      <div className="text-slate-500 text-sm font-semibold">No job requests found</div>
-                      <div className="text-slate-400 text-xs">
+                      <div className="text-slate-500 text-sm font-semibold dark:text-slate-400">No job requests found</div>
+                      <div className="text-slate-400 text-xs dark:text-slate-500">
                         {searchQuery
                           ? `No results matching "${searchQuery}" in ${activeTab}.`
                           : `There are no ${activeTab === 'All Requests' ? 'requests' : activeTab.toLowerCase()} to show.`}
@@ -595,7 +595,7 @@ const JobRequestTable = () => {
       {canAccessReport && (
         <button
           onClick={() => router.push('/accomplishment-report')}
-          className="fixed bottom-6 right-6 z-40 bg-indigo-600 hover:bg-indigo-700 text-white pl-4 pr-5 py-3 rounded-full shadow-xl shadow-indigo-200 flex items-center gap-2 text-sm font-bold transition-all"
+          className="fixed bottom-6 right-6 z-40 bg-indigo-600 hover:bg-indigo-700 text-white pl-4 pr-5 py-3 rounded-full shadow-xl shadow-indigo-200 flex items-center gap-2 text-sm font-bold transition-all dark:shadow-none"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />

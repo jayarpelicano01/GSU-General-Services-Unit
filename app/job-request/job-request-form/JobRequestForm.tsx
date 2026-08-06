@@ -116,18 +116,18 @@ const JobRequestForm = () => {
 
 return (
   <div className="min-h-screen bg-[#f8f9ff] py-12 px-4">
-    <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden dark:bg-slate-900 dark:border-slate-700">
       
       {/* Header section */}
-      <div className="px-8 py-6 border-b border-slate-100 bg-white">
-        <h1 className="text-xl font-bold text-slate-800">Job Request Form</h1>
-        <p className="text-sm text-slate-400 mt-1">General Services Unit (GSU) Office</p>
+      <div className="px-8 py-6 border-b border-slate-100 bg-white dark:border-slate-800 dark:bg-slate-900">
+        <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">Job Request Form</h1>
+        <p className="text-sm text-slate-400 mt-1 dark:text-slate-500">General Services Unit (GSU) Office</p>
       </div>
 
       <form className="p-8 space-y-8" onSubmit={handleSubmit}>
         {/* Requesting Unit */}
         <div className="relative">
-          <label htmlFor="unitId" className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+          <label htmlFor="unitId" className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 dark:text-slate-500">
             Requesting Unit <span className="text-red-400">*</span>
           </label>
           
@@ -136,7 +136,7 @@ return (
             name="unitId"
             value={formData.unitId}
             onChange={handleInputChange}
-            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer"
+            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300"
             required
           >
             <option value="" disabled>Select a Unit...</option>
@@ -148,7 +148,7 @@ return (
           </select>
 
           {/* Custom Arrow Icon since 'appearance-none' hides the default one */}
-          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pt-6 pointer-events-none text-slate-400">
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pt-6 pointer-events-none text-slate-400 dark:text-slate-500">
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
             </svg>
@@ -157,10 +157,10 @@ return (
 
         {/* Field Work */}
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-4 dark:text-slate-500">
             Field Work Selection <span className="text-red-400">*</span>
           </label>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 bg-slate-50/50 p-6 rounded-xl border border-slate-100">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 bg-slate-50/50 p-6 rounded-xl border border-slate-100 dark:bg-slate-800/50 dark:border-slate-800">
             {fieldWorkOptions.map((column) => (
               <div key={column.column} className="space-y-3">
                 {column.items.map((item) => (
@@ -173,12 +173,12 @@ return (
                         value={item}
                         checked={formData.fieldWork === item}
                         onChange={() => handleFieldWorkChange(item)}
-                        className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-slate-300 checked:border-indigo-600 transition-all"
+                        className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-slate-300 checked:border-indigo-600 transition-all dark:border-slate-700"
                         required
                       />
                       <div className="absolute w-2.5 h-2.5 rounded-full bg-indigo-600 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 transition-opacity" />
                     </div>
-                    <span className="ml-3 text-sm font-medium text-slate-600 group-hover:text-indigo-600 transition-colors">
+                    <span className="ml-3 text-sm font-medium text-slate-600 group-hover:text-indigo-600 transition-colors dark:text-slate-300">
                       {item}
                     </span>
                   </label>
@@ -191,7 +191,7 @@ return (
         {/* Single Column Text Areas */}
         <div className="space-y-8">
           <div>
-            <label htmlFor="specificWorkToBeDone" className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+            <label htmlFor="specificWorkToBeDone" className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 dark:text-slate-500">
               Specific Work Description <span className="text-red-400">*</span>
             </label>
             <textarea
@@ -200,7 +200,7 @@ return (
               value={formData.specificWorkToBeDone}
               onChange={handleInputChange}
               rows={4}
-              className="w-full border border-slate-200 rounded-lg px-4 py-3 text-slate-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+              className="w-full border border-slate-200 rounded-lg px-4 py-3 text-slate-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none dark:border-slate-700 dark:text-slate-200"
               placeholder="Detailed instructions..."
               required
             />
@@ -208,7 +208,7 @@ return (
         </div>
 
         {/* Action Buttons */}
-        <div className="pt-8 border-t border-slate-100 flex items-center justify-end gap-3">
+        <div className="pt-8 border-t border-slate-100 flex items-center justify-end gap-3 dark:border-slate-800">
           <button
             type="button"
             onClick={() => {
@@ -220,13 +220,13 @@ return (
                 });
               }
             }}
-            className="px-5 py-2.5 text-sm font-semibold text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all"
+            className="px-5 py-2.5 text-sm font-semibold text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all dark:text-slate-500 dark:hover:bg-rose-500/15"
           >
             Clear Form
           </button>
           <button
             type="submit"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2.5 rounded-lg text-sm font-bold shadow-md shadow-indigo-100 transition-all active:scale-95"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2.5 rounded-lg text-sm font-bold shadow-md shadow-indigo-100 transition-all active:scale-95 dark:shadow-none"
           >
             Submit Request
           </button>

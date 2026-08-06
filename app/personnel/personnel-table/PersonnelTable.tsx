@@ -266,19 +266,19 @@ const PersonnelTable = () => {
   // Field badge color
   const fieldBadge = (field: string) => {
     const colors: Record<string, string> = {
-      Welding: "bg-rose-50 text-rose-700 border-rose-200",
-      Painting: "bg-purple-50 text-purple-700 border-purple-200",
-      "Carpentry/Masonry": "bg-amber-50 text-amber-700 border-amber-200",
-      "Brush Cutter": "bg-orange-50 text-orange-700 border-orange-200",
-      Electrical: "bg-sky-50 text-sky-700 border-sky-200",
-      Plumbing: "bg-blue-50 text-blue-700 border-blue-200",
-      "Art & Sign": "bg-pink-50 text-pink-700 border-pink-200",
-      "Refrigeration & Air-Conditioning": "bg-cyan-50 text-cyan-700 border-cyan-200",
-      Landscaping: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      Utility: "bg-slate-50 text-slate-700 border-slate-200",
+      Welding: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:border-rose-500/30",
+      Painting: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-500/15 dark:text-purple-300 dark:border-purple-500/30",
+      "Carpentry/Masonry": "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30",
+      "Brush Cutter": "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-500/15 dark:text-orange-300 dark:border-orange-500/30",
+      Electrical: "bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-500/15 dark:text-sky-300 dark:border-sky-500/30",
+      Plumbing: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/15 dark:text-blue-300 dark:border-blue-500/30",
+      "Art & Sign": "bg-pink-50 text-pink-700 border-pink-200 dark:bg-pink-500/15 dark:text-pink-300 dark:border-pink-500/30",
+      "Refrigeration & Air-Conditioning": "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-500/15 dark:text-cyan-300 dark:border-cyan-500/30",
+      Landscaping: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30",
+      Utility: "bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700",
     };
     return (
-      <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold border whitespace-nowrap ${colors[field] ?? "bg-slate-50 text-slate-600 border-slate-200"}`}>
+      <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold border whitespace-nowrap ${colors[field] ?? "bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"}`}>
         {field}
       </span>
     );
@@ -286,11 +286,11 @@ const PersonnelTable = () => {
 
   const statusPill = (status: string) => {
     const classes: Record<string, string> = {
-      Active: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      Inactive: "bg-slate-100 text-slate-500 border-slate-200",
+      Active: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30",
+      Inactive: "bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700",
     };
     return (
-      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide whitespace-nowrap border ${classes[status] ?? "bg-slate-50 text-slate-600 border-slate-200"}`}>
+      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide whitespace-nowrap border ${classes[status] ?? "bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"}`}>
         {status}
       </span>
     );
@@ -301,13 +301,13 @@ const PersonnelTable = () => {
       {/* Header + filters */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-slate-800">Personnel</h1>
-          <p className="text-sm text-slate-400 mt-0.5">Manage maintenance personnel and their assignments</p>
+          <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">Personnel</h1>
+          <p className="text-sm text-slate-400 mt-0.5 dark:text-slate-500">Manage maintenance personnel and their assignments</p>
         </div>
 
         <div className="flex items-center gap-3">
           {/* Status tabs */}
-          <div className="flex items-center gap-2 text-xs font-bold bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
+          <div className="flex items-center gap-2 text-xs font-bold bg-white border border-slate-200 rounded-xl p-1 shadow-sm dark:bg-slate-900 dark:border-slate-800">
             {STATUS_TABS.map((tab) => {
               const count =
                 tab === "All"
@@ -318,7 +318,7 @@ const PersonnelTable = () => {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`px-3 py-1.5 rounded-lg transition-all ${
-                    activeTab === tab ? "bg-indigo-600 text-white shadow-sm" : "text-slate-500 hover:text-slate-700"
+                    activeTab === tab ? "bg-indigo-600 text-white shadow-sm" : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
                   }`}
                 >
                   {tab} <span className="opacity-60">({count})</span>
@@ -341,50 +341,50 @@ const PersonnelTable = () => {
       </div>
 
       {/* Search */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 dark:bg-slate-900 dark:border-slate-800">
         <div className="relative">
-          <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by name or field of work..."
-            className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+            className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
           />
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden dark:bg-slate-900 dark:border-slate-800">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200">
-            <thead className="bg-slate-50">
+          <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+            <thead className="bg-slate-50 dark:bg-slate-800">
               <tr>
-                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">ID</th>
-                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Name</th>
-                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Field</th>
-                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
-                <th className="px-4 py-3 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest">Actions</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">ID</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Name</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Field</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Status</th>
+                <th className="px-4 py-3 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center text-sm text-slate-400 animate-pulse">Loading personnel...</td>
+                  <td colSpan={5} className="px-4 py-12 text-center text-sm text-slate-400 animate-pulse dark:text-slate-500">Loading personnel...</td>
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-4 py-12 text-center">
-                    <p className="text-sm font-semibold text-slate-500">No personnel found</p>
-                    <p className="text-xs text-slate-400 mt-1">Personnel records will appear here once added.</p>
+                    <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">No personnel found</p>
+                    <p className="text-xs text-slate-400 mt-1 dark:text-slate-500">Personnel records will appear here once added.</p>
                   </td>
                 </tr>
               ) : (
                 paged.map((p) => (
-                  <tr key={p.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-4 py-3.5 text-sm text-slate-500 font-medium">{p.id}</td>
-                    <td className="px-4 py-3.5 text-sm font-semibold text-slate-800">{fullName(p)}</td>
+                  <tr key={p.id} className="hover:bg-slate-50 transition-colors dark:hover:bg-slate-800/50">
+                    <td className="px-4 py-3.5 text-sm text-slate-500 font-medium dark:text-slate-400">{p.id}</td>
+                    <td className="px-4 py-3.5 text-sm font-semibold text-slate-800 dark:text-slate-100">{fullName(p)}</td>
                     <td className="px-4 py-3.5">{fieldBadge(p.field)}</td>
                     <td className="px-4 py-3.5">{statusPill(p.status)}</td>
                     <td className="px-4 py-3.5 text-right">
@@ -393,7 +393,7 @@ const PersonnelTable = () => {
                           type="button"
                           onClick={() => handleOpenHistory(p)}
                           title="View History"
-                          className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                          className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all dark:text-slate-500 dark:hover:text-indigo-400 dark:hover:bg-indigo-500/10"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <circle cx="12" cy="12" r="10" />
@@ -404,7 +404,7 @@ const PersonnelTable = () => {
                           type="button"
                           onClick={() => handleOpenEdit(p)}
                           title="Edit"
-                          className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
+                          className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all dark:text-slate-500 dark:hover:text-amber-400 dark:hover:bg-amber-500/10"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
@@ -415,7 +415,7 @@ const PersonnelTable = () => {
                           type="button"
                           onClick={() => handleOpenDelete(p)}
                           title="Delete"
-                          className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                          className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all dark:text-slate-500 dark:hover:text-rose-400 dark:hover:bg-rose-500/10"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M3 6h18" />
@@ -431,7 +431,7 @@ const PersonnelTable = () => {
             </tbody>
           </table>
         </div>
-        <div className="border-t border-slate-200">
+        <div className="border-t border-slate-200 dark:border-slate-800">
           <Pagination
             currentPage={safePage}
             totalPages={totalPages}
@@ -454,40 +454,40 @@ const PersonnelTable = () => {
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">First Name *</label>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 dark:text-slate-400">First Name *</label>
               <input
                 value={formData.first_name}
                 onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                 placeholder="First name"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Middle Name</label>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 dark:text-slate-400">Middle Name</label>
               <input
                 value={formData.middle_name}
                 onChange={(e) => setFormData({ ...formData, middle_name: e.target.value })}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                 placeholder="Middle name"
               />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Last Name *</label>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 dark:text-slate-400">Last Name *</label>
               <input
                 value={formData.last_name}
                 onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                 placeholder="Last name"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Suffix</label>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 dark:text-slate-400">Suffix</label>
               <input
                 value={formData.suffix}
                 onChange={(e) => setFormData({ ...formData, suffix: e.target.value })}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                 placeholder="Jr., Sr., III, etc."
               />
             </div>
@@ -519,14 +519,14 @@ const PersonnelTable = () => {
             <button
               onClick={() => { setShowAddModal(false); setShowEditModal(false); setEditTarget(null); }}
               disabled={isSubmitting}
-              className="flex-1 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-xl transition-all disabled:opacity-30"
+              className="flex-1 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-xl transition-all disabled:opacity-30 dark:text-slate-500 dark:hover:text-slate-300 dark:hover:bg-slate-800/50"
             >
               Cancel
             </button>
             <button
               onClick={showEditModal ? handleEdit : handleAdd}
               disabled={isSubmitting}
-              className="flex-1 px-4 py-3 text-xs font-bold uppercase tracking-widest text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg shadow-indigo-100 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-3 text-xs font-bold uppercase tracking-widest text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg shadow-indigo-100 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed dark:shadow-none"
             >
               {isSubmitting ? (
                 <span className="inline-flex items-center gap-2">
@@ -551,44 +551,44 @@ const PersonnelTable = () => {
         maxWidth="3xl"
       >
         {historyLoading ? (
-          <div className="py-12 text-center text-sm text-slate-400 animate-pulse">Loading history...</div>
+          <div className="py-12 text-center text-sm text-slate-400 animate-pulse dark:text-slate-500">Loading history...</div>
         ) : (
           <div className="space-y-6">
             {/* Job Orders */}
             <div>
-              <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-500">
+              <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider mb-3 flex items-center gap-2 dark:text-slate-200">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-500 dark:text-indigo-400">
                   <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
                   <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
                 </svg>
                 Job Orders ({history.jobOrders.length})
               </h3>
               {history.jobOrders.length === 0 ? (
-                <p className="text-sm text-slate-400 italic">No job order assignments yet.</p>
+                <p className="text-sm text-slate-400 italic dark:text-slate-500">No job order assignments yet.</p>
               ) : (
-                <div className="overflow-x-auto border border-slate-200 rounded-lg">
-                  <table className="min-w-full divide-y divide-slate-200">
-                    <thead className="bg-slate-50">
+                <div className="overflow-x-auto border border-slate-200 rounded-lg dark:border-slate-800">
+                  <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+                    <thead className="bg-slate-50 dark:bg-slate-800">
                       <tr>
-                        <th className="px-3 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Date</th>
-                        <th className="px-3 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Unit</th>
-                        <th className="px-3 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Work</th>
-                        <th className="px-3 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
+                        <th className="px-3 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Date</th>
+                        <th className="px-3 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Unit</th>
+                        <th className="px-3 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Work</th>
+                        <th className="px-3 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                       {history.jobOrders.map((jo) => {
                         const unit = jo.job_order?.job_request?.unit;
                         return (
-                          <tr key={jo.id} className="hover:bg-slate-50">
-                            <td className="px-3 py-2.5 text-xs text-slate-600 whitespace-nowrap">{formatDate(jo.assigned_date)}</td>
-                            <td className="px-3 py-2.5 text-xs font-medium text-slate-700 whitespace-nowrap">{unit ? `${unit.unit_name} (${unit.unit_acronym})` : "—"}</td>
-                            <td className="px-3 py-2.5 text-xs text-slate-600 max-w-[200px] truncate">{jo.job_order?.job_request?.specific_work || "—"}</td>
+                          <tr key={jo.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td className="px-3 py-2.5 text-xs text-slate-600 whitespace-nowrap dark:text-slate-300">{formatDate(jo.assigned_date)}</td>
+                            <td className="px-3 py-2.5 text-xs font-medium text-slate-700 whitespace-nowrap dark:text-slate-200">{unit ? `${unit.unit_name} (${unit.unit_acronym})` : "—"}</td>
+                            <td className="px-3 py-2.5 text-xs text-slate-600 max-w-[200px] truncate dark:text-slate-300">{jo.job_order?.job_request?.specific_work || "—"}</td>
                             <td className="px-3 py-2.5">
                               <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border ${
-                                jo.job_order?.status === "Completed" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
-                                jo.job_order?.status === "In Progress" ? "bg-amber-50 text-amber-700 border-amber-200" :
-                                "bg-slate-50 text-slate-600 border-slate-200"
+                                jo.job_order?.status === "Completed" ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30" :
+                                jo.job_order?.status === "In Progress" ? "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30" :
+                                "bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
                               }`}>
                                 {jo.job_order?.status || "—"}
                               </span>
@@ -604,38 +604,38 @@ const PersonnelTable = () => {
 
             {/* Inspections */}
             <div>
-              <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-500">
+              <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider mb-3 flex items-center gap-2 dark:text-slate-200">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-500 dark:text-indigo-400">
                   <circle cx="11" cy="11" r="8" />
                   <path d="m21 21-4.3-4.3" />
                 </svg>
                 Inspections ({history.inspections.length})
               </h3>
               {history.inspections.length === 0 ? (
-                <p className="text-sm text-slate-400 italic">No inspection assignments yet.</p>
+                <p className="text-sm text-slate-400 italic dark:text-slate-500">No inspection assignments yet.</p>
               ) : (
-                <div className="overflow-x-auto border border-slate-200 rounded-lg">
-                  <table className="min-w-full divide-y divide-slate-200">
-                    <thead className="bg-slate-50">
+                <div className="overflow-x-auto border border-slate-200 rounded-lg dark:border-slate-800">
+                  <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+                    <thead className="bg-slate-50 dark:bg-slate-800">
                       <tr>
-                        <th className="px-3 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Date</th>
-                        <th className="px-3 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Unit</th>
-                        <th className="px-3 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Work</th>
-                        <th className="px-3 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
+                        <th className="px-3 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Date</th>
+                        <th className="px-3 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Unit</th>
+                        <th className="px-3 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Work</th>
+                        <th className="px-3 py-2 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                       {history.inspections.map((insp) => {
                         const unit = insp.inspection?.job_request?.unit;
                         return (
-                          <tr key={insp.id} className="hover:bg-slate-50">
-                            <td className="px-3 py-2.5 text-xs text-slate-600 whitespace-nowrap">{formatDate(insp.inspection?.inspection_date)}</td>
-                            <td className="px-3 py-2.5 text-xs font-medium text-slate-700 whitespace-nowrap">{unit ? `${unit.unit_name} (${unit.unit_acronym})` : "—"}</td>
-                            <td className="px-3 py-2.5 text-xs text-slate-600 max-w-[200px] truncate">{insp.inspection?.job_request?.specific_work || "—"}</td>
+                          <tr key={insp.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td className="px-3 py-2.5 text-xs text-slate-600 whitespace-nowrap dark:text-slate-300">{formatDate(insp.inspection?.inspection_date)}</td>
+                            <td className="px-3 py-2.5 text-xs font-medium text-slate-700 whitespace-nowrap dark:text-slate-200">{unit ? `${unit.unit_name} (${unit.unit_acronym})` : "—"}</td>
+                            <td className="px-3 py-2.5 text-xs text-slate-600 max-w-[200px] truncate dark:text-slate-300">{insp.inspection?.job_request?.specific_work || "—"}</td>
                             <td className="px-3 py-2.5">
                               <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border ${
-                                insp.inspection?.status === "Completed" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
-                                "bg-amber-50 text-amber-700 border-amber-200"
+                                insp.inspection?.status === "Completed" ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30" :
+                                "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30"
                               }`}>
                                 {insp.inspection?.status || "—"}
                               </span>

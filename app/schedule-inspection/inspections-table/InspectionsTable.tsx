@@ -69,11 +69,11 @@ const fullName = (p: Personnel) =>
 const statusPill = (status: string | null) => {
   const value = status ?? "Under Review";
   const classes: Record<string, string> = {
-    Completed: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    "Under Review": "bg-amber-50 text-amber-700 border-amber-200",
+    Completed: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30",
+    "Under Review": "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30",
   };
   return (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide whitespace-nowrap border ${classes[value] ?? "bg-slate-50 text-slate-600 border-slate-200"}`}>
+    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide whitespace-nowrap border ${classes[value] ?? "bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"}`}>
       {value}
     </span>
   );
@@ -250,11 +250,11 @@ const InspectionsTable = () => {
       {/* Header + filters */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-slate-800">Inspections</h1>
-          <p className="text-sm text-slate-400 mt-0.5">Monitor all inspections and their status</p>
+          <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">Inspections</h1>
+          <p className="text-sm text-slate-400 mt-0.5 dark:text-slate-500">Monitor all inspections and their status</p>
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-bold bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
+        <div className="flex items-center gap-2 text-xs font-bold bg-white border border-slate-200 rounded-xl p-1 shadow-sm dark:bg-slate-900 dark:border-slate-800">
           {STATUS_TABS.map((tab) => {
             const count =
               tab === "All"
@@ -265,7 +265,7 @@ const InspectionsTable = () => {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`px-3 py-1.5 rounded-lg transition-all ${
-                  activeTab === tab ? "bg-indigo-600 text-white shadow-sm" : "text-slate-500 hover:text-slate-700"
+                  activeTab === tab ? "bg-indigo-600 text-white shadow-sm" : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
                 }`}
               >
                 {tab} <span className="opacity-60">({count})</span>
@@ -276,45 +276,45 @@ const InspectionsTable = () => {
       </div>
 
       {/* Search */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 dark:bg-slate-900 dark:border-slate-800">
         <div className="relative">
-          <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by unit, field of work, specific work, or inspector..."
-            className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+            className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
           />
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden dark:bg-slate-900 dark:border-slate-800">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200">
-            <thead className="bg-slate-50">
+          <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+            <thead className="bg-slate-50 dark:bg-slate-800">
               <tr>
-                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Date Inspected</th>
-                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Section / Unit</th>
-                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Field of Work</th>
-                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Specific Work</th>
-                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Inspectors</th>
-                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
-                <th className="px-4 py-3 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest">Action</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Date Inspected</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Section / Unit</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Field of Work</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Specific Work</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Inspectors</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Status</th>
+                <th className="px-4 py-3 text-right text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-sm text-slate-400 animate-pulse">Loading inspections...</td>
+                  <td colSpan={7} className="px-4 py-12 text-center text-sm text-slate-400 animate-pulse dark:text-slate-500">Loading inspections...</td>
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-4 py-12 text-center">
-                    <p className="text-sm font-semibold text-slate-500">No inspections found</p>
-                    <p className="text-xs text-slate-400 mt-1">Assigned inspections will appear here once scheduled.</p>
+                    <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">No inspections found</p>
+                    <p className="text-xs text-slate-400 mt-1 dark:text-slate-500">Assigned inspections will appear here once scheduled.</p>
                   </td>
                 </tr>
               ) : (
@@ -323,20 +323,20 @@ const InspectionsTable = () => {
                   const unitName = unit ? `${unit.unit_name}${unit.unit_acronym ? ` (${unit.unit_acronym})` : ""}` : "—";
                   const inspectors = insp.personnels ?? [];
                   return (
-                    <tr key={insp.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-4 py-3.5 text-sm text-slate-700 whitespace-nowrap">{formatDate(insp.inspection_date)}</td>
-                      <td className="px-4 py-3.5 text-sm font-semibold text-slate-800">{unitName}</td>
-                      <td className="px-4 py-3.5 text-sm text-slate-600">{insp.job_request?.field_work || "—"}</td>
-                      <td className="px-4 py-3.5 text-sm text-slate-600 max-w-[240px]">
+                    <tr key={insp.id} className="hover:bg-slate-50 transition-colors dark:hover:bg-slate-800/50">
+                      <td className="px-4 py-3.5 text-sm text-slate-700 whitespace-nowrap dark:text-slate-200">{formatDate(insp.inspection_date)}</td>
+                      <td className="px-4 py-3.5 text-sm font-semibold text-slate-800 dark:text-slate-100">{unitName}</td>
+                      <td className="px-4 py-3.5 text-sm text-slate-600 dark:text-slate-300">{insp.job_request?.field_work || "—"}</td>
+                      <td className="px-4 py-3.5 text-sm text-slate-600 max-w-[240px] dark:text-slate-300">
                         <span className="line-clamp-2">{insp.job_request?.specific_work || "—"}</span>
                       </td>
                       <td className="px-4 py-3.5">
                         {inspectors.length === 0 ? (
-                          <span className="text-sm text-slate-400">—</span>
+                          <span className="text-sm text-slate-400 dark:text-slate-500">—</span>
                         ) : (
                           <div className="flex flex-wrap gap-1">
                             {inspectors.map((p) => (
-                              <span key={p.id} className="inline-flex items-center px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-[11px] font-semibold">
+                              <span key={p.id} className="inline-flex items-center px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-[11px] font-semibold dark:bg-indigo-500/15 dark:text-indigo-300">
                                 {fullName(p)}
                               </span>
                             ))}
@@ -350,7 +350,7 @@ const InspectionsTable = () => {
                             <button
                               type="button"
                               onClick={() => handleOpenResults(insp)}
-                              className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-lg transition-all whitespace-nowrap"
+                              className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-lg transition-all whitespace-nowrap dark:text-indigo-300 dark:hover:text-indigo-200 dark:bg-indigo-500/15 dark:hover:bg-indigo-500/25"
                             >
                               Submit Results
                             </button>
@@ -359,7 +359,7 @@ const InspectionsTable = () => {
                             type="button"
                             onClick={() => handlePrint(insp)}
                             title="Print inspection report"
-                            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all"
+                            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all dark:text-slate-500 dark:hover:text-indigo-400 dark:hover:bg-indigo-500/10"
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <path d="M6 9V2h12v7" />
@@ -376,7 +376,7 @@ const InspectionsTable = () => {
             </tbody>
           </table>
         </div>
-        <div className="border-t border-slate-200">
+        <div className="border-t border-slate-200 dark:border-slate-800">
           <Pagination
             currentPage={safePage}
             totalPages={totalPages}

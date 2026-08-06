@@ -47,26 +47,26 @@ export default function Modal({ isOpen, onClose, title, subtitle, children, maxW
     >
       {/* Modal Box: Refined rounded corners and shadow */}
       <div
-        className={`relative w-full ${maxWidthClass} max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-2xl bg-white shadow-2xl animate-in fade-in zoom-in duration-200`}
+        className={`relative w-full ${maxWidthClass} max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-2xl bg-white dark:bg-slate-900 shadow-2xl animate-in fade-in zoom-in duration-200`}
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
       >
         {/* Header: Matching your form/table headers */}
-        <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10">
+        <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900 sticky top-0 z-10">
           <div>
             {title && (
-              <h2 className="text-lg font-bold text-slate-800 leading-tight">
+              <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 leading-tight">
                 {title}
               </h2>
             )}
             {subtitle && (
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+              <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-0.5">
                 {subtitle}
               </p>
             )}
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-all active:scale-90"
+            className="p-2 rounded-full text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-600 dark:hover:text-slate-300 transition-all active:scale-90"
             aria-label="Close modal"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -76,7 +76,7 @@ export default function Modal({ isOpen, onClose, title, subtitle, children, maxW
         </div>
 
         {/* Content Area: Consistent padding with your sections */}
-        <div className="p-6 text-slate-600">
+        <div className="p-6 text-slate-600 dark:text-slate-300">
           {children}
         </div>
         

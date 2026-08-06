@@ -174,14 +174,14 @@ const AccomplishmentReportInner = () => {
   return (
     <div className="space-y-4 print:space-y-0">
       {/* Filter toolbar */}
-      <div className="no-print bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-wrap items-end justify-between gap-3">
+      <div className="no-print bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-wrap items-end justify-between gap-3 dark:bg-slate-900 dark:border-slate-800">
         <div className="flex flex-wrap items-end gap-4">
           {/* Report type */}
           <div>
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 dark:text-slate-500">
               Report Type
             </label>
-            <div className="flex rounded-lg border border-slate-200 p-0.5 bg-slate-50">
+            <div className="flex rounded-lg border border-slate-200 p-0.5 bg-slate-50 dark:border-slate-700 dark:bg-slate-800">
               {(
                 [
                   { value: "job-order", label: "Job Order" },
@@ -194,7 +194,7 @@ const AccomplishmentReportInner = () => {
                   className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
                     reportType === type.value
                       ? "bg-indigo-600 text-white shadow-sm"
-                      : "text-slate-500 hover:text-slate-700"
+                      : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
                   }`}
                 >
                   {type.label}
@@ -205,13 +205,13 @@ const AccomplishmentReportInner = () => {
 
           {/* Field of work */}
           <div>
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 dark:text-slate-500">
               Field of Work
             </label>
             <select
               value={selectedField}
               onChange={(e) => setSelectedField(e.target.value)}
-              className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+              className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
             >
               {FIELD_WORK_OPTIONS.map((field) => {
                 const count = fieldCounts[field] ?? 0;
@@ -226,7 +226,7 @@ const AccomplishmentReportInner = () => {
 
           {/* Month */}
           <div>
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 dark:text-slate-500">
               Month
             </label>
             <select
@@ -234,7 +234,7 @@ const AccomplishmentReportInner = () => {
               onChange={(e) =>
                 setFilterMonth(e.target.value === "" ? "" : Number(e.target.value))
               }
-              className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+              className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
             >
               <option value="">All Months</option>
               {MONTHS.map((m) => (
@@ -247,7 +247,7 @@ const AccomplishmentReportInner = () => {
 
           {/* Year */}
           <div>
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 dark:text-slate-500">
               Year
             </label>
             <select
@@ -255,7 +255,7 @@ const AccomplishmentReportInner = () => {
               onChange={(e) =>
                 setFilterYear(e.target.value === "" ? "" : Number(e.target.value))
               }
-              className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+              className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
             >
               <option value="">All Years</option>
               {availableYears.map((y) => (
@@ -267,7 +267,7 @@ const AccomplishmentReportInner = () => {
           </div>
         </div>
 
-        <div className="text-xs text-slate-400 font-medium pb-2">
+        <div className="text-xs text-slate-400 font-medium pb-2 dark:text-slate-500">
           {reportType === "job-order"
             ? `${activeDataCount} completed job order(s)`
             : `${activeDataCount} job request(s)`}
@@ -277,16 +277,16 @@ const AccomplishmentReportInner = () => {
       {/* Report Content */}
       <div className="overflow-x-auto pb-20 print:overflow-visible print:p-0">
         {loading ? (
-          <div className="p-8 animate-pulse space-y-6 bg-white rounded-xl shadow-sm border border-slate-200">
-            <div className="h-8 w-1/3 bg-slate-200 rounded" />
-            <div className="h-64 bg-slate-200 rounded-xl" />
+          <div className="p-8 animate-pulse space-y-6 bg-white rounded-xl shadow-sm border border-slate-200 dark:bg-slate-900 dark:border-slate-800">
+            <div className="h-8 w-1/3 bg-slate-200 rounded dark:bg-slate-800" />
+            <div className="h-64 bg-slate-200 rounded-xl dark:bg-slate-800" />
           </div>
         ) : activeDataCount === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-16 text-center">
-            <p className="text-slate-700 font-bold text-sm">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-16 text-center dark:bg-slate-900 dark:border-slate-800">
+            <p className="text-slate-700 font-bold text-sm dark:text-slate-200">
               No {reportType === "job-order" ? "job orders" : "job requests"} found
             </p>
-            <p className="text-slate-400 text-xs mt-1">
+            <p className="text-slate-400 text-xs mt-1 dark:text-slate-500">
               Try adjusting the field of work, month, or year filters.
             </p>
           </div>
@@ -311,7 +311,7 @@ const AccomplishmentReportInner = () => {
       {canPrint && (
         <button
           onClick={() => window.print()}
-          className="no-print fixed bottom-6 right-6 z-40 bg-indigo-600 hover:bg-indigo-700 text-white pl-4 pr-5 py-3 rounded-full shadow-xl shadow-indigo-200 flex items-center gap-2 text-sm font-bold transition-all"
+          className="no-print fixed bottom-6 right-6 z-40 bg-indigo-600 hover:bg-indigo-700 text-white pl-4 pr-5 py-3 rounded-full shadow-xl shadow-indigo-200 flex items-center gap-2 text-sm font-bold transition-all dark:shadow-none"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M6 9V2h12v7" />

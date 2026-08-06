@@ -81,11 +81,11 @@ export const CreateJobOrderModal = ({ open, request, prRisId, onClose }: Props) 
       >
         <CreateJobOrderFields request={request} personnelList={personnelList} form={form} onChange={setForm} />
 
-        <div className="flex items-center justify-between pt-6 mt-6 border-t border-slate-100">
+        <div className="flex items-center justify-between pt-6 mt-6 border-t border-slate-100 dark:border-slate-800">
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 font-semibold text-sm transition-colors"
+            className="text-slate-400 hover:text-slate-600 font-semibold text-sm transition-colors dark:text-slate-500 dark:hover:text-slate-300"
           >
             ← Back
           </button>
@@ -93,7 +93,7 @@ export const CreateJobOrderModal = ({ open, request, prRisId, onClose }: Props) 
             type="button"
             disabled={isSubmitting || !form.jobOrderNo || !form.specificWorkOrder.trim()}
             onClick={() => setShowConfirm(true)}
-            className="px-8 py-3 text-xs font-bold uppercase tracking-widest text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl shadow-lg shadow-indigo-200 transition-all active:scale-[0.98]"
+            className="px-8 py-3 text-xs font-bold uppercase tracking-widest text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl shadow-lg shadow-indigo-200 transition-all active:scale-[0.98] dark:shadow-none"
           >
             Process Order
           </button>

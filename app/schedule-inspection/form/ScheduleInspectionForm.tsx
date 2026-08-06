@@ -193,16 +193,16 @@ const ScheduleInspectionForm = () => {
   };
 
 
-  if (!requestData) return <div className="p-8 text-center text-slate-400">Loading...</div>;
+  if (!requestData) return <div className="p-8 text-center text-slate-400 dark:text-slate-500">Loading...</div>;
 
   return (
     <div className="min-h-screen bg-[#f8f9ff] py-12 px-4">
-      <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden dark:bg-slate-900 dark:border-slate-700">
         
         {/* Header - UPDATED: Removed subtitle */}
-        <div className="px-8 py-6 border-b border-slate-100 bg-white flex justify-between items-start">
+        <div className="px-8 py-6 border-b border-slate-100 bg-white flex justify-between items-start dark:border-slate-800 dark:bg-slate-900">
           <div>
-            <h1 className="text-xl font-bold text-slate-800">Schedule Inspection Form</h1>
+            <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">Schedule Inspection Form</h1>
           </div>
         </div>
 
@@ -212,14 +212,14 @@ const ScheduleInspectionForm = () => {
           <div className="space-y-6">   
             {/* Personnel */}
             <div className="space-y-4">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 dark:text-slate-500">
                 Personnel <span className="text-red-400">*</span>
               </label>
 
               {/* Filtered by field_work */}
-              <div className="border border-slate-200 rounded-xl overflow-hidden">
+              <div className="border border-slate-200 rounded-xl overflow-hidden dark:border-slate-700">
               {displayPersonnel.length === 0 ? (
-                <div className="px-4 py-6 text-center text-sm text-slate-400">
+                <div className="px-4 py-6 text-center text-sm text-slate-400 dark:text-slate-500">
                   No personnel available for <span className="font-semibold">{requestData?.field_work}</span>
                 </div>
               ) : (
@@ -240,29 +240,29 @@ const ScheduleInspectionForm = () => {
                         }));
                       }}
                       className={`flex items-center justify-between px-4 py-3 cursor-pointer transition-all
-                        ${index !== 0 ? 'border-t border-slate-100' : ''}
+                        ${index !== 0 ? 'border-t border-slate-100 dark:border-slate-800' : ''}
                         ${isSelected
-                          ? 'bg-indigo-50 text-indigo-700'
-                          : 'bg-white text-slate-600 hover:bg-slate-50'
+                          ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300'
+                          : 'bg-white text-slate-600 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/50'
                         }`}
                     >
                       <div className="flex items-center gap-3">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
-                          ${isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                          ${isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500'}`}>
                           {person.first_name[0]}{person.last_name[0]}
                         </div>
                         <div>
                           <span className="text-sm font-medium">{fullName}</span>
                           {/* Badge to indicate this person is from assist */}
                           {isAssist && (
-                            <span className="ml-2 text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full">
+                            <span className="ml-2 text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full dark:bg-amber-500/15 dark:text-amber-300">
                               Assist
                             </span>
                           )}
                         </div>
                       </div>
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all
-                        ${isSelected ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300'}`}>
+                        ${isSelected ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300 dark:border-slate-700'}`}>
                         {isSelected && (
                           <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -283,8 +283,8 @@ const ScheduleInspectionForm = () => {
               )}
 
               {/* Add person to assist */}
-              <div className="border-t border-slate-100 pt-4">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+              <div className="border-t border-slate-100 pt-4 dark:border-slate-800">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 dark:text-slate-500">
                   Add Person to Assist
                 </label>
                 <div className="relative">
@@ -298,7 +298,7 @@ const ScheduleInspectionForm = () => {
                       }));
                       e.target.value = ""; // reset after selection
                     }}
-                    className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer"
+                    className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300"
                   >
                     <option value="">Select a person to assist...</option>
                     {personnelList
@@ -313,7 +313,7 @@ const ScheduleInspectionForm = () => {
                       ))
                     }
                   </select>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">▼</div>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 dark:text-slate-500">▼</div>
                 </div>
               </div>
 
@@ -321,11 +321,11 @@ const ScheduleInspectionForm = () => {
                      </div>
 
           {/* Action Buttons */}
-          <div className="pt-8 border-t border-slate-100 flex items-center justify-between">
+          <div className="pt-8 border-t border-slate-100 flex items-center justify-between dark:border-slate-800">
             <button
                 type="button"
                 onClick={() => router.back()}
-                className="text-slate-400 hover:text-slate-600 font-semibold text-sm transition-colors flex items-center gap-2"
+                className="text-slate-400 hover:text-slate-600 font-semibold text-sm transition-colors flex items-center gap-2 dark:text-slate-500 dark:hover:text-slate-300"
             >
                 ← Back to Request List
             </button>
@@ -333,13 +333,13 @@ const ScheduleInspectionForm = () => {
             <div className="flex gap-3">
                 <button
                 type="button"
-                className="px-5 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-all"
+                className="px-5 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-all dark:text-slate-500 dark:hover:text-slate-300 dark:hover:bg-slate-800/50"
                 >
                 Print Preview
                 </button>
                 <button
                 type="submit"
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2.5 rounded-lg text-sm font-bold shadow-md shadow-indigo-100 transition-all active:scale-95"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2.5 rounded-lg text-sm font-bold shadow-md shadow-indigo-100 transition-all active:scale-95 dark:shadow-none"
                 >
                 Process Order
                 </button>

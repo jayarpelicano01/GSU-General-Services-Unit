@@ -51,7 +51,7 @@ export const ScheduleInspectionModal = ({
         <div className="space-y-6">
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-[0.15em] mb-2">
+            <label className="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em] mb-2">
               Inspection Date <span className="text-red-400">*</span>
             </label>
             <input
@@ -59,18 +59,18 @@ export const ScheduleInspectionModal = ({
               value={inspectionForm.scheduledDate}
               min={new Date().toISOString().split('T')[0]}
               onChange={(e) => onFormChange({ ...inspectionForm, scheduledDate: e.target.value })}
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer"
+              className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-200 font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer"
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-[0.15em] mb-2">
+            <label className="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em] mb-2">
               Personnel <span className="text-red-400">*</span>
             </label>
 
-            <div className="border border-slate-200 rounded-xl overflow-hidden">
+            <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
               {displayPersonnel.length === 0 ? (
-                <div className="px-4 py-6 text-center text-sm text-slate-400">
+                <div className="px-4 py-6 text-center text-sm text-slate-400 dark:text-slate-500">
                   No personnel available for <span className="font-semibold">{inspectionTarget?.field_work}</span>
                 </div>
               ) : (
@@ -84,25 +84,25 @@ export const ScheduleInspectionModal = ({
                       key={person.id}
                       onClick={() => togglePersonnel(String(person.id), isSelected)}
                       className={`flex items-center justify-between px-4 py-3 cursor-pointer transition-all
-                        ${index !== 0 ? 'border-t border-slate-100' : ''}
-                        ${isSelected ? 'bg-indigo-50 text-indigo-700' : 'bg-white text-slate-600 hover:bg-slate-50'}`}
+                        ${index !== 0 ? 'border-t border-slate-100 dark:border-slate-800' : ''}
+                        ${isSelected ? 'bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}
                     >
                       <div className="flex items-center gap-3">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
-                          ${isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                          ${isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'}`}>
                           {person.first_name[0]}{person.last_name[0]}
                         </div>
                         <div>
                           <span className="text-sm font-medium">{fullName}</span>
                           {isAssist && (
-                            <span className="ml-2 text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full">
+                            <span className="ml-2 text-[10px] font-semibold uppercase tracking-wide bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-300 px-1.5 py-0.5 rounded-full">
                               Assist
                             </span>
                           )}
                         </div>
                       </div>
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all
-                        ${isSelected ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300'}`}>
+                        ${isSelected ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300 dark:border-slate-600'}`}>
                         {isSelected && (
                           <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -116,13 +116,13 @@ export const ScheduleInspectionModal = ({
             </div>
 
             {inspectionForm.personnels.length > 0 && (
-              <p className="text-xs text-indigo-500 font-medium mt-2">
+              <p className="text-xs text-indigo-500 dark:text-indigo-400 font-medium mt-2">
                 {inspectionForm.personnels.length} personnel selected
               </p>
             )}
 
-            <div className="pt-4 mt-2 border-t border-slate-100">
-              <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-[0.15em] mb-2">
+            <div className="pt-4 mt-2 border-t border-slate-100 dark:border-slate-800">
+              <label className="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em] mb-2">
                 Add Person to Assist
               </label>
               <div className="relative">
@@ -133,7 +133,7 @@ export const ScheduleInspectionModal = ({
                     onFormChange({ ...inspectionForm, personnels: [...inspectionForm.personnels, id] });
                     e.target.value = '';
                   }}
-                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-600 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer"
+                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-600 dark:text-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer"
                 >
                   <option value="">Select a person to assist...</option>
                   {personnelList
@@ -147,22 +147,22 @@ export const ScheduleInspectionModal = ({
                       </option>
                     ))}
                 </select>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 text-xs">▼</div>
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 dark:text-slate-500 text-xs">▼</div>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 pt-6 border-t border-slate-100">
+          <div className="flex items-center gap-3 pt-6 border-t border-slate-100 dark:border-slate-800">
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 transition-colors"
+              className="flex-1 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={onConfirmOpen}
               disabled={isSubmitting || !inspectionForm.scheduledDate || inspectionForm.personnels.length === 0}
-              className="flex-2 px-6 py-3 text-xs font-bold uppercase tracking-widest text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl shadow-lg shadow-indigo-200 transition-all active:scale-[0.98]"
+              className="flex-2 px-6 py-3 text-xs font-bold uppercase tracking-widest text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none transition-all active:scale-[0.98]"
             >
               {isSubmitting ? 'Scheduling...' : 'Confirm Schedule'}
             </button>

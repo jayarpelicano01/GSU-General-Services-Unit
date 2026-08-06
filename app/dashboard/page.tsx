@@ -43,8 +43,8 @@ const UnitMonthlyTrend = lazy(() =>
 
 function ChartFallback() {
   return (
-    <Card className="rounded-xl shadow-sm border border-slate-200">
-      <CardContent className="h-72 flex items-center justify-center text-slate-400 text-sm">
+    <Card className="rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 dark:bg-slate-900">
+      <CardContent className="h-72 flex items-center justify-center text-slate-400 dark:text-slate-500 text-sm">
         Loading chart...
       </CardContent>
     </Card>
@@ -52,15 +52,15 @@ function ChartFallback() {
 }
 
 const statusColors: Record<string, string> = {
-  Pending: "bg-amber-100 text-amber-800",
-  "Under Inspection": "bg-indigo-100 text-indigo-800",
-  Approved: "bg-emerald-100 text-emerald-800",
-  "Awaiting Materials": "bg-blue-100 text-blue-800",
-  Disapproved: "bg-rose-100 text-rose-800",
-  Cancelled: "bg-slate-100 text-slate-800",
-  Assigned: "bg-blue-100 text-blue-800",
-  Ongoing: "bg-emerald-100 text-emerald-800",
-  Completed: "bg-emerald-100 text-emerald-800",
+  Pending: "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300",
+  "Under Inspection": "bg-indigo-100 text-indigo-800 dark:bg-indigo-500/15 dark:text-indigo-300",
+  Approved: "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300",
+  "Awaiting Materials": "bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-300",
+  Disapproved: "bg-rose-100 text-rose-800 dark:bg-rose-500/15 dark:text-rose-300",
+  Cancelled: "bg-slate-100 text-slate-800 dark:bg-slate-700/40 dark:text-slate-300",
+  Assigned: "bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-300",
+  Ongoing: "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300",
+  Completed: "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300",
 }
 
 const statusDotColors: Record<string, string> = {
@@ -80,7 +80,7 @@ function StatusBadge({ status }: { status: string }) {
     <span
       className={cn(
         "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
-        statusColors[status] || "bg-slate-100 text-slate-800"
+        statusColors[status] || "bg-slate-100 text-slate-800 dark:bg-slate-700/40 dark:text-slate-300"
       )}
     >
       <span className={cn("w-1.5 h-1.5 rounded-full", statusDotColors[status] || "bg-slate-400")} />
@@ -189,10 +189,10 @@ function StatCard({
   valueSuffix?: string
 }) {
   return (
-    <Card className="rounded-xl shadow-sm border border-slate-200">
+    <Card className="group rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 dark:bg-slate-900 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
       <CardContent className="p-5">
         <div className="flex items-start justify-between">
-          <div className={cn("rounded-full p-3", bgColor)}>
+          <div className={cn("rounded-full p-3 transition-transform duration-200 group-hover:scale-105", bgColor)}>
             <Icon className={cn("w-6 h-6", textColor)} aria-hidden="true" />
           </div>
           <span
@@ -207,11 +207,11 @@ function StatCard({
           </span>
         </div>
         <div className="mt-3">
-          <p className="text-3xl font-extrabold text-slate-900">
+          <p className="text-3xl font-extrabold text-slate-900 dark:text-slate-100">
             {value.toLocaleString()}
-            {valueSuffix ? <span className="ml-1 text-base font-semibold text-slate-400">{valueSuffix}</span> : null}
+            {valueSuffix ? <span className="ml-1 text-base font-semibold text-slate-400 dark:text-slate-500">{valueSuffix}</span> : null}
           </p>
-          <p className="text-sm font-medium text-slate-500 mt-1">{name}</p>
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">{name}</p>
         </div>
       </CardContent>
     </Card>
@@ -220,16 +220,16 @@ function StatCard({
 
 function EmptyChartCard({ title, description }: { title: string; description: string }) {
   return (
-    <Card className="rounded-xl shadow-sm border border-slate-200">
+    <Card className="rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 dark:bg-slate-900">
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
-          <Activity className="w-5 h-5 text-indigo-600" />
+          <Activity className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
           {title}
         </CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="h-72 flex items-center justify-center text-slate-400 text-sm">
+        <div className="h-72 flex items-center justify-center text-slate-400 dark:text-slate-500 text-sm">
           No data available
         </div>
       </CardContent>
@@ -414,13 +414,13 @@ function DashboardContent() {
   if (error) {
     return (
       <div className="max-w-7xl mx-auto">
-        <Card className="rounded-xl shadow-sm border border-slate-200">
+        <Card className="rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 dark:bg-slate-900">
           <CardContent className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="rounded-full bg-rose-50 p-4 mb-4">
+            <div className="rounded-full bg-rose-50 dark:bg-rose-500/15 p-4 mb-4">
               <Activity className="w-8 h-8 text-rose-500" aria-hidden="true" />
             </div>
-            <h2 className="text-lg font-bold text-slate-900">Unable to load dashboard</h2>
-            <p className="text-sm text-slate-500 mt-1 max-w-sm">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Unable to load dashboard</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-sm">
               Something went wrong while fetching your dashboard data. Please try again.
             </p>
             <Button className="mt-6" onClick={() => { setLoading(true); fetchDashboardData() }}>
@@ -507,10 +507,10 @@ function DashboardContent() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900">
+          <h1 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">
             {getGreeting()}, {getFirstName(user)}
           </h1>
-          <p className="text-slate-500 mt-1">{getRoleLabel(user)}</p>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">{getRoleLabel(user)}</p>
         </div>
         {!isGsuStaff && (
           <Button onClick={() => setNewRequestOpen(true)}>
@@ -582,7 +582,7 @@ function DashboardContent() {
 
       {/* Recent Requests */}
       <div className="grid grid-cols-1 gap-6">
-        <Card className="rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <Card className="rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 dark:bg-slate-900 overflow-hidden">
           <div className="" />
           <CardHeader className="flex flex-row items-start justify-between px-6 pt-5 pb-4">
             <div className="flex items-start gap-3">
@@ -591,7 +591,7 @@ function DashboardContent() {
                 <CardDescription>{recentRequestsDescription}</CardDescription>
               </div>
             </div>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-semibold">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-xs font-semibold">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
@@ -601,8 +601,8 @@ function DashboardContent() {
           </CardHeader>
           <CardContent className="p-0">
             {recentRequests.length === 0 ? (
-              <div className="p-6 text-center text-slate-500">
-                <FileText className="w-12 h-12 mx-auto text-slate-300 mb-3" />
+              <div className="p-6 text-center text-slate-500 dark:text-slate-400">
+                <FileText className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
                 <p>No job requests yet</p>
                 {!isGsuStaff && (
                   <Button className="mt-4" onClick={() => setNewRequestOpen(true)}>
@@ -624,25 +624,25 @@ function DashboardContent() {
                   </TableHeader>
                   <TableBody>
                     {recentRequests.map((request) => (
-                      <TableRow key={request.id} className="hover:bg-slate-50/70 border-slate-100">
+                      <TableRow key={request.id} className="hover:bg-slate-50/70 border-slate-100 dark:border-slate-800 dark:hover:bg-slate-800/50">
                         <TableCell className="py-3.5">
-                          <span className="inline-flex font-mono text-xs font-semibold text-slate-500 bg-slate-100 rounded-md px-2 py-1 tabular-nums">
+                          <span className="inline-flex font-mono text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 rounded-md px-2 py-1 tabular-nums">
                             #{request.id.toString().padStart(3, "0")}
                           </span>
                         </TableCell>
                         <TableCell className="py-3.5">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500/10 to-violet-500/10 border border-indigo-100 text-indigo-600 flex items-center justify-center text-[11px] font-bold flex-shrink-0">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500/10 to-violet-500/10 border border-indigo-100 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-[11px] font-bold flex-shrink-0">
                               {request.unit.unit_acronym.slice(0, 1)}
                             </div>
                             <div className="min-w-0">
-                              <div className="font-semibold text-slate-800 leading-tight">{request.unit.unit_acronym}</div>
-                              <div className="text-xs text-slate-400 truncate max-w-[150px]">{request.unit.unit_name}</div>
+                              <div className="font-semibold text-slate-800 dark:text-slate-100 leading-tight">{request.unit.unit_acronym}</div>
+                              <div className="text-xs text-slate-400 dark:text-slate-500 truncate max-w-[150px]">{request.unit.unit_name}</div>
                             </div>
                           </div>
                         </TableCell>
                         <TableCell className="py-3.5">
-                          <span className="inline-flex max-w-[170px] truncate px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 text-xs font-medium">
+                          <span className="inline-flex max-w-[170px] truncate px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-medium">
                             {request.field_work}
                           </span>
                         </TableCell>
@@ -650,15 +650,15 @@ function DashboardContent() {
                           <StatusBadge status={request.status} />
                         </TableCell>
                         <TableCell className="py-3.5 text-right">
-                          <div className="text-sm font-medium text-slate-700 tabular-nums">{format(new Date(request.request_date), "MMM d")}</div>
-                          <div className="text-xs text-slate-400 tabular-nums">{format(new Date(request.request_date), "yyyy")}</div>
+                          <div className="text-sm font-medium text-slate-700 dark:text-slate-200 tabular-nums">{format(new Date(request.request_date), "MMM d")}</div>
+                          <div className="text-xs text-slate-400 dark:text-slate-500 tabular-nums">{format(new Date(request.request_date), "yyyy")}</div>
                         </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
-                <div className="border-t border-slate-100 bg-slate-50/50">
-                  <Button variant="ghost" size="sm" className="w-full justify-center py-2.5 text-indigo-600 hover:text-indigo-700 hover:bg-transparent group" asChild>
+                <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40">
+                  <Button variant="ghost" size="sm" className="w-full justify-center py-2.5 text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 hover:bg-transparent group" asChild>
                     <Link href="/job-request-list">
                       View All Requests
                       <ChevronRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-0.5" />

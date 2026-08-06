@@ -105,10 +105,10 @@ const NewJobRequestModal = ({ isOpen, onClose, onCreated }: Props) => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Requesting Unit */}
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
             Requesting Unit <span className="text-red-400">*</span>
           </label>
-          <div className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-slate-600 font-medium">
+          <div className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-slate-600 dark:text-slate-300 font-medium">
             {selectedUnit
               ? `${selectedUnit.unit_name} ${selectedUnit.unit_acronym ? `(${selectedUnit.unit_acronym})` : ""}`
               : "Your unit"}
@@ -117,10 +117,10 @@ const NewJobRequestModal = ({ isOpen, onClose, onCreated }: Props) => {
 
         {/* Field Work */}
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">
             Field Work Selection <span className="text-red-400">*</span>
           </label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 bg-slate-50/50 p-6 rounded-xl border border-slate-100">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 bg-slate-50/50 dark:bg-slate-800/50 p-6 rounded-xl border border-slate-100 dark:border-slate-800">
             {fieldWorkOptions.map((column) => (
               <div key={column.column} className="space-y-3">
                 {column.items.map((item) => (
@@ -135,11 +135,11 @@ const NewJobRequestModal = ({ isOpen, onClose, onCreated }: Props) => {
                           setFieldWork(fieldWork === item ? "" : item);
                           setError(null);
                         }}
-                        className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-slate-300 checked:border-indigo-600 transition-all"
+                        className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-slate-300 dark:border-slate-600 checked:border-indigo-600 transition-all"
                       />
                       <div className="absolute w-2.5 h-2.5 rounded-full bg-indigo-600 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 transition-opacity" />
                     </div>
-                    <span className="ml-3 text-sm font-medium text-slate-600 group-hover:text-indigo-600 transition-colors leading-snug">
+                    <span className="ml-3 text-sm font-medium text-slate-600 dark:text-slate-300 group-hover:text-indigo-600 transition-colors leading-snug">
                       {item}
                     </span>
                   </label>
@@ -151,7 +151,7 @@ const NewJobRequestModal = ({ isOpen, onClose, onCreated }: Props) => {
 
         {/* Specific Work Description */}
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
             Specific Work Description <span className="text-red-400">*</span>
           </label>
           <textarea
@@ -161,30 +161,30 @@ const NewJobRequestModal = ({ isOpen, onClose, onCreated }: Props) => {
               setSpecificWork(e.target.value);
               setError(null);
             }}
-            className="w-full border border-slate-200 rounded-lg px-4 py-3 text-slate-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
             placeholder="Detailed instructions..."
           />
         </div>
 
         {error && (
-          <div className="px-4 py-3 bg-rose-50 border border-rose-100 rounded-lg text-sm text-rose-700 font-medium">
+          <div className="px-4 py-3 bg-rose-50 dark:bg-rose-500/15 border border-rose-100 dark:border-rose-500/30 rounded-lg text-sm text-rose-700 dark:text-rose-300 font-medium">
             {error}
           </div>
         )}
 
         {/* Action Buttons */}
-        <div className="pt-5 border-t border-slate-100 flex items-center justify-end gap-3">
+        <div className="pt-5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 text-sm font-semibold text-slate-400 hover:text-slate-600 rounded-lg transition-all"
+            className="px-5 py-2.5 text-sm font-semibold text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg transition-all"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2.5 rounded-lg text-sm font-bold shadow-md shadow-indigo-100 transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2.5 rounded-lg text-sm font-bold shadow-md shadow-indigo-100 dark:shadow-none transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
           >
             {isSubmitting ? "Submitting..." : "Submit Request"}
           </button>

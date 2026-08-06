@@ -19,10 +19,13 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  Sun,
+  Moon,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { useAuth } from "@/app/context/AuthContext"
+import { useTheme } from "@/app/context/ThemeContext"
 import { getUserDisplay } from "@/lib/rbac"
 import type { Role } from "@/lib/rbac"
 
@@ -40,6 +43,7 @@ export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const { user, logout } = useAuth()
+  const { theme, toggleTheme } = useTheme()
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -66,14 +70,14 @@ export function Sidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "no-print fixed left-0 top-0 z-50 h-screen bg-white border-r border-slate-200 transition-all duration-300 flex flex-col",
+          "no-print fixed left-0 top-0 z-50 h-screen bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-all duration-300 flex flex-col",
           collapsed ? "w-20" : "w-72",
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
         aria-label="Main navigation"
       >
         {/* Header */}
-        <div className={cn("flex items-center justify-between h-16 px-4 border-b border-slate-200", collapsed && "justify-center")}>
+        <div className={cn("flex items-center justify-between h-16 px-4 border-b border-slate-200 dark:border-slate-800", collapsed && "justify-center")}>
           {!collapsed && (
             <Link href="/dashboard" className="flex items-center gap-3" aria-label="GSU System Home">
               <img
@@ -82,8 +86,8 @@ export function Sidebar() {
                 className="w-9 h-9 object-contain flex-shrink-0"
               />
               <div className="overflow-hidden">
-                <span className="text-lg font-extrabold text-slate-900 truncate block">GSU System</span>
-                <p className="text-[10px] text-slate-400 uppercase tracking-wider truncate">Job Requesting & Ordering</p>
+                <span className="text-lg font-extrabold text-slate-900 dark:text-slate-100 truncate block">GSU System</span>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">Job Requesting & Ordering</p>
               </div>
             </Link>
           )}
@@ -119,8 +123,8 @@ export function Sidebar() {
                   "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
                   collapsed ? "justify-center" : "",
                   isActive
-                    ? "bg-indigo-50 text-indigo-700"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                    ? "bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
                 )}
                 title={collapsed ? item.name : undefined}
                 aria-current={isActive ? "page" : undefined}
@@ -133,30 +137,38 @@ export function Sidebar() {
         </nav>
 
         {/* Footer / User section */}
-        <div className={cn("p-3 border-t border-slate-200", collapsed && "px-2")}>
+        <div className={cn("p-3 border-t border-slate-200 dark:border-slate-800", collapsed && "px-2")}>
           <div className={cn("flex items-center gap-3 px-2 py-2", collapsed && "justify-center")}>
-            <div className="w-9 h-9 rounded-xl bg-indigo-100 flex items-center justify-center flex-shrink-0">
-              <Building2 className="w-5 h-5 text-indigo-600" />
+            <div className="w-9 h-9 rounded-xl bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
+              <Building2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             </div>
             {!collapsed && (
               <div className="flex-1 min-w-0 overflow-hidden">
-                <p className="text-sm font-medium text-slate-900 truncate">{display.name}</p>
-                <p className="text-xs text-slate-500 truncate">{display.subtitle}</p>
+                <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">{display.name}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{display.subtitle}</p>
               </div>
             )}
           </div>
           {!collapsed && (
             <div className="pt-2 space-y-1">
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 transition-colors"
+              >
+                {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+              </button>
               <Link
                 href="/settings"
-                className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 transition-colors"
               >
                 <Settings className="w-5 h-5" />
                 <span>Settings</span>
               </Link>
               <Button
                 variant="ghost"
-                className="w-full justify-start gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                className="w-full justify-start gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
                 onClick={handleLogout}
               >
                 <LogOut className="w-5 h-5" />

@@ -3,6 +3,7 @@ import { DM_Sans } from "next/font/google"
 import "./globals.css"
 import { AuthProvider } from "@/app/context/AuthContext"
 import { ToastProvider } from "@/app/context/ToastContext"
+import { ThemeProvider } from "@/app/context/ThemeContext"
 import { RouteProgress } from "@/app/components/navigation/RouteProgress"
 
 const dmSans = DM_Sans({
@@ -22,12 +23,21 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(localStorage.getItem("gsu-theme")==="dark"){document.documentElement.classList.add("dark");document.documentElement.style.colorScheme="dark"}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className={`${dmSans.variable} antialiased`}>
         <RouteProgress />
-        <AuthProvider>
-          <ToastProvider>{children}</ToastProvider>
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

@@ -83,56 +83,56 @@ const WaitingMaterialsTable = () => {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-slate-800">Waiting for Materials</h1>
-          <p className="text-sm text-slate-400 mt-0.5">
+          <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">Waiting for Materials</h1>
+          <p className="text-sm text-slate-400 mt-0.5 dark:text-slate-500">
             Job requests awaiting materials — {filtered.length} pending
           </p>
         </div>
 
-        <span className="bg-orange-50 text-orange-600 text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-orange-100 whitespace-nowrap">
+        <span className="bg-orange-50 text-orange-600 text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-orange-100 whitespace-nowrap dark:bg-orange-500/15 dark:text-orange-300 dark:border-orange-500/30">
           {filtered.length} Awaiting
         </span>
       </div>
 
       {/* Search */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 dark:bg-slate-900 dark:border-slate-800">
         <div className="relative">
-          <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by ID, unit, field of work, or work description..."
-            className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+            className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
           />
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden dark:bg-slate-900 dark:border-slate-800">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200">
-            <thead className="bg-slate-50">
+          <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+            <thead className="bg-slate-50 dark:bg-slate-800">
               <tr>
-                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Request No.</th>
-                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Section / Unit</th>
-                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Field of Work</th>
-                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Work Description</th>
-                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Date Requested</th>
-                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Request No.</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Section / Unit</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Field of Work</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Work Description</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Date Requested</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center text-sm text-slate-400 animate-pulse">Loading requests...</td>
+                  <td colSpan={6} className="px-4 py-12 text-center text-sm text-slate-400 animate-pulse dark:text-slate-500">Loading requests...</td>
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-4 py-12 text-center">
-                    <p className="text-sm font-semibold text-slate-500">No requests waiting for materials</p>
-                    <p className="text-xs text-slate-400 mt-1">Requests awaiting materials will appear here once the inspection marks them as such.</p>
+                    <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">No requests waiting for materials</p>
+                    <p className="text-xs text-slate-400 mt-1 dark:text-slate-500">Requests awaiting materials will appear here once the inspection marks them as such.</p>
                   </td>
                 </tr>
               ) : (
@@ -140,23 +140,23 @@ const WaitingMaterialsTable = () => {
                   const unit = req.unit;
                   const unitName = unit ? `${unit.unit_name}${unit.unit_acronym ? ` (${unit.unit_acronym})` : ""}` : "—";
                   return (
-                    <tr key={req.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-4 py-3.5 text-sm font-medium text-slate-400 tabular-nums whitespace-nowrap">#{req.id}</td>
+                    <tr key={req.id} className="hover:bg-slate-50 transition-colors dark:hover:bg-slate-800/50">
+                      <td className="px-4 py-3.5 text-sm font-medium text-slate-400 tabular-nums whitespace-nowrap dark:text-slate-500">#{req.id}</td>
                       <td className="px-4 py-3.5">
-                        <div className="text-sm font-semibold text-slate-800">{unitName}</div>
-                        <div className="text-[11px] text-slate-400 mt-0.5">{unit?.location?.location_name}</div>
+                        <div className="text-sm font-semibold text-slate-800 dark:text-slate-100">{unitName}</div>
+                        <div className="text-[11px] text-slate-400 mt-0.5 dark:text-slate-500">{unit?.location?.location_name}</div>
                       </td>
                       <td className="px-4 py-3.5">
-                        <span className="text-slate-600 text-[12px] font-semibold bg-slate-100 px-2.5 py-1 rounded">
+                        <span className="text-slate-600 text-[12px] font-semibold bg-slate-100 px-2.5 py-1 rounded dark:text-slate-300 dark:bg-slate-800">
                           {req.field_work || "—"}
                         </span>
                       </td>
-                      <td className="px-4 py-3.5 text-sm text-slate-600 max-w-[240px]">
+                      <td className="px-4 py-3.5 text-sm text-slate-600 max-w-[240px] dark:text-slate-300">
                         <span className="line-clamp-2">{req.specific_work || "—"}</span>
                       </td>
-                      <td className="px-4 py-3.5 text-sm text-slate-600 whitespace-nowrap">{formatDate(req.request_date)}</td>
+                      <td className="px-4 py-3.5 text-sm text-slate-600 whitespace-nowrap dark:text-slate-300">{formatDate(req.request_date)}</td>
                       <td className="px-4 py-3.5">
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide border bg-orange-50 text-orange-600 border-orange-200">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide border bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-500/15 dark:text-orange-300 dark:border-orange-500/30">
                           Awaiting Materials
                         </span>
                       </td>
@@ -167,7 +167,7 @@ const WaitingMaterialsTable = () => {
             </tbody>
           </table>
         </div>
-        <div className="border-t border-slate-200">
+        <div className="border-t border-slate-200 dark:border-slate-800">
           <Pagination
             currentPage={safePage}
             totalPages={totalPages}

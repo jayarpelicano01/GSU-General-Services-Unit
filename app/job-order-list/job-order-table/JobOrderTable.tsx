@@ -227,23 +227,23 @@ const JobOrderTable = () => {
 
   return (
     
-    <div className="min-h-screen bg-[#f8f9ff] p-4 sm:p-6 lg:p-8">
-        <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div className="min-h-screen bg-[#f8f9ff] p-4 sm:p-6 lg:p-8 dark:bg-slate-950">
+        <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden dark:bg-slate-900 dark:border-slate-800">
 
             <div className="px-4 sm:px-8 pt-6 pb-3 flex items-start sm:items-center justify-between gap-3">
                 <div className="min-w-0">
-                    <h2 className="text-slate-800 text-lg font-extrabold tracking-tight">Job Orders</h2>
-                    <p className="text-slate-400 text-[12px] font-medium mt-0.5">Manage and monitor all job orders</p>
+                    <h2 className="text-slate-800 text-lg font-extrabold tracking-tight dark:text-slate-100">Job Orders</h2>
+                    <p className="text-slate-400 text-[12px] font-medium mt-0.5 dark:text-slate-500">Manage and monitor all job orders</p>
                 </div>
-                <span className="bg-indigo-50 text-indigo-500 text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-indigo-100 whitespace-nowrap shrink-0">
+                <span className="bg-indigo-50 text-indigo-500 text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-indigo-100 whitespace-nowrap shrink-0 dark:bg-indigo-500/15 dark:text-indigo-300 dark:border-indigo-500/30">
                     {filteredOrders.length} {activeTab === 'All Orders' ? 'Total' : activeTab}
                 </span>
             </div>
 
             {/* Search bar */}
-            <div className="px-4 sm:px-8 py-3 border-b border-slate-100">
+            <div className="px-4 sm:px-8 py-3 border-b border-slate-100 dark:border-slate-800">
                 <div className="relative max-w-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                         <circle cx="11" cy="11" r="8" />
                         <path d="M21 21l-4.35-4.35" />
                     </svg>
@@ -252,13 +252,13 @@ const JobOrderTable = () => {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search by JO no., unit, field of work, description, status, or date..."
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 dark:placeholder:text-slate-500"
                     />
                 </div>
             </div>
         
             {/* Navigation Tabs (From Screenshot) */}
-            <div className="flex items-center border-b border-slate-100 px-4 sm:px-8 py-2 gap-5 sm:gap-8 overflow-x-auto">
+            <div className="flex items-center border-b border-slate-100 px-4 sm:px-8 py-2 gap-5 sm:gap-8 overflow-x-auto dark:border-slate-800">
                 {tabs.map((tab) => {
                     const count = tab === 'All Orders'
                         ? orders.length
@@ -269,8 +269,8 @@ const JobOrderTable = () => {
                             key={tab}
                             className={`py-4 text-sm font-medium flex items-center gap-2 whitespace-nowrap ${
                                 activeTab === tab
-                                ? 'text-indigo-600 border-b-2 border-indigo-600'
-                                : 'text-slate-400 hover:text-slate-600'
+                                ? 'text-indigo-600 border-b-2 border-indigo-600 dark:text-indigo-400'
+                                : 'text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300'
                             }`}
                             onClick={() => setActiveTab(tab)}
                         >
@@ -278,8 +278,8 @@ const JobOrderTable = () => {
                             {count > 0 && (
                                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
                                     activeTab === tab
-                                    ? 'bg-indigo-100 text-indigo-600'
-                                    : 'bg-slate-100 text-slate-400'
+                                    ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300'
+                                    : 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500'
                                 }`}>
                                     {count}
                                 </span>
@@ -294,64 +294,64 @@ const JobOrderTable = () => {
             
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="text-slate-400 text-[11px] font-bold uppercase tracking-widest border-b border-slate-100">
+              <tr className="text-slate-400 text-[11px] font-bold uppercase tracking-widest border-b border-slate-100 dark:text-slate-500 dark:border-slate-800">
                 <th className="px-4 sm:px-8 py-5">
-                  <button onClick={() => toggleSort('jo')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors">
+                  <button onClick={() => toggleSort('jo')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors dark:hover:text-indigo-400">
                     JO No. <span className="text-[9px]">{sortIndicator('jo')}</span>
                   </button>
                 </th>
                 <th className="px-4 py-5">
-                  <button onClick={() => toggleSort('unit')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors">
+                  <button onClick={() => toggleSort('unit')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors dark:hover:text-indigo-400">
                     Requesting Unit <span className="text-[9px]">{sortIndicator('unit')}</span>
                   </button>
                 </th>
                 <th className="px-4 py-5">Field of Work</th>
                 <th className="px-4 py-5">Work Description</th>
                 <th className="px-4 py-5 text-center">
-                  <button onClick={() => toggleSort('status')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors">
+                  <button onClick={() => toggleSort('status')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors dark:hover:text-indigo-400">
                     Status <span className="text-[9px]">{sortIndicator('status')}</span>
                   </button>
                 </th>
                 <th className="px-4 sm:px-8 py-5 text-right">
-                  <button onClick={() => toggleSort('date')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors">
+                  <button onClick={() => toggleSort('date')} className="inline-flex items-center gap-1 hover:text-indigo-600 transition-colors dark:hover:text-indigo-400">
                     Date <span className="text-[9px]">{sortIndicator('date')}</span>
                   </button>
                 </th>
                 <th className="px-4 py-5 text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {pagedOrders.map((order) => (
-                <tr key={order.id} className="hover:bg-slate-50/50 transition-colors group">
+                <tr key={order.id} className="hover:bg-slate-50/50 transition-colors group dark:hover:bg-slate-800/50">
                   
                   {/* ID */}
-                  <td className="px-4 sm:px-8 py-6 text-slate-400 text-sm font-medium tabular-nums whitespace-nowrap">
+                  <td className="px-4 sm:px-8 py-6 text-slate-400 text-sm font-medium tabular-nums whitespace-nowrap dark:text-slate-500">
                     #{order.jo_number}
                   </td>
                   
                   {/* Requesting Unit */}
                   <td className="px-4 py-6">
-                    <div className="text-slate-700 font-bold text-sm leading-tight">
+                    <div className="text-slate-700 font-bold text-sm leading-tight dark:text-slate-200">
                       {order.job_request?.unit?.unit_name || 'Unknown Unit'}
                     </div>
-                    <div className="text-slate-400 text-[11px] mt-0.5 font-medium">
+                    <div className="text-slate-400 text-[11px] mt-0.5 font-medium dark:text-slate-500">
                       {order.job_request?.unit?.unit_acronym} • {order.job_request?.unit?.location?.location_name}
                     </div>
                   </td>
 
                   {/* Field of Work */}
                   <td className="px-4 py-6">
-                    <span className="text-slate-600 text-[13px] font-semibold bg-slate-100 px-2.5 py-1 rounded">
+                    <span className="text-slate-600 text-[13px] font-semibold bg-slate-100 px-2.5 py-1 rounded dark:text-slate-300 dark:bg-slate-800">
                       {order.job_request?.field_work}
                     </span>
                   </td>
                   
                   {/* Work Description */}
                   <td className="px-4 py-6 max-w-50">
-                    <div className="font-bold text-slate-700 text-sm" title={order.specific_work}>
+                    <div className="font-bold text-slate-700 text-sm dark:text-slate-200" title={order.specific_work}>
                       {order.specific_work}
                     </div>
-                    <div className="text-indigo-500 text-[10px] font-bold uppercase mt-1">
+                    <div className="text-indigo-500 text-[10px] font-bold uppercase mt-1 dark:text-indigo-400">
                       Est: {order.job_request?.estimated_duration_value} {order.job_request?.estimated_duration_unit}
                     </div>
                   </td>
@@ -359,17 +359,17 @@ const JobOrderTable = () => {
                   {/* Overall Status Badge */}
                   <td className="px-4 py-6 text-center">
                     <span className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold tracking-tight inline-block min-w-20 ${
-                      order.status === 'Completed' ? 'bg-emerald-100 text-emerald-600' :
-                      order.status === 'Assigned' ? 'bg-amber-100 text-amber-600 border border-amber-200' :
-                      order.status === 'Ongoing' ? 'bg-blue-100 text-blue-600' :
-                      'bg-rose-100 text-rose-600'
+                      order.status === 'Completed' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300' :
+                      order.status === 'Assigned' ? 'bg-amber-100 text-amber-600 border border-amber-200 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30' :
+                      order.status === 'Ongoing' ? 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-300' :
+                      'bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-300'
                     }`}>
                       {order.status?.toUpperCase() || 'UNKNOWN'}
                     </span>
                   </td>
 
                   {/* Date */}
-                  <td className="px-4 sm:px-8 py-6 text-slate-500 text-sm tabular-nums whitespace-nowrap">
+                  <td className="px-4 sm:px-8 py-6 text-slate-500 text-sm tabular-nums whitespace-nowrap dark:text-slate-400">
                     {order.date_started ? new Date(order.date_started).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '—'}
                   </td>
 
@@ -381,7 +381,7 @@ const JobOrderTable = () => {
                         <button 
                             type="button"
                             onClick={() => setViewingOrder(order)}
-                            className="text-indigo-600 hover:text-indigo-800 transition-colors font-bold text-[11px] uppercase tracking-wider underline underline-offset-4"
+                            className="text-indigo-600 hover:text-indigo-800 transition-colors font-bold text-[11px] uppercase tracking-wider underline underline-offset-4 dark:text-indigo-400 dark:hover:text-indigo-300"
                         >
                             View Details
                         </button>
@@ -390,7 +390,7 @@ const JobOrderTable = () => {
                         <button 
                             type="button"
                             onClick={() => setSelectedOrder(order)}
-                            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all"
+                            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all dark:text-slate-500 dark:hover:text-indigo-400 dark:hover:bg-indigo-500/10"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <circle cx="12" cy="12" r="1" /><circle cx="12" cy="5" r="1" /><circle cx="12" cy="19" r="1" />
@@ -401,7 +401,7 @@ const JobOrderTable = () => {
                         <button 
                             type="button"
                             onClick={() => setViewingOrder(order)}
-                            className="text-indigo-600 hover:text-indigo-800 transition-colors font-bold text-[11px] uppercase tracking-wider underline underline-offset-4"
+                            className="text-indigo-600 hover:text-indigo-800 transition-colors font-bold text-[11px] uppercase tracking-wider underline underline-offset-4 dark:text-indigo-400 dark:hover:text-indigo-300"
                         >
                             View Details
                         </button>
@@ -414,14 +414,14 @@ const JobOrderTable = () => {
                 <tr>
                   <td colSpan={7} className="px-8 py-16 text-center">
                     <div className="flex flex-col items-center gap-3">
-                      <div className="p-3 bg-slate-100 rounded-full text-slate-400">
+                      <div className="p-3 bg-slate-100 rounded-full text-slate-400 dark:bg-slate-800 dark:text-slate-500">
                         <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                           <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
                       </div>
                       <div>
-                        <p className="text-slate-500 font-bold text-sm">No job orders here yet</p>
-                        <p className="text-slate-400 text-xs font-medium mt-1">
+                        <p className="text-slate-500 font-bold text-sm dark:text-slate-400">No job orders here yet</p>
+                        <p className="text-slate-400 text-xs font-medium mt-1 dark:text-slate-500">
                           No job orders found{searchQuery ? ` matching "${searchQuery}"` : ''} in {activeTab}.
                         </p>
                       </div>
@@ -432,7 +432,7 @@ const JobOrderTable = () => {
             </tbody>
           </table>
         </div>
-        <div className="border-t border-slate-100">
+        <div className="border-t border-slate-100 dark:border-slate-800">
           <Pagination
             currentPage={safePage}
             totalPages={totalPages}
@@ -459,17 +459,17 @@ const JobOrderTable = () => {
             <div className="flex flex-col gap-2">
 
                 {/* Status + summary header */}
-                <div className="px-4 py-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
+                <div className="px-4 py-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between dark:bg-slate-800 dark:border-slate-800">
                     <div className="min-w-0">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Work Description</p>
-                        <p className="text-sm font-bold text-slate-700 truncate mt-0.5">{selectedOrder.specific_work}</p>
-                        <p className="text-[11px] text-slate-400 mt-0.5">{selectedOrder.job_request?.field_work} • {selectedOrder.job_request?.unit?.unit_acronym}</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Work Description</p>
+                        <p className="text-sm font-bold text-slate-700 truncate mt-0.5 dark:text-slate-200">{selectedOrder.specific_work}</p>
+                        <p className="text-[11px] text-slate-400 mt-0.5 dark:text-slate-500">{selectedOrder.job_request?.field_work} • {selectedOrder.job_request?.unit?.unit_acronym}</p>
                     </div>
                     <span className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold tracking-tight inline-block shrink-0 ${
-                        selectedOrder.status === 'Completed' ? 'bg-emerald-100 text-emerald-600' :
-                        selectedOrder.status === 'Assigned' ? 'bg-amber-100 text-amber-600 border border-amber-200' :
-                        selectedOrder.status === 'Ongoing' ? 'bg-blue-100 text-blue-600' :
-                        'bg-rose-100 text-rose-600'
+                        selectedOrder.status === 'Completed' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300' :
+                        selectedOrder.status === 'Assigned' ? 'bg-amber-100 text-amber-600 border border-amber-200 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30' :
+                        selectedOrder.status === 'Ongoing' ? 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-300' :
+                        'bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-300'
                     }`}>
                         {selectedOrder.status?.toUpperCase() || 'UNKNOWN'}
                     </span>
@@ -477,22 +477,22 @@ const JobOrderTable = () => {
 
                 {/* 1. View Details Action */}
                 <button 
-                    className="group w-full text-left px-4 py-4 rounded-xl hover:bg-slate-50 border border-slate-100 transition-all flex items-center justify-between" 
+                    className="group w-full text-left px-4 py-4 rounded-xl hover:bg-slate-50 border border-slate-100 transition-all flex items-center justify-between dark:hover:bg-slate-800/50 dark:border-slate-800" 
                     onClick={() => {
                         setViewingOrder(selectedOrder); 
                         setSelectedOrder(null);
                     }}
                 >
                     <div className="flex items-center gap-4">
-                        <div className="p-2.5 bg-slate-100 rounded-lg text-slate-500 group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-colors">
+                        <div className="p-2.5 bg-slate-100 rounded-lg text-slate-500 group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-colors dark:bg-slate-800 dark:text-slate-400 dark:group-hover:bg-indigo-500/20 dark:group-hover:text-indigo-300">
                             <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                 <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
                         </div>
-                        <span className="text-slate-700 font-bold text-sm">View Full Details</span>
+                        <span className="text-slate-700 font-bold text-sm dark:text-slate-200">View Full Details</span>
                     </div>
-                    <svg className="text-slate-300 group-hover:translate-x-1 group-hover:text-indigo-400 transition-all" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <svg className="text-slate-300 group-hover:translate-x-1 group-hover:text-indigo-400 transition-all dark:text-slate-600" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                         <path d="M9 5l7 7-7 7" />
                     </svg>
                 </button>
@@ -501,44 +501,44 @@ const JobOrderTable = () => {
                     <>
                         {/* Divider with text */}
                         <div className="flex items-center my-3 px-2">
-                            <div className="h-px bg-slate-100 flex-1" />
-                            <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest px-4">Update Status</span>
-                            <div className="h-px bg-slate-100 flex-1" />
+                            <div className="h-px bg-slate-100 flex-1 dark:bg-slate-800" />
+                            <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest px-4 dark:text-slate-500">Update Status</span>
+                            <div className="h-px bg-slate-100 flex-1 dark:bg-slate-800" />
                         </div>
 
                         {/* 2. Complete Order Action (Now Indigo) */}
                         <button 
-                            className="group w-full text-left px-4 py-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 hover:border-emerald-200 transition-all flex items-center gap-4 shadow-sm"
+                            className="group w-full text-left px-4 py-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 hover:border-emerald-200 transition-all flex items-center gap-4 shadow-sm dark:bg-emerald-500/15 dark:hover:bg-emerald-500/25 dark:border-emerald-500/30 dark:hover:border-emerald-500/40"
                             onClick={() => {
                                 handleOpenCompleteModal(selectedOrder); 
                             }}
                         >
-                            <div className="p-2.5 bg-white rounded-lg text-emerald-600 shadow-sm group-hover:scale-110 transition-transform">
+                            <div className="p-2.5 bg-white rounded-lg text-emerald-600 shadow-sm group-hover:scale-110 transition-transform dark:bg-slate-800 dark:text-emerald-400">
                                 <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
                                     <path d="M5 13l4 4L19 7" />
                                 </svg>
                             </div>
                             <div>
-                                <span className="text-emerald-900 font-extrabold text-sm block">Mark as Completed</span>
-                                <span className="text-emerald-600/70 text-[11px] font-medium block mt-0.5">Finalize and close this job order</span>
+                                <span className="text-emerald-900 font-extrabold text-sm block dark:text-emerald-300">Mark as Completed</span>
+                                <span className="text-emerald-600/70 text-[11px] font-medium block mt-0.5 dark:text-emerald-400/70">Finalize and close this job order</span>
                             </div>
                         </button>
 
                         {/* 3. Cancel Order Action (Keep Rose for warnings) */}
                         <button 
-                            className="group w-full text-left px-4 py-4 rounded-xl hover:bg-rose-50 border border-transparent hover:border-rose-100 transition-all flex items-center gap-4 mt-1"
+                            className="group w-full text-left px-4 py-4 rounded-xl hover:bg-rose-50 border border-transparent hover:border-rose-100 transition-all flex items-center gap-4 mt-1 dark:hover:bg-rose-500/10 dark:hover:border-rose-500/30"
                             onClick={() => {
                                 setCancelOrder(selectedOrder); 
                                 setCancelReason(""); 
                                 setSelectedOrder(null); 
                             }}
                         >
-                            <div className="p-2.5 text-rose-400 group-hover:text-rose-600 group-hover:bg-rose-100 rounded-lg transition-colors">
+                            <div className="p-2.5 text-rose-400 group-hover:text-rose-600 group-hover:bg-rose-100 rounded-lg transition-colors dark:text-rose-400 dark:group-hover:text-rose-300 dark:group-hover:bg-rose-500/20">
                                 <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                     <path d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </div>
-                            <span className="text-rose-600 font-bold text-sm">Cancel Order</span>
+                            <span className="text-rose-600 font-bold text-sm dark:text-rose-400">Cancel Order</span>
                         </button>
                     </>
                 )}
@@ -557,25 +557,25 @@ const JobOrderTable = () => {
         <div className="space-y-6">
             <div className="grid grid-cols-1 gap-5">
                 <div>
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-[0.15em] mb-2">
+                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-[0.15em] mb-2 dark:text-slate-500">
                         Date Started
                     </label>
                     <input 
                         type="date"
                         value={formData.date_started}
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer"
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                         onChange={(e) => setFormData({...formData, date_started: e.target.value})}
                     />
                 </div>
 
                 <div>
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-[0.15em] mb-2">
+                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-[0.15em] mb-2 dark:text-slate-500">
                         Date Accomplished
                     </label>
                     <input 
                         type="date"
                         value={formData.date_accomplished}
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer"
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
                         onChange={(e) => setFormData({...formData, date_accomplished: e.target.value})}
                     />
                 </div>
@@ -589,12 +589,12 @@ const JobOrderTable = () => {
                     rows={4}
                     placeholder="Any additional notes or constraints for this completed order..."
                     value={formData.remarks}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all resize-none"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all resize-none dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 dark:placeholder:text-slate-600"
                     onChange={(e) => setFormData({...formData, remarks: e.target.value})}
                 />
             </div>
 
-            <div className="flex items-center gap-3 pt-6 border-t border-slate-100">
+            <div className="flex items-center gap-3 pt-6 border-t border-slate-100 dark:border-slate-800">
                 <Button
                     type="button"
                     variant="ghost"
@@ -634,13 +634,13 @@ const JobOrderTable = () => {
         maxWidth="md"
     >
         <div className="space-y-6">
-            <div className="bg-rose-50/50 border border-rose-100 p-4 rounded-xl flex gap-3">
-                <div className="text-rose-500 shrink-0">
+            <div className="bg-rose-50/50 border border-rose-100 p-4 rounded-xl flex gap-3 dark:bg-rose-500/10 dark:border-rose-500/30">
+                <div className="text-rose-500 shrink-0 dark:text-rose-400">
                     <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                         <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                 </div>
-                <p className="text-[12px] text-rose-800 leading-relaxed font-medium">
+                <p className="text-[12px] text-rose-800 leading-relaxed font-medium dark:text-rose-300">
                     <strong>Attention:</strong> Cancelling this order will mark it as inactive. This action is recorded in the system logs.
                 </p>
             </div>
@@ -653,12 +653,12 @@ const JobOrderTable = () => {
                     rows={4}
                     placeholder="Briefly describe why this job order is being cancelled..."
                     value={cancelReason}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all resize-none"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all resize-none dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 dark:placeholder:text-slate-600"
                     onChange={(e) => setCancelReason(e.target.value)}
                 />
             </div>
 
-            <div className="flex items-center gap-3 pt-6 border-t border-slate-100">
+            <div className="flex items-center gap-3 pt-6 border-t border-slate-100 dark:border-slate-800">
                 <Button
                     type="button"
                     variant="ghost"
@@ -685,7 +685,7 @@ const JobOrderTable = () => {
       {canAccessReport && (
         <button
           onClick={handleGenerateReport}
-          className="fixed bottom-6 right-6 z-40 bg-indigo-600 hover:bg-indigo-700 text-white pl-4 pr-5 py-3 rounded-full shadow-xl shadow-indigo-200 flex items-center gap-2 text-sm font-bold transition-all"
+          className="fixed bottom-6 right-6 z-40 bg-indigo-600 hover:bg-indigo-700 text-white pl-4 pr-5 py-3 rounded-full shadow-xl shadow-indigo-200 flex items-center gap-2 text-sm font-bold transition-all dark:shadow-none"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
