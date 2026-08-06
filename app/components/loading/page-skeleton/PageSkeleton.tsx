@@ -2,10 +2,10 @@ import Spinner from "../spinner/Spinner";
 
 
 const PageSkeleton = () => (
-  <div className="min-h-screen bg-[#f8f9ff] flex items-center justify-center">
+  <div className="min-h-screen bg-[#f8f9ff] dark:bg-slate-950 flex items-center justify-center">
     <div className="flex flex-col items-center gap-4">
       <Spinner size="lg" />
-      <p className="text-slate-400 text-sm font-medium">Loading...</p>
+      <p className="text-slate-400 dark:text-slate-500 text-sm font-medium">Loading...</p>
     </div>
   </div>
 );

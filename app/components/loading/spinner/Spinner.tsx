@@ -11,9 +11,9 @@ const sizes = {
 };
 
   const colors = {
-    indigo: 'border-indigo-100 border-t-indigo-600',
+    indigo: 'border-indigo-100 border-t-indigo-600 dark:border-slate-700 dark:border-t-indigo-500',
     white:  'border-white/20 border-t-white',
-    slate:  'border-slate-100 border-t-slate-500',
+    slate:  'border-slate-100 border-t-slate-500 dark:border-slate-700 dark:border-t-slate-400',
   };
 
   return (

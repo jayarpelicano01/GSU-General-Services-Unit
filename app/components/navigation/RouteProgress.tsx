@@ -46,7 +46,7 @@ export function RouteProgress() {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 z-[200] h-0.5 bg-indigo-100/60 pointer-events-none"
+      className="fixed top-0 left-0 right-0 z-[200] h-0.5 bg-indigo-100/60 dark:bg-indigo-500/20 pointer-events-none"
       aria-hidden="true"
     >
       <div className="h-full bg-indigo-600" style={{ width: `${width}%` }} />
