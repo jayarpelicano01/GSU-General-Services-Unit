@@ -64,7 +64,7 @@ const JobOrderTable = () => {
     const [sortKey, setSortKey] = useState<'jo' | 'unit' | 'date' | 'status'>('jo');
     const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
     const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(25);
+    const [pageSize, setPageSize] = useState(5);
     
     const today = new Date().toISOString().split('T')[0];
 

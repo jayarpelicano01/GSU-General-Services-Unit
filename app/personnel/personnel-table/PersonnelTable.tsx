@@ -103,7 +103,7 @@ const PersonnelTable = () => {
   const [activeTab, setActiveTab] = useState<(typeof STATUS_TABS)[number]>("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  const [pageSize, setPageSize] = useState(5);
 
   // Modal states
   const [showAddModal, setShowAddModal] = useState(false);

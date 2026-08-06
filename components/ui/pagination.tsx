@@ -21,7 +21,7 @@ export function Pagination({
   pageSize,
   onPageChange,
   onPageSizeChange,
-  pageSizes = [10, 25, 50],
+  pageSizes = [5, 10, 25],
 }: PaginationProps) {
   if (totalPages <= 1 && totalItems <= pageSizes[0]) return null
 

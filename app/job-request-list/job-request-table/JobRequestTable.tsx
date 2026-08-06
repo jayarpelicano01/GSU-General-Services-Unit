@@ -67,7 +67,7 @@ const JobRequestTable = () => {
   const [viewingRequest, setViewingRequest] = useState<JobRequest | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+    const [pageSize, setPageSize] = useState(5);
 
   const [disapproveTarget, setDisapproveTarget] = useState<JobRequest | null>(null);
   const [disapproveReason, setDisapproveReason] = useState('');

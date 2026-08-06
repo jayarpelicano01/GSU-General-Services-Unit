@@ -78,7 +78,7 @@ const PrRisTable = () => {
   const [activeTab, setActiveTab] = useState<(typeof STATUS_TABS)[number]>("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  const [pageSize, setPageSize] = useState(5);
   const hasSetDefaultTab = React.useRef(false);
   const [createJobOrderDoc, setCreateJobOrderDoc] = useState<PrRisDocument | null>(null);
 
