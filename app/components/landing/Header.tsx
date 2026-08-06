@@ -87,7 +87,12 @@ export default function Header() {
               Workflow
               <span className="absolute bottom-0.5 left-4 right-4 h-0.5 bg-indigo-500 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300" />
             </button>
-            <Link href="/login" className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 rounded-lg transition-colors">Login</Link>
+            <Link
+              href="/login"
+              className="ml-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-transparent"
+            >
+              Login
+            </Link>
           </nav>
 
           {/* Theme Toggle */}
