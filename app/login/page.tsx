@@ -86,7 +86,7 @@ const LoginPageInner = () => {
                 </div>
               </Link>
 
-              <h2 className="text-2xl sm:text-3xl font-display text-slate-900 dark:text-slate-100 mb-2">Sign in to your account</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">Sign in to your account</h2>
               <p className="text-slate-600 dark:text-slate-400 mb-8">Enter your credentials to access the dashboard</p>
 
               <form className="space-y-6" onSubmit={handleSubmit}>

@@ -233,7 +233,7 @@ const JobOrderTable = () => {
 
             <div className="px-4 sm:px-8 pt-6 pb-3 flex items-start sm:items-center justify-between gap-3">
                 <div className="min-w-0">
-                    <h2 className="text-slate-800 text-lg font-display tracking-tight dark:text-slate-100">Job Orders</h2>
+                    <h2 className="text-slate-800 text-lg font-bold tracking-tight dark:text-slate-100">Job Orders</h2>
                     <p className="text-slate-400 text-[12px] font-medium mt-0.5 dark:text-slate-500">Manage and monitor all job orders</p>
                 </div>
                 <span className="bg-indigo-50 text-indigo-500 text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-indigo-100 whitespace-nowrap shrink-0 dark:bg-indigo-500/15 dark:text-indigo-300 dark:border-indigo-500/30">

@@ -151,7 +151,7 @@ export default function WorkflowDiagram() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-center max-w-2xl mx-auto mb-12 lg:mb-16"
         >
-          <h2 className="text-2xl sm:text-3xl font-display tracking-tight text-slate-900 dark:text-slate-100 mb-4">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-4">
             The Complete GSU Workflow
           </h2>
           <p className="text-lg text-slate-600 dark:text-slate-400">

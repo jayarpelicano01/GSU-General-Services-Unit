@@ -71,7 +71,7 @@ export default function Features() {
           viewport={{ once: true }}
           className="text-center max-w-2xl mx-auto mb-16"
         >
-          <h2 className="text-2xl sm:text-3xl font-display tracking-tight text-slate-900 dark:text-slate-100 mb-4">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-4">
             Built for Your Workflow
           </h2>
           <p className="text-lg text-slate-600 dark:text-slate-400">
