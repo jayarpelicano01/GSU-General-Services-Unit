@@ -66,7 +66,7 @@ export default function Header() {
               className="w-9 h-9 lg:w-10 lg:h-10 object-contain"
             />
             <div className="hidden sm:block">
-              <span className="text-lg font-bold text-slate-900 dark:text-slate-100">GSU System</span>
+              <span className="text-lg font-display text-slate-900 dark:text-slate-100">GSU System</span>
               <p className="text-[9px] text-slate-400 dark:text-slate-500 uppercase tracking-wider">Job Requesting & Ordering</p>
             </div>
           </Link>

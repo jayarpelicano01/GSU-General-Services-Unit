@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Script from "next/script"
 import { DM_Sans } from "next/font/google"
 import "./globals.css"
 import { AuthProvider } from "@/app/context/AuthContext"
@@ -8,7 +9,7 @@ import { RouteProgress } from "@/app/components/navigation/RouteProgress"
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-dm-sans",
 })
 
@@ -32,6 +33,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${dmSans.variable} antialiased`}>
+        <Script src="https://cdn.lordicon.com/lordicon.js" strategy="afterInteractive" />
         <RouteProgress />
         <ThemeProvider>
           <AuthProvider>

@@ -81,12 +81,12 @@ const LoginPageInner = () => {
                   </svg>
                 </span>
                 <div>
-                  <span className="text-xl font-bold text-slate-900 dark:text-slate-100">GSU <span className="text-indigo-600 dark:text-indigo-400">System</span></span>
+                  <span className="text-xl font-display text-slate-900 dark:text-slate-100">GSU <span className="text-indigo-600 dark:text-indigo-400">System</span></span>
                   <p className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider">Job Requesting & Ordering</p>
                 </div>
               </Link>
 
-              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">Sign in to your account</h2>
+              <h2 className="text-2xl sm:text-3xl font-display text-slate-900 dark:text-slate-100 mb-2">Sign in to your account</h2>
               <p className="text-slate-600 dark:text-slate-400 mb-8">Enter your credentials to access the dashboard</p>
 
               <form className="space-y-6" onSubmit={handleSubmit}>

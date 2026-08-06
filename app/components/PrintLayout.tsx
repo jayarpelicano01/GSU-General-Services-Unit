@@ -25,7 +25,7 @@ const PrintLayout = ({ children, title, subtitle, backPath }: PrintLayoutProps) 
       <aside className="no-print w-80 h-screen bg-white p-8 fixed left-0 border-r border-slate-200 flex flex-col z-20">
         <div className="mb-10">
           <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-[0.2em] mb-2">Workflow</p>
-          <h2 className="font-black text-slate-800 text-xl leading-tight">
+          <h2 className="font-bold text-slate-800 text-xl leading-tight">
             {title} <br /> 
             <span className="text-slate-400 font-medium text-base">{subtitle}</span>
           </h2>

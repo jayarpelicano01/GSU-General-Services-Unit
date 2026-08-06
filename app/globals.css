@@ -2,6 +2,10 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme {
+  --font-sans: "Bahnschrift", "Bahnschrift Light", "Segoe UI Variable Display", "Segoe UI", var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -10,11 +14,18 @@
 body {
   background-color: var(--background);
   color: var(--foreground);
+  font-family: var(--font-sans);
+  font-weight: 400;
 }
 
 .dark {
   --background: #020617;
   --foreground: #f1f5f9;
+}
+
+@utility font-display {
+  font-weight: 300;
+  letter-spacing: -0.01em;
 }
 
 @keyframes aurora {

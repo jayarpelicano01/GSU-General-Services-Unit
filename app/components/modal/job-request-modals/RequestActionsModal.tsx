@@ -35,7 +35,7 @@ export const RequestActionsModal = ({
             <p className="text-sm font-bold text-slate-700 dark:text-slate-200 truncate mt-0.5">{selectedRequest.specific_work}</p>
             <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">{selectedRequest.field_work}</p>
           </div>
-          <span className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold tracking-tight inline-block shrink-0 ${
+          <span className={`px-3 py-1.5 rounded-full text-[10px] font-bold tracking-tight inline-block shrink-0 ${
             selectedRequest.status === 'For Approval'       ? 'bg-violet-100 dark:bg-violet-500/20 text-violet-600 dark:text-violet-300 border border-violet-200 dark:border-violet-500/30' :
             selectedRequest.status === 'Approved'           ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-300' :
             selectedRequest.status === 'Pending'            ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30' :
@@ -97,7 +97,7 @@ export const RequestActionsModal = ({
                 </svg>
               </div>
               <div>
-                <span className="text-blue-900 dark:text-blue-300 font-extrabold text-sm block">Schedule Inspection</span>
+                <span className="text-blue-900 dark:text-blue-300 font-bold text-sm block">Schedule Inspection</span>
                 <span className="text-blue-600/70 dark:text-blue-400/70 text-[11px] font-medium block mt-0.5">Assign personnel to evaluate the request on site</span>
               </div>
             </button>
@@ -111,7 +111,7 @@ export const RequestActionsModal = ({
                 </svg>
               </div>
               <div>
-                <span className="text-emerald-900 dark:text-emerald-300 font-extrabold text-sm block">Create Job Order</span>
+                <span className="text-emerald-900 dark:text-emerald-300 font-bold text-sm block">Create Job Order</span>
                 <span className="text-emerald-600/70 dark:text-emerald-400/70 text-[11px] font-medium block mt-0.5">Dispatch work order to personnel</span>
               </div>
             </button>
@@ -136,7 +136,7 @@ export const RequestActionsModal = ({
                 </svg>
               </div>
               <div>
-                <span className="text-blue-900 dark:text-blue-300 font-extrabold text-sm block">See Inspection</span>
+                <span className="text-blue-900 dark:text-blue-300 font-bold text-sm block">See Inspection</span>
                 <span className="text-blue-600/70 dark:text-blue-400/70 text-[11px] font-medium block mt-0.5">View inspection schedule and results in the inspections tab</span>
               </div>
             </button>
@@ -160,7 +160,7 @@ export const RequestActionsModal = ({
                 </svg>
               </div>
               <div>
-                <span className="text-amber-900 dark:text-amber-300 font-extrabold text-sm block">See PR / RIS</span>
+                <span className="text-amber-900 dark:text-amber-300 font-bold text-sm block">See PR / RIS</span>
                 <span className="text-amber-600/70 dark:text-amber-400/70 text-[11px] font-medium block mt-0.5">View the purchase request or requisition document in the PR / RIS tab</span>
               </div>
             </button>

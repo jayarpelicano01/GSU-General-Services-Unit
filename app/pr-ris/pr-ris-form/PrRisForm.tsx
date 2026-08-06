@@ -394,7 +394,7 @@ const PrRisForm = () => {
                     <td colSpan={5} className="px-2 py-2.5 border border-slate-200 bg-slate-50 text-right text-xs font-bold text-slate-500 uppercase tracking-widest dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
                       Total
                     </td>
-                    <td className="px-2 py-2.5 border border-slate-200 bg-slate-50 text-right text-sm font-extrabold text-slate-800 tabular-nums dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
+                    <td className="px-2 py-2.5 border border-slate-200 bg-slate-50 text-right text-sm font-bold text-slate-800 tabular-nums dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
                       ₱ {total.toFixed(2)}
                     </td>
                     <td className="px-2 py-2.5 border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800" />

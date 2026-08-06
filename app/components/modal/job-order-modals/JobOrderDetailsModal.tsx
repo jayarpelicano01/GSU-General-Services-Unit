@@ -48,7 +48,7 @@ export const JobOrderDetailsModal = ({ viewingOrder, onClose }: Props) => (
         {/* Status */}
         <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 dark:bg-slate-800/50 dark:border-slate-800">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Current Status</span>
-          <span className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold tracking-tight inline-block ${
+          <span className={`px-3 py-1.5 rounded-full text-[10px] font-bold tracking-tight inline-block ${
             viewingOrder.status === 'Completed'  ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300' :
             viewingOrder.status === 'Assigned'   ? 'bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300' :
             viewingOrder.status === 'Cancelled'  ? 'bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-300' :

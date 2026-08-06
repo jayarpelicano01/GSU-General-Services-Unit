@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/ui/button"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
 import { DashboardSkeleton } from "@/app/components/dashboard/DashboardSkeleton"
+import { LordIcon } from "@/components/ui/lord-icon"
 import {
   FileText,
   Clock,
@@ -178,6 +179,11 @@ function StatCard({
   change,
   changeUp,
   valueSuffix,
+  lordIcon,
+  primary,
+  secondary,
+  darkPrimary,
+  darkSecondary,
 }: {
   name: string
   value: number
@@ -187,13 +193,30 @@ function StatCard({
   change: string
   changeUp: boolean
   valueSuffix?: string
+  lordIcon?: string
+  primary?: string
+  secondary?: string
+  darkPrimary?: string
+  darkSecondary?: string
 }) {
   return (
     <Card className="group rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 dark:bg-slate-900 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
       <CardContent className="p-5">
         <div className="flex items-start justify-between">
           <div className={cn("rounded-full p-3 transition-transform duration-200 group-hover:scale-105", bgColor)}>
-            <Icon className={cn("w-6 h-6", textColor)} aria-hidden="true" />
+            {lordIcon ? (
+              <LordIcon
+                icon={lordIcon}
+                trigger="morph"
+                primary={primary}
+                secondary={secondary}
+                darkPrimary={darkPrimary}
+                darkSecondary={darkSecondary}
+                className="w-6 h-6"
+              />
+            ) : (
+              <Icon className={cn("w-6 h-6", textColor)} aria-hidden="true" />
+            )}
           </div>
           <span
             title="Compared to the previous 30 days"
@@ -207,7 +230,7 @@ function StatCard({
           </span>
         </div>
         <div className="mt-3">
-          <p className="text-3xl font-extrabold text-slate-900 dark:text-slate-100">
+          <p className="text-3xl font-display text-slate-900 dark:text-slate-100">
             {value.toLocaleString()}
             {valueSuffix ? <span className="ml-1 text-base font-semibold text-slate-400 dark:text-slate-500">{valueSuffix}</span> : null}
           </p>
@@ -223,7 +246,7 @@ function EmptyChartCard({ title, description }: { title: string; description: st
     <Card className="rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 dark:bg-slate-900">
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
-          <Activity className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+          <LordIcon icon="lbcxnxti" trigger="hover" className="w-5 h-5" primary="#4f46e5" secondary="#c7d2fe" />
           {title}
         </CardTitle>
         <CardDescription>{description}</CardDescription>
@@ -246,6 +269,11 @@ interface StatCardData {
   change: string
   changeUp: boolean
   valueSuffix?: string
+  lordIcon?: string
+  primary?: string
+  secondary?: string
+  darkPrimary?: string
+  darkSecondary?: string
 }
 
 function DashboardContent() {
@@ -437,24 +465,39 @@ function DashboardContent() {
       name: "Pending Inspections",
       value: stats.pendingInspections,
       icon: SearchCheck,
-      bgColor: "bg-indigo-50",
+      bgColor: "bg-indigo-50 dark:bg-indigo-500/15",
       textColor: "text-indigo-600",
+      lordIcon: "wjyqkiew",
+      primary: "#4f46e5",
+      secondary: "#c7d2fe",
+      darkPrimary: "#818cf8",
+      darkSecondary: "#1e1b4b",
       ...stats.trends.pendingInspections,
     },
     {
       name: "Awaiting Materials",
       value: stats.awaitingMaterials,
       icon: Package,
-      bgColor: "bg-blue-50",
+      bgColor: "bg-blue-50 dark:bg-blue-500/15",
       textColor: "text-blue-600",
+      lordIcon: "rezibkiy",
+      primary: "#2563eb",
+      secondary: "#bfdbfe",
+      darkPrimary: "#60a5fa",
+      darkSecondary: "#172554",
       ...stats.trends.awaitingMaterials,
     },
     {
       name: "Completed This Month",
       value: stats.completedThisMonth,
       icon: CheckCircle2,
-      bgColor: "bg-green-50",
+      bgColor: "bg-green-50 dark:bg-green-500/15",
       textColor: "text-green-600",
+      lordIcon: "lvrxlmju",
+      primary: "#16a34a",
+      secondary: "#bbf7d0",
+      darkPrimary: "#4ade80",
+      darkSecondary: "#052e16",
       ...stats.trends.completedThisMonth,
     },
   ]
@@ -464,32 +507,52 @@ function DashboardContent() {
       name: "Completed This Month",
       value: stats.completedThisMonth,
       icon: CheckCircle2,
-      bgColor: "bg-green-50",
+      bgColor: "bg-green-50 dark:bg-green-500/15",
       textColor: "text-green-600",
+      lordIcon: "lvrxlmju",
+      primary: "#16a34a",
+      secondary: "#bbf7d0",
+      darkPrimary: "#4ade80",
+      darkSecondary: "#052e16",
       ...stats.trends.completedThisMonth,
     },
     {
       name: "In Progress",
       value: stats.inProgress,
       icon: Activity,
-      bgColor: "bg-emerald-50",
+      bgColor: "bg-emerald-50 dark:bg-emerald-500/15",
       textColor: "text-emerald-600",
+      lordIcon: "fwkrbvja",
+      primary: "#10b981",
+      secondary: "#a7f3d0",
+      darkPrimary: "#34d399",
+      darkSecondary: "#022c22",
       ...stats.trends.inProgress,
     },
     {
       name: "My Pending Requests",
       value: stats.myPendingRequests,
       icon: Clock,
-      bgColor: "bg-amber-50",
+      bgColor: "bg-amber-50 dark:bg-amber-500/15",
       textColor: "text-amber-600",
+      lordIcon: "hmpomorl",
+      primary: "#d97706",
+      secondary: "#fde68a",
+      darkPrimary: "#fbbf24",
+      darkSecondary: "#451a03",
       ...stats.trends.myPendingRequests,
     },
     {
       name: "Avg Days to Complete",
       value: stats.avgDaysToComplete,
       icon: Timer,
-      bgColor: "bg-blue-50",
+      bgColor: "bg-blue-50 dark:bg-blue-500/15",
       textColor: "text-blue-600",
+      lordIcon: "warimioc",
+      primary: "#2563eb",
+      secondary: "#bfdbfe",
+      darkPrimary: "#60a5fa",
+      darkSecondary: "#172554",
       change: "—",
       changeUp: true,
       valueSuffix: "days",
@@ -507,7 +570,7 @@ function DashboardContent() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">
+          <h1 className="text-2xl font-display text-slate-900 dark:text-slate-100">
             {getGreeting()}, {getFirstName(user)}
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mt-1">{getRoleLabel(user)}</p>
@@ -602,7 +665,7 @@ function DashboardContent() {
           <CardContent className="p-0">
             {recentRequests.length === 0 ? (
               <div className="p-6 text-center text-slate-500 dark:text-slate-400">
-                <FileText className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
+                <LordIcon icon="hmpomorl" trigger="loop" className="w-12 h-12 mx-auto mb-3" primary="#94a3b8" secondary="#cbd5e1" />
                 <p>No job requests yet</p>
                 {!isGsuStaff && (
                   <Button className="mt-4" onClick={() => setNewRequestOpen(true)}>

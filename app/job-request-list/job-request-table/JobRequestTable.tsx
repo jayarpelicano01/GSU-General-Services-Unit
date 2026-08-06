@@ -6,6 +6,7 @@ import { API } from '@/app/utils/api/api';
 import { RequestActionsModal } from '@/app/components/modal/job-request-modals/RequestActionsModal';
 import { RequestDetailsModal } from '@/app/components/modal/job-request-modals/RequestDetailsModal';
 import PageSkeleton from '@/app/components/loading/page-skeleton/PageSkeleton';
+import { LordIcon } from '@/components/ui/lord-icon';
 import { DisapproveModal } from '@/app/components/modal/job-request-modals/DisapproveModal';
 import { HeadRejectModal } from '@/app/components/modal/job-request-modals/HeadRejectModal';
 import { ScheduleInspectionModal } from '@/app/components/modal/job-request-modals/ScheduleInspectionModal';
@@ -14,8 +15,9 @@ import { Personnel, InspectionFormData } from '@/app/types/JobRequest';
 import { useAuth } from '@/app/context/AuthContext';
 import { useToast } from '@/app/context/ToastContext';
 import { getErrorMessage } from '@/app/utils/errors';
-import { Button } from '@/components/ui/button';
 import { Pagination } from '@/components/ui/pagination';
+import { MoreVertical, Check, X } from 'lucide-react';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 
 interface JobRequest {
   id: number;
@@ -289,7 +291,7 @@ const JobRequestTable = () => {
 
         <div className="px-4 sm:px-8 pt-6 pb-3 flex items-start sm:items-center justify-between gap-3">
           <div className="min-w-0">
-            <h2 className="text-lg font-extrabold tracking-tight text-slate-800 dark:text-slate-100">Job Requests</h2>
+            <h2 className="text-lg font-display tracking-tight text-slate-800 dark:text-slate-100">Job Requests</h2>
             <p className="text-slate-400 text-[12px] font-medium mt-0.5 dark:text-slate-500">Manage and monitor all incoming job requests</p>
           </div>
           <span className="bg-indigo-50 text-indigo-500 text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-indigo-100 whitespace-nowrap shrink-0 dark:bg-indigo-500/15 dark:text-indigo-300 dark:border-indigo-500/30">
@@ -414,7 +416,7 @@ const JobRequestTable = () => {
 
                   {/* Status */}
                   <td className="px-4 py-6 text-center">
-                    <span className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold tracking-tight inline-block min-w-20 ${
+                    <span className={`px-3 py-1.5 rounded-full text-[10px] font-bold tracking-tight inline-block min-w-20 ${
                       req.status === 'For Approval'        ? 'bg-violet-100 text-violet-600 border border-violet-200 dark:bg-violet-500/20 dark:text-violet-300 dark:border-violet-500/30' :
                       req.status === 'Approved'           ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300' :
                       req.status === 'Pending'            ? 'bg-amber-100 text-amber-600 border border-amber-200 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30' :
@@ -437,29 +439,42 @@ const JobRequestTable = () => {
                   <td className="px-4 py-6 text-right">
                     <div className="flex justify-end items-center">
                       {isUnitHead && req.status === 'For Approval' && req.unit?.id === user?.unit_id ? (
-                        <div className="flex items-center gap-2">
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="success"
-                            className="uppercase tracking-wider text-[11px] px-3 py-2"
-                            onClick={() => handleApproveRequest(req)}
-                          >
-                            Approve
-                          </Button>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="destructive"
-                            className="uppercase tracking-wider text-[11px] px-3 py-2"
-                            onClick={() => {
-                              setRejectTarget(req);
-                              setRejectReason('');
-                            }}
-                          >
-                            Reject
-                          </Button>
-                        </div>
+                        <DropdownMenu.Root>
+                          <DropdownMenu.Trigger asChild>
+                            <button
+                              type="button"
+                              aria-label="Request actions"
+                              className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all dark:text-slate-500 dark:hover:text-indigo-400 dark:hover:bg-indigo-500/10"
+                            >
+                              <MoreVertical className="w-5 h-5" />
+                            </button>
+                          </DropdownMenu.Trigger>
+                          <DropdownMenu.Portal>
+                            <DropdownMenu.Content
+                              align="end"
+                              sideOffset={6}
+                              className="z-50 min-w-40 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg dark:border-slate-700 dark:bg-slate-900"
+                            >
+                              <DropdownMenu.Item
+                                onSelect={() => handleApproveRequest(req)}
+                                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 outline-none cursor-pointer select-none hover:bg-emerald-50 hover:text-emerald-700 focus:bg-emerald-50 focus:text-emerald-700 dark:text-slate-200 dark:hover:bg-emerald-500/15 dark:hover:text-emerald-300 dark:focus:bg-emerald-500/15 dark:focus:text-emerald-300"
+                              >
+                                <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                                Approve
+                              </DropdownMenu.Item>
+                              <DropdownMenu.Item
+                                onSelect={() => {
+                                  setRejectTarget(req);
+                                  setRejectReason('');
+                                }}
+                                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 outline-none cursor-pointer select-none hover:bg-rose-50 hover:text-rose-700 focus:bg-rose-50 focus:text-rose-700 dark:text-slate-200 dark:hover:bg-rose-500/15 dark:hover:text-rose-300 dark:focus:bg-rose-500/15 dark:focus:text-rose-300"
+                              >
+                                <X className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                                Reject
+                              </DropdownMenu.Item>
+                            </DropdownMenu.Content>
+                          </DropdownMenu.Portal>
+                        </DropdownMenu.Root>
                       ) : isUnitUser ? (
                         <button
                           type="button"
@@ -475,11 +490,10 @@ const JobRequestTable = () => {
                         <button
                           type="button"
                           onClick={() => setSelectedRequest(req)}
+                          aria-label="Request actions"
                           className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all dark:text-slate-500 dark:hover:text-indigo-400 dark:hover:bg-indigo-500/10"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="12" cy="12" r="1" /><circle cx="12" cy="5" r="1" /><circle cx="12" cy="19" r="1" />
-                          </svg>
+                          <MoreVertical className="w-5 h-5" />
                         </button>
                       ) : (
                         <button
@@ -501,9 +515,7 @@ const JobRequestTable = () => {
                 <tr>
                   <td colSpan={7} className="px-8 py-16 text-center">
                     <div className="flex flex-col items-center gap-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                      </svg>
+                      <LordIcon icon="hmpomorl" trigger="loop" className="w-10 h-10" primary="#94a3b8" secondary="#cbd5e1" />
                       <div className="text-slate-500 text-sm font-semibold dark:text-slate-400">No job requests found</div>
                       <div className="text-slate-400 text-xs dark:text-slate-500">
                         {searchQuery

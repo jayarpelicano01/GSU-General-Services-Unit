@@ -151,7 +151,7 @@ export default function WorkflowDiagram() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-center max-w-2xl mx-auto mb-12 lg:mb-16"
         >
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-4">
+          <h2 className="text-2xl sm:text-3xl font-display tracking-tight text-slate-900 dark:text-slate-100 mb-4">
             The Complete GSU Workflow
           </h2>
           <p className="text-lg text-slate-600 dark:text-slate-400">
@@ -199,7 +199,7 @@ export default function WorkflowDiagram() {
                     variants={circleVariants}
                     className={`relative w-20 h-20 rounded-full border-4 flex items-center justify-center ${step.bgColor} ${step.borderColor} shadow-sm transition-shadow duration-300 group-hover:shadow-md`}
                   >
-                    <span className={`text-2xl font-extrabold ${step.color}`}>
+                    <span className={`text-2xl font-display ${step.color}`}>
                       {step.number}
                     </span>
                     {/* Pulse animation for first step */}
@@ -253,7 +253,7 @@ export default function WorkflowDiagram() {
                     variants={circleVariants}
                     className={`relative w-12 h-12 rounded-full border-3 flex items-center justify-center ${step.bgColor} ${step.borderColor}`}
                   >
-                    <span className={`text-xl font-extrabold ${step.color}`}>
+                    <span className={`text-xl font-display ${step.color}`}>
                       {step.number}
                     </span>
                   </motion.div>
@@ -300,7 +300,7 @@ export default function WorkflowDiagram() {
               whileHover={{ y: -4 }}
               className={`p-4 rounded-xl text-center bg-${stat.color}-50 border border-${stat.color}-100 hover:shadow-md transition-shadow duration-200 dark:bg-${stat.color}-500/15 dark:border-${stat.color}-500/30 dark:hover:shadow-none`}
             >
-              <div className={`text-3xl font-bold text-${stat.color}-600 dark:text-${stat.color}-400`}>
+              <div className={`text-3xl font-display text-${stat.color}-600 dark:text-${stat.color}-400`}>
                 {stat.value}
               </div>
               <div className="text-sm font-medium text-slate-600 dark:text-slate-400 mt-1">

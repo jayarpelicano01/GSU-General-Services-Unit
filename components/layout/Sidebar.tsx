@@ -86,7 +86,7 @@ export function Sidebar() {
                 className="w-9 h-9 object-contain flex-shrink-0"
               />
               <div className="overflow-hidden">
-                <span className="text-lg font-extrabold text-slate-900 dark:text-slate-100 truncate block">GSU System</span>
+                <span className="text-lg font-display text-slate-900 dark:text-slate-100 truncate block">GSU System</span>
                 <p className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">Job Requesting & Ordering</p>
               </div>
             </Link>

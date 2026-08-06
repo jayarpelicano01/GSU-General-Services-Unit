@@ -8,6 +8,7 @@ import { useAuth } from '@/app/context/AuthContext';
 import { useToast } from '@/app/context/ToastContext';
 import { JobOrderDetailsModal } from '@/app/components/modal/job-order-modals/JobOrderDetailsModal';
 import { Button } from '@/components/ui/button';
+import { LordIcon } from '@/components/ui/lord-icon';
 import { Pagination } from '@/components/ui/pagination';
 
 interface JobRequest {
@@ -232,7 +233,7 @@ const JobOrderTable = () => {
 
             <div className="px-4 sm:px-8 pt-6 pb-3 flex items-start sm:items-center justify-between gap-3">
                 <div className="min-w-0">
-                    <h2 className="text-slate-800 text-lg font-extrabold tracking-tight dark:text-slate-100">Job Orders</h2>
+                    <h2 className="text-slate-800 text-lg font-display tracking-tight dark:text-slate-100">Job Orders</h2>
                     <p className="text-slate-400 text-[12px] font-medium mt-0.5 dark:text-slate-500">Manage and monitor all job orders</p>
                 </div>
                 <span className="bg-indigo-50 text-indigo-500 text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-indigo-100 whitespace-nowrap shrink-0 dark:bg-indigo-500/15 dark:text-indigo-300 dark:border-indigo-500/30">
@@ -358,7 +359,7 @@ const JobOrderTable = () => {
 
                   {/* Overall Status Badge */}
                   <td className="px-4 py-6 text-center">
-                    <span className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold tracking-tight inline-block min-w-20 ${
+                    <span className={`px-3 py-1.5 rounded-full text-[10px] font-bold tracking-tight inline-block min-w-20 ${
                       order.status === 'Completed' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300' :
                       order.status === 'Assigned' ? 'bg-amber-100 text-amber-600 border border-amber-200 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30' :
                       order.status === 'Ongoing' ? 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-300' :
@@ -414,10 +415,8 @@ const JobOrderTable = () => {
                 <tr>
                   <td colSpan={7} className="px-8 py-16 text-center">
                     <div className="flex flex-col items-center gap-3">
-                      <div className="p-3 bg-slate-100 rounded-full text-slate-400 dark:bg-slate-800 dark:text-slate-500">
-                        <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
+                      <div className="p-3 bg-slate-100 rounded-full dark:bg-slate-800">
+                        <LordIcon icon="fwkrbvja" trigger="loop" className="w-6 h-6" primary="#94a3b8" secondary="#cbd5e1" />
                       </div>
                       <div>
                         <p className="text-slate-500 font-bold text-sm dark:text-slate-400">No job orders here yet</p>
@@ -465,7 +464,7 @@ const JobOrderTable = () => {
                         <p className="text-sm font-bold text-slate-700 truncate mt-0.5 dark:text-slate-200">{selectedOrder.specific_work}</p>
                         <p className="text-[11px] text-slate-400 mt-0.5 dark:text-slate-500">{selectedOrder.job_request?.field_work} • {selectedOrder.job_request?.unit?.unit_acronym}</p>
                     </div>
-                    <span className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold tracking-tight inline-block shrink-0 ${
+                    <span className={`px-3 py-1.5 rounded-full text-[10px] font-bold tracking-tight inline-block shrink-0 ${
                         selectedOrder.status === 'Completed' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300' :
                         selectedOrder.status === 'Assigned' ? 'bg-amber-100 text-amber-600 border border-amber-200 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30' :
                         selectedOrder.status === 'Ongoing' ? 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-300' :
@@ -519,7 +518,7 @@ const JobOrderTable = () => {
                                 </svg>
                             </div>
                             <div>
-                                <span className="text-emerald-900 font-extrabold text-sm block dark:text-emerald-300">Mark as Completed</span>
+                                <span className="text-emerald-900 font-bold text-sm block dark:text-emerald-300">Mark as Completed</span>
                                 <span className="text-emerald-600/70 text-[11px] font-medium block mt-0.5 dark:text-emerald-400/70">Finalize and close this job order</span>
                             </div>
                         </button>

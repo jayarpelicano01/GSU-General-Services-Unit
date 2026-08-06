@@ -22,7 +22,7 @@ export const RequestDetailsModal = ({ viewingRequest, onClose }: Props) => (
         {/* Status */}
         <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
           <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Current Status</span>
-          <span className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold tracking-tight inline-block ${
+          <span className={`px-3 py-1.5 rounded-full text-[10px] font-bold tracking-tight inline-block ${
             viewingRequest.status === 'Pending' && !viewingRequest.head_approved ? 'bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-300 border border-red-200 dark:border-red-500/30' :
             viewingRequest.status === 'Approved'           ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-300' :
             viewingRequest.status === 'Pending'            ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30' :
