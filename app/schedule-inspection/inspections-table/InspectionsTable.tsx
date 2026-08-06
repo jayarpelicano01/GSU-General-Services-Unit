@@ -9,6 +9,7 @@ import { JobOrderFormData } from "@/app/types/JobOrder";
 import { createJobOrder } from "@/app/utils/jobOrder";
 import { useToast } from "@/app/context/ToastContext";
 import { getErrorMessage } from "@/app/utils/errors";
+import { Pagination } from "@/components/ui/pagination";
 
 interface InspectionUnit {
   unit_name: string;
@@ -85,6 +86,8 @@ const InspectionsTable = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<(typeof STATUS_TABS)[number]>("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
   const [resultTarget, setResultTarget] = useState<Inspection | null>(null);
   const [resultForm, setResultForm] = useState<InspectionResultFormData>({
@@ -235,6 +238,13 @@ const InspectionsTable = () => {
     });
   }, [inspections, activeTab, searchQuery]);
 
+  useEffect(() => { setCurrentPage(1); }, [activeTab, searchQuery]);
+
+  const totalItems = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const paged = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
+
   return (
     <div className="space-y-4">
       {/* Header + filters */}
@@ -308,7 +318,7 @@ const InspectionsTable = () => {
                   </td>
                 </tr>
               ) : (
-                filtered.map((insp) => {
+                paged.map((insp) => {
                   const unit = insp.job_request?.unit;
                   const unitName = unit ? `${unit.unit_name}${unit.unit_acronym ? ` (${unit.unit_acronym})` : ""}` : "—";
                   const inspectors = insp.personnels ?? [];
@@ -365,6 +375,16 @@ const InspectionsTable = () => {
               )}
             </tbody>
           </table>
+        </div>
+        <div className="border-t border-slate-200">
+          <Pagination
+            currentPage={safePage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            totalItems={totalItems}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+          />
         </div>
       </div>
 

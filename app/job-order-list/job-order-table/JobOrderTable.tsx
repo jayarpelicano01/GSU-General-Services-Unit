@@ -7,6 +7,8 @@ import Modal from '@/app/components/modal/modal';
 import { useAuth } from '@/app/context/AuthContext';
 import { useToast } from '@/app/context/ToastContext';
 import { JobOrderDetailsModal } from '@/app/components/modal/job-order-modals/JobOrderDetailsModal';
+import { Button } from '@/components/ui/button';
+import { Pagination } from '@/components/ui/pagination';
 
 interface JobRequest {
         id: number;
@@ -61,6 +63,8 @@ const JobOrderTable = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [sortKey, setSortKey] = useState<'jo' | 'unit' | 'date' | 'status'>('jo');
     const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(25);
     
     const today = new Date().toISOString().split('T')[0];
 
@@ -121,8 +125,6 @@ const JobOrderTable = () => {
         setSelectedOrder(null); 
         
         setCompleteOrder(order);
-
-        console.log(order.date_started);
 
         if (order.date_started) {
             startDateValue = new Date(order.date_started).toISOString().split('T')[0];
@@ -192,6 +194,13 @@ const JobOrderTable = () => {
 
     const sortIndicator = (key: 'jo' | 'unit' | 'date' | 'status') =>
         sortKey === key ? (sortDir === 'asc' ? '↑' : '↓') : '↕';
+
+    useEffect(() => { setCurrentPage(1); }, [activeTab, searchQuery]);
+
+    const totalItems = sortedOrders.length;
+    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+    const safePage = Math.min(currentPage, totalPages);
+    const pagedOrders = sortedOrders.slice((safePage - 1) * pageSize, safePage * pageSize);
 
     useEffect(() => {
         const AssignedOrders = orders.filter(order => {
@@ -312,7 +321,7 @@ const JobOrderTable = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {sortedOrders.map((order) => (
+              {pagedOrders.map((order) => (
                 <tr key={order.id} className="hover:bg-slate-50/50 transition-colors group">
                   
                   {/* ID */}
@@ -401,17 +410,37 @@ const JobOrderTable = () => {
                 </td>
                 </tr>
               ))}
-              {sortedOrders.length === 0 && (
+              {totalItems === 0 && (
                 <tr>
                   <td colSpan={7} className="px-8 py-16 text-center">
-                    <div className="text-slate-400 text-sm font-medium">
-                      No job orders found{searchQuery ? ` matching "${searchQuery}"` : ''} in {activeTab}.
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="p-3 bg-slate-100 rounded-full text-slate-400">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-slate-500 font-bold text-sm">No job orders here yet</p>
+                        <p className="text-slate-400 text-xs font-medium mt-1">
+                          No job orders found{searchQuery ? ` matching "${searchQuery}"` : ''} in {activeTab}.
+                        </p>
+                      </div>
                     </div>
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
+        </div>
+        <div className="border-t border-slate-100">
+          <Pagination
+            currentPage={safePage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            totalItems={totalItems}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+          />
         </div>
       </div>
 
@@ -479,19 +508,19 @@ const JobOrderTable = () => {
 
                         {/* 2. Complete Order Action (Now Indigo) */}
                         <button 
-                            className="group w-full text-left px-4 py-4 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 hover:border-indigo-200 transition-all flex items-center gap-4 shadow-sm"
+                            className="group w-full text-left px-4 py-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 hover:border-emerald-200 transition-all flex items-center gap-4 shadow-sm"
                             onClick={() => {
                                 handleOpenCompleteModal(selectedOrder); 
                             }}
                         >
-                            <div className="p-2.5 bg-white rounded-lg text-indigo-600 shadow-sm group-hover:scale-110 transition-transform">
+                            <div className="p-2.5 bg-white rounded-lg text-emerald-600 shadow-sm group-hover:scale-110 transition-transform">
                                 <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
                                     <path d="M5 13l4 4L19 7" />
                                 </svg>
                             </div>
                             <div>
-                                <span className="text-indigo-900 font-extrabold text-sm block">Mark as Completed</span>
-                                <span className="text-indigo-600/70 text-[11px] font-medium block mt-0.5">Finalize and close this job order</span>
+                                <span className="text-emerald-900 font-extrabold text-sm block">Mark as Completed</span>
+                                <span className="text-emerald-600/70 text-[11px] font-medium block mt-0.5">Finalize and close this job order</span>
                             </div>
                         </button>
 
@@ -566,16 +595,20 @@ const JobOrderTable = () => {
             </div>
 
             <div className="flex items-center gap-3 pt-6 border-t border-slate-100">
-                <button 
+                <Button
+                    type="button"
+                    variant="ghost"
                     disabled={isSubmitting}
-                    onClick={() => setCompleteOrder(null)} 
-                    className="flex-1 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    onClick={() => setCompleteOrder(null)}
+                    className="flex-1 px-4 py-3 text-xs font-bold uppercase"
                 >
                     Cancel
-                </button>
-                <button 
+                </Button>
+                <Button
+                    type="button"
+                    variant="success"
                     disabled={isSubmitting}
-                    className="flex-2 px-4 py-3 text-xs font-bold uppercase tracking-widest text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg shadow-indigo-200 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
+                    className="flex-2 px-4 py-3 text-xs font-bold uppercase rounded-xl"
                     onClick={handleFinalSubmit}
                 >
                     {isSubmitting ? (
@@ -587,7 +620,7 @@ const JobOrderTable = () => {
                             Processing...
                         </span>
                     ) : "Submit Completion"}
-                </button>
+                </Button>
             </div>
         </div>
     </Modal>
@@ -626,18 +659,22 @@ const JobOrderTable = () => {
             </div>
 
             <div className="flex items-center gap-3 pt-6 border-t border-slate-100">
-                <button 
-                    onClick={() => setCancelOrder(null)} 
-                    className="flex-1 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 transition-colors"
+                <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setCancelOrder(null)}
+                    className="flex-1 px-4 py-3 text-xs font-bold uppercase"
                 >
                     Go Back
-                </button>
-                <button 
-                    className="flex-2 px-4 py-3 text-xs font-bold uppercase tracking-widest text-white bg-rose-500 hover:bg-rose-600 rounded-xl shadow-lg shadow-rose-200 transition-all active:scale-[0.98]"
+                </Button>
+                <Button
+                    type="button"
+                    variant="destructive"
+                    className="flex-2 px-4 py-3 text-xs font-bold uppercase rounded-xl"
                     onClick={handleCancelSubmit}
                 >
                     Confirm Cancellation
-                </button>
+                </Button>
             </div>
         </div>
     </Modal>

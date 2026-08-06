@@ -14,6 +14,8 @@ import { Personnel, InspectionFormData } from '@/app/types/JobRequest';
 import { useAuth } from '@/app/context/AuthContext';
 import { useToast } from '@/app/context/ToastContext';
 import { getErrorMessage } from '@/app/utils/errors';
+import { Button } from '@/components/ui/button';
+import { Pagination } from '@/components/ui/pagination';
 
 interface JobRequest {
   id: number;
@@ -64,6 +66,8 @@ const JobRequestTable = () => {
   const [selectedRequest, setSelectedRequest] = useState<JobRequest | null>(null);
   const [viewingRequest, setViewingRequest] = useState<JobRequest | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
   const [disapproveTarget, setDisapproveTarget] = useState<JobRequest | null>(null);
   const [disapproveReason, setDisapproveReason] = useState('');
@@ -107,11 +111,6 @@ const JobRequestTable = () => {
     
   }, []); 
 
-  if (viewingRequest) {
-    console.log(viewingRequest);
-    
-  }
-  
   const handleDisapproveRequest = (req: JobRequest) => {
     setDisapproveTarget(req);
     setDisapproveReason('');
@@ -254,6 +253,15 @@ const JobRequestTable = () => {
     sortKey === key ? (sortDir === 'asc' ? '↑' : '↓') : '↕';
 
   useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, searchQuery]);
+
+  const totalItems = sortedRequests.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const pagedRequests = sortedRequests.slice((safePage - 1) * pageSize, safePage * pageSize);
+
+  useEffect(() => {
     const hasForApproval = requests.some(r => r.status === 'For Approval');
     const hasPending = requests.some(r => r.status === 'Pending');
     const hasUnderInspection = requests.some(r => r.status === 'Under Inspection');
@@ -369,7 +377,7 @@ const JobRequestTable = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {sortedRequests.map((req) => (
+              {pagedRequests.map((req) => (
                 <tr key={req.id} className="hover:bg-slate-50/50 transition-colors group">
                   
                   {/* ID */}
@@ -430,23 +438,27 @@ const JobRequestTable = () => {
                     <div className="flex justify-end items-center">
                       {isUnitHead && req.status === 'For Approval' && req.unit?.id === user?.unit_id ? (
                         <div className="flex items-center gap-2">
-                          <button
+                          <Button
                             type="button"
+                            size="sm"
+                            variant="success"
+                            className="uppercase tracking-wider text-[11px] px-3 py-2"
                             onClick={() => handleApproveRequest(req)}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wider shadow-sm shadow-emerald-100 transition-all"
                           >
                             Approve
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             type="button"
+                            size="sm"
+                            variant="destructive"
+                            className="uppercase tracking-wider text-[11px] px-3 py-2"
                             onClick={() => {
                               setRejectTarget(req);
                               setRejectReason('');
                             }}
-                            className="bg-rose-500 hover:bg-rose-600 text-white px-3 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wider shadow-sm shadow-rose-100 transition-all"
                           >
                             Reject
-                          </button>
+                          </Button>
                         </div>
                       ) : isUnitUser ? (
                         <button
@@ -485,11 +497,19 @@ const JobRequestTable = () => {
                   </td>
                 </tr>
               ))}
-              {sortedRequests.length === 0 && (
+              {totalItems === 0 && (
                 <tr>
                   <td colSpan={7} className="px-8 py-16 text-center">
-                    <div className="text-slate-400 text-sm font-medium">
-                      No job requests found{searchQuery ? ` matching "${searchQuery}"` : ''} in {activeTab}.
+                    <div className="flex flex-col items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                      </svg>
+                      <div className="text-slate-500 text-sm font-semibold">No job requests found</div>
+                      <div className="text-slate-400 text-xs">
+                        {searchQuery
+                          ? `No results matching "${searchQuery}" in ${activeTab}.`
+                          : `There are no ${activeTab === 'All Requests' ? 'requests' : activeTab.toLowerCase()} to show.`}
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -497,6 +517,15 @@ const JobRequestTable = () => {
             </tbody>
           </table>
         </div>
+
+        <Pagination
+          currentPage={safePage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(size) => { setPageSize(size); setCurrentPage(1); }}
+        />
       </div>
 
       <RequestActionsModal

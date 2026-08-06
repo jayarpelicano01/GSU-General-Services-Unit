@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { API } from "@/app/utils/api/api";
+import { Pagination } from "@/components/ui/pagination";
 
 interface AwaitingUnit {
   unit_name: string;
@@ -34,6 +35,8 @@ const WaitingMaterialsTable = () => {
   const [requests, setRequests] = useState<AwaitingRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
   const fetchRequests = async () => {
     try {
@@ -67,6 +70,13 @@ const WaitingMaterialsTable = () => {
         .includes(query)
     );
   }, [requests, searchQuery]);
+
+  useEffect(() => { setCurrentPage(1); }, [searchQuery]);
+
+  const totalItems = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const paged = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   return (
     <div className="space-y-4">
@@ -126,7 +136,7 @@ const WaitingMaterialsTable = () => {
                   </td>
                 </tr>
               ) : (
-                filtered.map((req) => {
+                paged.map((req) => {
                   const unit = req.unit;
                   const unitName = unit ? `${unit.unit_name}${unit.unit_acronym ? ` (${unit.unit_acronym})` : ""}` : "—";
                   return (
@@ -156,6 +166,16 @@ const WaitingMaterialsTable = () => {
               )}
             </tbody>
           </table>
+        </div>
+        <div className="border-t border-slate-200">
+          <Pagination
+            currentPage={safePage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            totalItems={totalItems}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+          />
         </div>
       </div>
     </div>

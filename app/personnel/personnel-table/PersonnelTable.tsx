@@ -6,6 +6,7 @@ import Modal from "@/app/components/modal/modal";
 import ConfirmDialog from "@/app/components/confirm/Confirm";
 import { useToast } from "@/app/context/ToastContext";
 import { getErrorMessage } from "@/app/utils/errors";
+import { Pagination } from "@/components/ui/pagination";
 
 const FIELDS = [
   "Welding",
@@ -101,6 +102,8 @@ const PersonnelTable = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<(typeof STATUS_TABS)[number]>("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
   // Modal states
   const [showAddModal, setShowAddModal] = useState(false);
@@ -141,7 +144,14 @@ const PersonnelTable = () => {
       if (!query) return true;
       return fullName(p).toLowerCase().includes(query) || p.field.toLowerCase().includes(query);
     });
-  }, [personnel, activeTab, searchQuery]);
+    }, [personnel, activeTab, searchQuery]);
+
+  useEffect(() => { setCurrentPage(1); }, [activeTab, searchQuery]);
+
+  const totalItems = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const paged = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   // Add
   const handleOpenAdd = () => {
@@ -371,7 +381,7 @@ const PersonnelTable = () => {
                   </td>
                 </tr>
               ) : (
-                filtered.map((p) => (
+                paged.map((p) => (
                   <tr key={p.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-4 py-3.5 text-sm text-slate-500 font-medium">{p.id}</td>
                     <td className="px-4 py-3.5 text-sm font-semibold text-slate-800">{fullName(p)}</td>
@@ -420,6 +430,16 @@ const PersonnelTable = () => {
               )}
             </tbody>
           </table>
+        </div>
+        <div className="border-t border-slate-200">
+          <Pagination
+            currentPage={safePage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            totalItems={totalItems}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+          />
         </div>
       </div>
 

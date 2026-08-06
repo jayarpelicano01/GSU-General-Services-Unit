@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { API } from "@/app/utils/api/api";
 import { useRouter } from "next/navigation";
 import { CreateJobOrderModal } from "@/app/components/modal/job-order-modals/CreateJobOrderModal";
+import { Pagination } from "@/components/ui/pagination";
 
 interface PrRisUnit {
   unit_name: string;
@@ -76,6 +77,8 @@ const PrRisTable = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<(typeof STATUS_TABS)[number]>("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
   const hasSetDefaultTab = React.useRef(false);
   const [createJobOrderDoc, setCreateJobOrderDoc] = useState<PrRisDocument | null>(null);
 
@@ -123,6 +126,13 @@ const PrRisTable = () => {
       return [unit, field, work, type].join(" ").toLowerCase().includes(query);
     });
   }, [documents, activeTab, searchQuery]);
+
+  useEffect(() => { setCurrentPage(1); }, [activeTab, searchQuery]);
+
+  const totalItems = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const paged = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   return (
     <div className="space-y-4">
@@ -201,7 +211,7 @@ const PrRisTable = () => {
                   </td>
                 </tr>
               ) : (
-                filtered.map((doc) => {
+                paged.map((doc) => {
                   const unit = doc.job_request?.unit;
                   const unitName = unit ? `${unit.unit_name}${unit.unit_acronym ? ` (${unit.unit_acronym})` : ""}` : "—";
                   return (
@@ -254,6 +264,16 @@ const PrRisTable = () => {
               )}
             </tbody>
           </table>
+        </div>
+        <div className="border-t border-slate-200">
+          <Pagination
+            currentPage={safePage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            totalItems={totalItems}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+          />
         </div>
       </div>
 
