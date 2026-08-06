@@ -50,7 +50,7 @@ const AccomplishmentReport = ({selectedField, JobOrders, month, year}: Props) =>
     return (
         <div 
             style={{padding: "10mm 10mm 10mm 10mm"}} 
-            className=" print-header text-black font-sans w-[297mm] min-h-[210mm] mx-auto overflow-hidden"
+            className="print-header bg-white text-black font-sans w-[297mm] min-h-[210mm] mx-auto overflow-hidden"
             >
             <div className="flex justify-center items-center relative mb-2">
                 <Image 
