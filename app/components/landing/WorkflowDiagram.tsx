@@ -23,9 +23,9 @@ const workflowSteps: WorkflowStep[] = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
       </svg>
     ),
-    color: "text-amber-600",
-    bgColor: "bg-amber-50",
-    borderColor: "border-amber-200",
+    color: "text-amber-600 dark:text-amber-300",
+    bgColor: "bg-amber-50 dark:bg-amber-500/15",
+    borderColor: "border-amber-200 dark:border-amber-500/30",
     role: "UNIT STAFF",
   },
   {
@@ -37,9 +37,9 @@ const workflowSteps: WorkflowStep[] = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
       </svg>
     ),
-    color: "text-blue-600",
-    bgColor: "bg-blue-50",
-    borderColor: "border-blue-200",
+    color: "text-blue-600 dark:text-blue-300",
+    bgColor: "bg-blue-50 dark:bg-blue-500/15",
+    borderColor: "border-blue-200 dark:border-blue-500/30",
     role: "GSU STAFF",
   },
   {
@@ -52,9 +52,9 @@ const workflowSteps: WorkflowStep[] = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
       </svg>
     ),
-    color: "text-blue-600",
-    bgColor: "bg-blue-50",
-    borderColor: "border-blue-200",
+    color: "text-blue-600 dark:text-blue-300",
+    bgColor: "bg-blue-50 dark:bg-blue-500/15",
+    borderColor: "border-blue-200 dark:border-blue-500/30",
     role: "PERSONNEL",
   },
   {
@@ -66,9 +66,9 @@ const workflowSteps: WorkflowStep[] = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m-1.5 0h1.5m-18.375.75a.75.75 0 01-.75.75h-1.5a.75.75 0 01-.75-.75v-1.5a.75.75 0 01.75-.75H3m14.25 1.5a.75.75 0 00.75-.75v-1.5a.75.75 0 00-.75-.75h-1.5a.75.75 0 00-.75.75v1.5a.75.75 0 00.75.75h1.5m-1.5 11.25h-9.75c-.621 0-1.125.504-1.125 1.125v2.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125v-2.25c0-.621-.504-1.125-1.125-1.125zm-3.75-13.5h9a2.25 2.25 0 012.25 2.25v.75a2.25 2.25 0 01-2.25 2.25h-9a2.25 2.25 0 01-2.25-2.25v-.75a2.25 2.25 0 012.25-2.25z" />
       </svg>
     ),
-    color: "text-orange-600",
-    bgColor: "bg-orange-50",
-    borderColor: "border-orange-200",
+    color: "text-orange-600 dark:text-orange-300",
+    bgColor: "bg-orange-50 dark:bg-orange-500/15",
+    borderColor: "border-orange-200 dark:border-orange-500/30",
     role: "SUPPLY OFFICER",
   },
   {
@@ -80,9 +80,9 @@ const workflowSteps: WorkflowStep[] = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H6a3.375 3.375 0 00-3.375 3.375v11.25A3.375 3.375 0 006 19.5h7.5" />
       </svg>
     ),
-    color: "text-indigo-600",
-    bgColor: "bg-indigo-50",
-    borderColor: "border-indigo-200",
+    color: "text-indigo-600 dark:text-indigo-300",
+    bgColor: "bg-indigo-50 dark:bg-indigo-500/15",
+    borderColor: "border-indigo-200 dark:border-indigo-500/30",
     role: "GSU STAFF",
   },
   {
@@ -94,9 +94,9 @@ const workflowSteps: WorkflowStep[] = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
       </svg>
     ),
-    color: "text-emerald-600",
-    bgColor: "bg-emerald-50",
-    borderColor: "border-emerald-200",
+    color: "text-emerald-600 dark:text-emerald-300",
+    bgColor: "bg-emerald-50 dark:bg-emerald-500/15",
+    borderColor: "border-emerald-200 dark:border-emerald-500/30",
     role: "PERSONNEL",
   },
   {
@@ -108,9 +108,9 @@ const workflowSteps: WorkflowStep[] = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
       </svg>
     ),
-    color: "text-slate-600",
-    bgColor: "bg-slate-50",
-    borderColor: "border-slate-200",
+    color: "text-slate-600 dark:text-slate-400",
+    bgColor: "bg-slate-50 dark:bg-slate-800",
+    borderColor: "border-slate-200 dark:border-slate-700",
     role: "UNIT HEAD",
   },
 ];
@@ -141,13 +141,7 @@ const statsVariants: Variants = {
 
 export default function WorkflowDiagram() {
   return (
-    <section id="workflow" className="relative py-16 sm:py-24 bg-[#f8f9ff] overflow-hidden">
-      {/* Ambient background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-24 -right-24 w-80 h-80 bg-indigo-100/60 rounded-full blur-2xl animate-aurora" />
-        <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-emerald-50 rounded-full blur-2xl animate-float-slow" />
-      </div>
-
+    <section id="workflow" className="relative py-16 sm:py-24 bg-[#f8f9ff] dark:bg-slate-950 overflow-hidden">
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
@@ -157,11 +151,11 @@ export default function WorkflowDiagram() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-center max-w-2xl mx-auto mb-12 lg:mb-16"
         >
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 mb-4">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-4">
             The Complete GSU Workflow
           </h2>
-          <p className="text-lg text-slate-600">
-            Seven connected steps — each with clear ownership, audit trail, and digital documentation.
+          <p className="text-lg text-slate-600 dark:text-slate-400">
+            Seven connected steps, each with clear ownership, an audit trail, and digital documentation.
           </p>
         </motion.div>
 
@@ -174,7 +168,7 @@ export default function WorkflowDiagram() {
               whileInView={{ scaleX: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 1.4, ease: "easeInOut" }}
-              className="absolute top-10 left-0 right-0 h-0.5 origin-left bg-slate-200"
+              className="absolute top-10 left-0 right-0 h-0.5 origin-left bg-slate-200 dark:bg-slate-800"
             />
             {/* Animated progress fill on the line */}
             <motion.div
@@ -213,7 +207,7 @@ export default function WorkflowDiagram() {
                       <div className="absolute inset-0 rounded-full border-4 border-current animate-ping opacity-75" style={{ borderColor: step.color.replace('text-', '') }} />
                     )}
                     {/* Hover ring */}
-                    <div className="absolute -inset-2 rounded-full border-2 border-transparent group-hover:border-indigo-200 transition-colors duration-300" />
+                    <div className="absolute -inset-2 rounded-full border-2 border-transparent group-hover:border-indigo-200 dark:group-hover:border-indigo-500/30 transition-colors duration-300" />
                   </motion.div>
 
                   {/* Role Badge */}
@@ -222,12 +216,12 @@ export default function WorkflowDiagram() {
                   </span>
 
                   {/* Title */}
-                  <h3 className="mt-3 text-center text-sm font-bold text-slate-900 max-w-[140px] group-hover:text-indigo-600 transition-colors duration-200">
+                  <h3 className="mt-3 text-center text-sm font-bold text-slate-900 dark:text-slate-100 max-w-[140px] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200">
                     {step.title}
                   </h3>
 
                   {/* Description */}
-                  <p className="mt-2 text-center text-[11px] text-slate-500 max-w-[140px] leading-snug">
+                  <p className="mt-2 text-center text-[11px] text-slate-500 dark:text-slate-400 max-w-[140px] leading-snug">
                     {step.description}
                   </p>
                 </motion.div>
@@ -251,7 +245,7 @@ export default function WorkflowDiagram() {
                 variants={itemVariants}
                 whileHover={{ x: 6 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className="flex gap-4 p-4 bg-white rounded-xl border border-slate-200 hover:border-indigo-200 hover:shadow-md transition-colors duration-200 group"
+                className="flex gap-4 p-4 bg-white rounded-xl border border-slate-200 hover:border-indigo-200 hover:shadow-md transition-colors duration-200 group dark:bg-slate-900 dark:border-slate-800 dark:hover:border-indigo-500/30 dark:hover:shadow-none"
               >
                 {/* Step Indicator */}
                 <div className="flex flex-col items-center shrink-0">
@@ -264,7 +258,7 @@ export default function WorkflowDiagram() {
                     </span>
                   </motion.div>
                   {index < workflowSteps.length - 1 && (
-                    <div className="w-0.5 h-16 bg-slate-200 mt-2" />
+                    <div className="w-0.5 h-16 bg-slate-200 dark:bg-slate-800 mt-2" />
                   )}
                 </div>
 
@@ -274,9 +268,9 @@ export default function WorkflowDiagram() {
                     <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full ${step.bgColor} ${step.color}`}>
                       {step.role}
                     </span>
-                    <h3 className="text-sm font-bold text-slate-900">{step.title}</h3>
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">{step.title}</h3>
                   </div>
-                  <p className="text-[12px] text-slate-500 leading-snug">{step.description}</p>
+                  <p className="text-[12px] text-slate-500 dark:text-slate-400 leading-snug">{step.description}</p>
                 </div>
               </motion.article>
             ))}
@@ -304,12 +298,12 @@ export default function WorkflowDiagram() {
               viewport={{ once: true }}
               transition={{ type: "spring", stiffness: 200, damping: 18, delay: 0.1 }}
               whileHover={{ y: -4 }}
-              className={`p-4 rounded-xl text-center ${stat.color}-50 border ${stat.color}-100 hover:shadow-md transition-shadow duration-200`}
+              className={`p-4 rounded-xl text-center bg-${stat.color}-50 border border-${stat.color}-100 hover:shadow-md transition-shadow duration-200 dark:bg-${stat.color}-500/15 dark:border-${stat.color}-500/30 dark:hover:shadow-none`}
             >
-              <div className={`text-3xl font-extrabold text-${stat.color}-600`}>
+              <div className={`text-3xl font-bold text-${stat.color}-600 dark:text-${stat.color}-400`}>
                 {stat.value}
               </div>
-              <div className="text-sm font-medium text-slate-600 mt-1">
+              <div className="text-sm font-medium text-slate-600 dark:text-slate-400 mt-1">
                 {stat.label}
               </div>
             </motion.div>

@@ -18,9 +18,9 @@ const features: Feature[] = [
       </svg>
     ),
     title: "Submit Requests",
-    description: "Unit staff create detailed job requests with field of work, specifications, estimated duration, and material requirements — all in a guided multi-step form.",
-    color: "text-indigo-600",
-    bgColor: "bg-indigo-50",
+    description: "Unit staff create detailed job requests with field of work, specifications, estimated duration, and material requirements, all in a guided multi-step form.",
+    color: "text-indigo-600 dark:text-indigo-300",
+    bgColor: "bg-indigo-50 dark:bg-indigo-500/15",
   },
   {
     icon: (
@@ -30,9 +30,9 @@ const features: Feature[] = [
       </svg>
     ),
     title: "Inspect & Approve",
-    description: "GSU staff schedule inspections, assign personnel, record assessment results, and determine material availability — with full audit trail and digital sign-off.",
-    color: "text-blue-600",
-    bgColor: "bg-blue-50",
+    description: "GSU staff schedule inspections, assign personnel, record assessment results, and determine material availability, with full audit trail and digital sign-off.",
+    color: "text-blue-600 dark:text-blue-300",
+    bgColor: "bg-blue-50 dark:bg-blue-500/15",
   },
   {
     icon: (
@@ -42,8 +42,8 @@ const features: Feature[] = [
     ),
     title: "Order & Complete",
     description: "Convert approved requests to job orders, assign personnel, track execution progress, and generate completion reports with printable documentation.",
-    color: "text-emerald-600",
-    bgColor: "bg-emerald-50",
+    color: "text-emerald-600 dark:text-emerald-300",
+    bgColor: "bg-emerald-50 dark:bg-emerald-500/15",
   },
 ];
 
@@ -64,13 +64,7 @@ const headerVariants: Variants = {
 
 export default function Features() {
   return (
-    <section id="features" className="relative py-16 sm:py-24 bg-white overflow-hidden">
-      {/* Ambient background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-96 h-72 bg-indigo-50 rounded-full blur-2xl animate-aurora" />
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-violet-50 rounded-full blur-2xl animate-float-slow" />
-      </div>
-
+    <section id="features" className="relative py-16 sm:py-24 bg-white dark:bg-slate-900 overflow-hidden">
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
@@ -80,11 +74,11 @@ export default function Features() {
           viewport={{ once: true }}
           className="text-center max-w-2xl mx-auto mb-16"
         >
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 mb-4">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-4">
             Built for Your Workflow
           </h2>
-          <p className="text-lg text-slate-600">
-            Every feature designed around the actual GSU process — no forced workflows, no missing steps.
+          <p className="text-lg text-slate-600 dark:text-slate-400">
+            Every feature designed around the actual GSU process, with no forced workflows and no missing steps.
           </p>
         </motion.div>
 
@@ -102,7 +96,7 @@ export default function Features() {
               variants={itemVariants}
               whileHover={{ y: -6 }}
               transition={{ type: "spring", stiffness: 300, damping: 22 }}
-              className="group relative p-6 sm:p-8 bg-white rounded-2xl border border-slate-200 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-100 transition-colors duration-300"
+              className="group relative p-6 sm:p-8 bg-white rounded-2xl border border-slate-200 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-100 transition-colors duration-300 dark:bg-slate-800/50 dark:border-slate-800 dark:hover:border-indigo-500/30 dark:hover:shadow-none"
             >
               {/* Top accent line on hover */}
               <span className="absolute top-0 left-6 right-6 h-0.5 bg-indigo-500 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300" />
@@ -113,12 +107,12 @@ export default function Features() {
               </div>
 
               {/* Title */}
-              <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors duration-200">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200">
                 {feature.title}
               </h3>
 
               {/* Description */}
-              <p className="text-slate-600 leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
                 {feature.description}
               </p>
             </motion.article>
@@ -133,7 +127,7 @@ export default function Features() {
           transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
           className="mt-16"
         >
-          <h3 className="text-lg font-semibold text-slate-900 mb-6 text-center">Also Includes</h3>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-6 text-center">Also Includes</h3>
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -152,10 +146,10 @@ export default function Features() {
                 variants={itemVariants}
                 whileHover={{ y: -4 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className="group p-4 bg-slate-50 rounded-xl border border-transparent hover:border-indigo-100 hover:bg-white hover:shadow-md hover:shadow-indigo-100 transition-all duration-200 cursor-default"
+                className="group p-4 bg-slate-50 rounded-xl border border-transparent hover:border-indigo-100 hover:bg-white hover:shadow-md hover:shadow-indigo-100 transition-all duration-200 cursor-default dark:bg-slate-800 dark:hover:border-indigo-500/30 dark:hover:bg-slate-800 dark:hover:shadow-none"
               >
                 <span className="text-2xl mb-2 block group-hover:scale-125 group-hover:-rotate-6 transition-transform duration-300">{item.icon}</span>
-                <span className="text-sm font-medium text-slate-700">{item.label}</span>
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{item.label}</span>
               </motion.div>
             ))}
           </motion.div>
