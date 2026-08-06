@@ -39,19 +39,19 @@ export default function Footer() {
                 </svg>
               </div>
               <div>
-                <h3 className="text-white font-extrabold text-lg">GSU System</h3>
+                <h3 className="text-white font-bold text-lg">GSU System</h3>
                 <p className="text-[11px] text-slate-400 uppercase tracking-wider">Job Requesting & Ordering</p>
               </div>
             </div>
             <p className="text-sm text-slate-400 leading-relaxed max-w-xs">
               Streamlining facility maintenance workflows for the General Services Unit.
-              From request to completion — transparent, accountable, efficient.
+              From request to completion, transparent, accountable, and efficient.
             </p>
           </div>
 
           {/* System Links */}
           <nav aria-label="System Navigation">
-            <h4 className="text-white font-semibold mb-4">System</h4>
+            <h4 className="text-white font-bold mb-4">System</h4>
             <ul className="space-y-3">
               {footerLinks.system.map((link) => (
                 <li key={link.label}>
@@ -69,7 +69,7 @@ export default function Footer() {
 
           {/* Resources */}
           <nav aria-label="Resources">
-            <h4 className="text-white font-semibold mb-4">Resources</h4>
+            <h4 className="text-white font-bold mb-4">Resources</h4>
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.label}>
@@ -87,7 +87,7 @@ export default function Footer() {
 
           {/* Support */}
           <nav aria-label="Support">
-            <h4 className="text-white font-semibold mb-4">Support</h4>
+            <h4 className="text-white font-bold mb-4">Support</h4>
             <ul className="space-y-3">
               {footerLinks.support.map((link) => (
                 <li key={link.label}>
